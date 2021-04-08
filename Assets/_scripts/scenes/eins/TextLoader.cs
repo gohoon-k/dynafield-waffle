@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public class EinsTextLoader : MonoBehaviour {
+public class TextLoader : MonoBehaviour {
     
     public Text text;
     private Animator _textAnimator;
