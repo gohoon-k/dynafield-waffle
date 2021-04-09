@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,9 +22,16 @@ public class ScreenTranslator : MonoBehaviour {
         StartCoroutine(HideTransition());
     }
 
-    private IEnumerator HideTransition() {
+    public IEnumerator HideTransition() {
         yield return new WaitForSeconds(0.75f);
         _transitionImage.rectTransform.anchoredPosition = new Vector2(0f, -1440f);
+    }
+
+    public IEnumerator ShowTransition(Action finishAction) {
+        _transitionImage.rectTransform.anchoredPosition = new Vector2(0, 0);
+        _transitionAnimator.Play("ui_fade_in");
+        yield return new WaitForSeconds(0.75f);
+        finishAction();
     }
     
 }
