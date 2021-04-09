@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraAnimationPlayer : MonoBehaviour {
@@ -13,5 +11,5 @@ public class CameraAnimationPlayer : MonoBehaviour {
             GetComponent<Animator>().Play("intro_camera");
         }    
     }
-    
+
 }
