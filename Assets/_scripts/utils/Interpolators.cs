@@ -3,6 +3,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using UnityEditor;
 
 /// <summary>
 /// Coroutine helpers for interpolators
@@ -21,20 +22,16 @@ public class Interpolators {
         LinearCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
         EaseOutCurve = new AnimationCurve();
-        EaseOutCurve.AddKey(new Keyframe(0f, 0f) {
-            inTangent = 2, outTangent = 2, tangentMode = 0
-        });
-        EaseOutCurve.AddKey(new Keyframe(1f, 1f) {
-            inTangent = 0, outTangent = 0, tangentMode = 0
-        });
+        EaseOutCurve.AddKey(new Keyframe(0f, 0f) { inTangent = 2, outTangent = 2 });
+        EaseOutCurve.AddKey(new Keyframe(1f, 1f) { inTangent = 0, outTangent = 0 });
+        AnimationUtility.SetKeyLeftTangentMode(EaseOutCurve, 0, 0);
+        AnimationUtility.SetKeyLeftTangentMode(EaseOutCurve, 1, 0);
 
         EaseInCurve = new AnimationCurve();
-        EaseInCurve.AddKey(new Keyframe(0f, 0f) {
-            inTangent = 0, outTangent = 0, tangentMode = 0
-        });
-        EaseInCurve.AddKey(new Keyframe(1f, 1f) {
-            inTangent = 2, outTangent = 2, tangentMode = 0
-        });
+        EaseInCurve.AddKey(new Keyframe(0f, 0f) { inTangent = 0, outTangent = 0 });
+        EaseInCurve.AddKey(new Keyframe(1f, 1f) { inTangent = 2, outTangent = 2 });
+        AnimationUtility.SetKeyLeftTangentMode(EaseInCurve, 0, 0);
+        AnimationUtility.SetKeyLeftTangentMode(EaseInCurve, 1, 0);
         
         EaseInOutCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     }
