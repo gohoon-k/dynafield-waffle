@@ -12,7 +12,7 @@ public class TextLoader : MonoBehaviour {
 
     void Start() {
         LoadingTexts texts = JsonUtility.FromJson<LoadingTexts>(
-            (Resources.Load("texts/eins", typeof(TextAsset)) as TextAsset).ToString()
+            ((TextAsset) Resources.Load("texts/eins", typeof(TextAsset))).ToString()
         );
         text.text = texts.texts[Random.Range(0, texts.texts.Length)];
 
