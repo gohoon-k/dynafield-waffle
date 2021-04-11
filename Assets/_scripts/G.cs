@@ -13,6 +13,7 @@ public static class G
         public const string Speed = "speed";
 
         public const string Energy = "energy";
+        public const string CoolDown = "cool_down";
 
         public const string BestScore = "score_{0}_{1}";
         public const string BestAccuracy = "accuracy_{0}_{1}";
