@@ -1,5 +1,6 @@
-public static class G
-{
+public static class G {
+
+    public static Track[] tracks;
     
     public static class Keys {
 
@@ -83,6 +84,13 @@ public static class G
         public static int CountOfBad = 0;
         public static int CountOfError = 0;
 
+    }
+
+    public class Track {
+        public string Title;
+        public string Artist;
+        public string Id;
+        public int[] Difficulty;
     }
     
 }
