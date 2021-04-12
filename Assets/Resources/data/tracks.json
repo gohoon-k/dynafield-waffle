@@ -1,0 +1,18 @@
+﻿{
+  "tracks": [
+    {
+      "internal_name": "art_for_rest",
+      "title": "art for rest",
+      "artist": "arforest",
+      "id": 0,
+      "difficulty": [6, 9]
+    },
+    {
+      "internal_name": "awaken",
+      "title": "awaken",
+      "artist": "plum",
+      "id": 1,
+      "difficulty": [3, 8]
+    }
+  ]
+}
