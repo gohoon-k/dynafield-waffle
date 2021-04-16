@@ -5,14 +5,16 @@
       "title": "art for rest",
       "artist": "arforest",
       "id": 0,
-      "difficulty": [6, 9]
+      "difficulty": [6, 9],
+      "length": "3:17"
     },
     {
       "internal_name": "awaken",
       "title": "awaken",
       "artist": "plum",
       "id": 1,
-      "difficulty": [3, 8]
+      "difficulty": [3, 8],
+      "length": "2:32"
     }
   ]
 }
