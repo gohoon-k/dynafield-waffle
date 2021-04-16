@@ -1,3 +1,5 @@
+using System;
+
 public static class G {
 
     public static Track[] tracks;
@@ -19,6 +21,7 @@ public static class G {
         public const string BestScore = "score_{0}_{1}";
         public const string BestAccuracy = "accuracy_{0}_{1}";
         public const string SuperPlay = "super_play_{0}_{1}";
+        public const string PlayTimes = "play_time_{0}_{1}";
 
         public static string FormatKey(string key) {
             return string.Format(key, PlaySettings.TrackId, PlaySettings.Difficulty);
@@ -35,22 +38,25 @@ public static class G {
 
     public static class PlaySettings {
 
-        public static int TrackId = -1;
+        public static int TrackId = 0;
 
         public static int Difficulty = 0;
         public static bool NotifyLineMove = false;
         public static bool ShowEarlyLate = false;
 
-        public static float Sync = 0;
-        public static int Speed = 4;
+        public static float Sync = 165;
+        public static int DisplaySpeed = 3;
 
+        public static bool AutoPlay = true;
+
+        public static float Speed => DisplaySpeed / 200f;
     }
 
     public static class InternalSettings {
 
-        public static float[] JudgeOfClick = { 0.5f, 0.67f, 0.73f, 0.85f };
-        public static float[] JudgeOfSlide = { 0.73f, 0.73f, 0.9f, 0.9f };
-        public static float[] JudgeOfHold = { 0.67f, 0.73f, 0.85f, 0.92f };
+        public static float[] JudgeOfClick = { 0.2f, 0.08f, 0.06f };
+        public static float[] JudgeOfSlide = { 0.2f, 0.08f, 0.08f };
+        public static float[] JudgeOfHold = { 0.50f, 0.80f, 0.90f };
 
         public static float[] ScoreRatioByJudges = { 1f, 1f, 0.75f, 0.25f, 0f };
         public static float[] AccuracyRatioByJudges = { 1f, 0.75f, 0.3f, 0.1f, 0f };
@@ -59,19 +65,22 @@ public static class G {
 
     public static class InGame {
 
+        public static bool PreparePause = false;
         public static bool Paused = false;
         public static bool CanBePaused = true;
+        public static bool CanBeResumed = false;
 
         public static bool ReadyAnimated = false;
 
-        public static int Time = 0;
+        public static float Time = 0;
 
         public static int CountOfNotes = 0;
         public static int ScorePerNote = 0;
 
         public static float ScoreByJudge = 0;
         public static float ScoreByCombo = 0;
-        public static float TotalScore = 0;
+        
+        public static float TotalScore => ScoreByJudge + ScoreByCombo;
 
         public static float Accuracy = 0;
         
@@ -84,13 +93,35 @@ public static class G {
         public static int CountOfBad = 0;
         public static int CountOfError = 0;
 
+        public static void Init() {
+            Time = 0;
+            ScoreByJudge = 0;
+            ScoreByCombo = 0;
+            Accuracy = 0;
+            Combo = 0;
+            MaxCombo = 0;
+            CountOfAccuracyPerfect = 0;
+            CountOfPerfect = 0;
+            CountOfGreat = 0;
+            CountOfBad = 0;
+            CountOfError = 0;
+        }
+
     }
 
+    [Serializable]
+    public class Tracks {
+        public Track[] tracks;
+    }
+
+    [Serializable]
     public class Track {
-        public string Title;
-        public string Artist;
-        public string Id;
-        public int[] Difficulty;
+        public string internalName;
+        public string title;
+        public string artist;
+        public string id;
+        public int[] difficulty;
+        public string length;
     }
     
 }
