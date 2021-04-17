@@ -12,6 +12,7 @@ public class UserInterfaceUpdater : MonoBehaviour {
     public Text difficulty;
 
     public Image background;
+    public Image backgroundBright;
 
     public Text preparePauseInfo;
 
@@ -40,6 +41,10 @@ public class UserInterfaceUpdater : MonoBehaviour {
             (Sprite) Resources.Load($"textures/tracks/track_{G.Tracks[G.PlaySettings.TrackId].internal_name}",
                 typeof(Sprite));
         
+        backgroundBright.sprite =
+            (Sprite) Resources.Load($"textures/tracks/track_{G.Tracks[G.PlaySettings.TrackId].internal_name}_bright",
+                typeof(Sprite));
+
         _retryInfoAnimator = retryInfo.gameObject.GetComponent<Animator>();
     }
 
