@@ -3,11 +3,11 @@ using UnityEngine;
 
 public static class G {
 
-    public static Track[] tracks;
+    public static Track[] Tracks;
     
     public static void InitTracks() {
-        if (tracks != null) return;
-        tracks = JsonUtility.FromJson<G.Tracks>(Resources.Load("data/tracks", typeof(TextAsset)).ToString()).tracks;
+        if (Tracks != null) return;
+        Tracks = JsonUtility.FromJson<TrackList>(Resources.Load("data/tracks", typeof(TextAsset)).ToString()).tracks;
     }
     
     public static class Keys {
@@ -116,7 +116,7 @@ public static class G {
     }
 
     [Serializable]
-    public class Tracks {
+    public class TrackList {
         public Track[] tracks;
     }
 
@@ -128,7 +128,6 @@ public static class G {
         public string id;
         public int[] difficulty;
         public string length;
-        public int end_margin;
     }
     
 }
