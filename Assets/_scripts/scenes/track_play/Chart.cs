@@ -7,7 +7,7 @@ class Chart {
     public MoveX[] move_x;
     public Zoom[] zoom;
 
-    public int end_margin;
+    public float end_margin;
 
     [System.Serializable]
     public class Note{
