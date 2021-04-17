@@ -118,7 +118,7 @@ public class ChartPlayer : MonoBehaviour {
         }
 
         _audio = GetComponent<AudioSource>();
-        _audio.clip = (AudioClip) Resources.Load("tracks/art_for_rest", typeof(AudioClip));
+        _audio.clip = (AudioClip) Resources.Load($"tracks/{G.Tracks[G.PlaySettings.TrackId].internal_name}", typeof(AudioClip));
 
         Time.timeScale = 1.0f;
 
