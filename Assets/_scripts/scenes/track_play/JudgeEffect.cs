@@ -37,7 +37,6 @@ public class JudgeEffect : MonoBehaviour {
     }
 
     void Update() {
-        
         if (_startFadeOut) {
             _startFadeOut = false;
             StartCoroutine(Interpolators.Linear(1, 0, 0.25f,
