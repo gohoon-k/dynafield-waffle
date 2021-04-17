@@ -267,16 +267,13 @@ public class ChartPlayer : MonoBehaviour {
 
         var lastFrame = Math.Ceiling(_chart.chart[G.InGame.CountOfNotes - 1].t) * constants.placingPrecision;
 
-        // var next60FrameTime = 0f;
-
         var diffBetweenSpeeds = new List<List<float>>();
         var lastSpeedFrame = 0;
 
         for (var frame = 0; frame <= lastFrame; frame++) {
             var time = frame / constants.placingPrecision;
 
-            if (currentSpeedId < _chart.speed.Length && _chart.speed[currentSpeedId].t <= time /*next60FrameTime &&
-                next60FrameTime <= time*/) {
+            if (currentSpeedId < _chart.speed.Length && _chart.speed[currentSpeedId].t <= time) {
                 diffBetweenSpeeds.Add(new List<float> {frame - lastSpeedFrame, currentSpeed});
 
                 currentSpeed = _chart.speed[currentSpeedId].s;
@@ -284,15 +281,6 @@ public class ChartPlayer : MonoBehaviour {
 
                 currentSpeedId++;
             }
-
-            // var timeFrame = 0;
-            //
-            // if (next60FrameTime <= time) {
-            //     while (next60FrameTime <= time) {
-            //         timeFrame++;
-            //         next60FrameTime = timeFrame / 60f;
-            //     }
-            // }
 
             var loop = 0;
             while (currentNoteId < G.InGame.CountOfNotes && _chart.chart[currentNoteId].t <= time) {
@@ -423,10 +411,10 @@ public class ChartPlayer : MonoBehaviour {
 
                 StartCoroutine(DelayResume());
             } else {
-                if (G.InGame.CanBeResumed) {
-                    StartCoroutine(Ready());
-                    scripts.userInterfaceUpdater.ShowPauseMenu(false);
-                }
+                if (!G.InGame.CanBeResumed) return;
+                
+                StartCoroutine(Ready());
+                scripts.userInterfaceUpdater.ShowPauseMenu(false);
             }
         }
     }
