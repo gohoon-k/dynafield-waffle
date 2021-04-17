@@ -7,7 +7,7 @@ public class InputDetector : MonoBehaviour {
 
     public ScreenTranslator translator;
     
-    private void Update() {
+    void Update() {
 
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Application.Quit();
