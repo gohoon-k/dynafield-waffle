@@ -1,8 +1,14 @@
 using System;
+using UnityEngine;
 
 public static class G {
 
     public static Track[] tracks;
+    
+    public static void InitTracks() {
+        if (tracks != null) return;
+        tracks = JsonUtility.FromJson<G.Tracks>(Resources.Load("data/tracks", typeof(TextAsset)).ToString()).tracks;
+    }
     
     public static class Keys {
 
@@ -31,7 +37,7 @@ public static class G {
 
     public static class Items {
 
-        public static int Energy = 0;
+        public static int Energy = 3;
         public static long CoolDown = -1;
 
     }
@@ -40,14 +46,14 @@ public static class G {
 
         public static int TrackId = 0;
 
-        public static int Difficulty = 0;
+        public static int Difficulty = 1;
         public static bool NotifyLineMove = false;
         public static bool ShowEarlyLate = false;
 
         public static float Sync = 165;
         public static int DisplaySpeed = 3;
 
-        public static bool AutoPlay = true;
+        public static bool AutoPlay = false;
 
         public static float Speed => DisplaySpeed / 200f;
     }
@@ -116,12 +122,13 @@ public static class G {
 
     [Serializable]
     public class Track {
-        public string internalName;
+        public string internal_name;
         public string title;
         public string artist;
         public string id;
         public int[] difficulty;
         public string length;
+        public int end_margin;
     }
     
 }
