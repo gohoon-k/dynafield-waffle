@@ -120,10 +120,9 @@ public class ChartPlayer : MonoBehaviour {
         _audio = GetComponent<AudioSource>();
         _audio.clip = (AudioClip) Resources.Load($"tracks/{G.Tracks[G.PlaySettings.TrackId].internal_name}", typeof(AudioClip));
 
-        Time.timeScale = 1.0f;
-
         animators.foreground.Play("ingame_foreground_fade_in", -1, 0);
         StartCoroutine(Intro());
+        
     }
 
     // Update is called once per frame
