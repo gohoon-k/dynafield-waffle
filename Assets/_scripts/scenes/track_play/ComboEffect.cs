@@ -20,13 +20,13 @@ public class ComboEffect : MonoBehaviour {
     }
 
     // Update is called once per frame
-    // void Update()
-    // {
-    //     if (G.InGame.Combo > 0 && G.InGame.Combo > _currentStep * period && G.InGame.Combo / period != _currentStep - 1) {
-    //         _textMesh.text = $"{_currentStep * period}";
-    //         _effectMesh.text = $"{_currentStep * period}";
-    //         _currentStep++;
-    //         _animator.Play("ingame_combo_effect", -1, 0);
-    //     }
-    // }
+    void Update()
+    {
+        if (G.InGame.Combo > 0 && G.InGame.Combo > _currentStep * period && G.InGame.Combo / period != _currentStep - 1) {
+            _textMesh.text = $"{_currentStep * period}";
+            _effectMesh.text = $"{_currentStep * period}";
+            _currentStep++;
+            _animator.Play("ingame_combo_effect", -1, 0);
+        }
+    }
 }
