@@ -2553,10 +2553,12 @@ MonoBehaviour:
     main: {fileID: 1601456207}
   constants:
     placingPrecision: 600
+    viewMode: 1
   notePrefabs:
     click: {fileID: 4191954091923668995, guid: c10a19e4a1a23504382f17f7fa6bbf06, type: 3}
     slide: {fileID: 3189764165758293691, guid: 42c59fe0bf6a4cc44af6c8ad2a7fcc78, type: 3}
     hold: {fileID: 4302255478716996725, guid: 65ac6be67ae0b424f9cf515a3c294042, type: 3}
+    swipe: {fileID: 6392525985862173633, guid: f9d6e2dea23763448bdf3ce03966c263, type: 3}
   animators:
     foreground: {fileID: 610029951}
     ready: {fileID: 2086782848}
