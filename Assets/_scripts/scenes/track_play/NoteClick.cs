@@ -20,14 +20,10 @@ public class NoteClick : Note {
     }
 
     protected override void PlayErrorAnim() {
-        // animator.Play("click_error_anim", -1, 0);
-        // StartCoroutine(DestroySelf());
         AlphaAnim(_renderer);
     }
 
     protected override void PlayDestroyAnim() {
-        // animator.Play("click_destroy_anim", -1, 0);
-        // StartCoroutine(DestroySelf());
         ScaleAnim();
         AlphaAnim(_renderer);
     }

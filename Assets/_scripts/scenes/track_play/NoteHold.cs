@@ -68,7 +68,6 @@ public class NoteHold : Note {
     }
 
     protected override void PlayErrorAnim() {
-        // animator.Play("hold_deactivated_anim", -1, 0);
         DeactivateAnim(startRenderer);
         DeactivateAnim(holdRenderer);
         DeactivateAnim(endRenderer);
@@ -82,8 +81,6 @@ public class NoteHold : Note {
     }
 
     private void PlayRemoveAnim() {
-        // animator.Play("hold_remove_anim", -1, 0);
-        // StartCoroutine(DestroySelf());
         AlphaAnim(startRenderer);
         AlphaAnim(holdRenderer);
         AlphaAnim(endRenderer);
