@@ -16,6 +16,7 @@ public class NotePrefabs {
     public GameObject click;
     public GameObject slide;
     public GameObject hold;
+    public GameObject swipe;
 }
 
 [Serializable]
@@ -36,6 +37,7 @@ public class Animators {
 [Serializable]
 public class Constants {
     public float placingPrecision;
+    public bool viewMode;
 }
 
 public class ChartPlayer : MonoBehaviour {
@@ -104,7 +106,7 @@ public class ChartPlayer : MonoBehaviour {
         G.InGame.CountOfNotes = _chart.chart.Length;
         G.InGame.CanBePaused = false;
 
-        _loadableNoteCount = _loadableNoteCountsPerSpeed[G.PlaySettings.DisplaySpeed];
+        _loadableNoteCount = (Application.isEditor && constants.viewMode) ? 2000 : _loadableNoteCountsPerSpeed[G.PlaySettings.DisplaySpeed];
 
         _positions = new float[G.InGame.CountOfNotes];
         _holdHeights = new float[G.InGame.CountOfNotes];
@@ -209,6 +211,7 @@ public class ChartPlayer : MonoBehaviour {
             0 => notePrefabs.click,
             1 => notePrefabs.slide,
             2 => notePrefabs.hold,
+            3 => notePrefabs.swipe,
             _ => notePrefabs.click
         };
 
