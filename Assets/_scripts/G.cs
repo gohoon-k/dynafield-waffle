@@ -60,9 +60,10 @@ public static class G {
 
     public static class InternalSettings {
 
-        public static float[] JudgeOfClick = { 0.2f, 0.08f, 0.06f };
-        public static float[] JudgeOfSlide = { 0.2f, 0.08f, 0.08f };
-        public static float[] JudgeOfHold = { 0.50f, 0.80f, 0.90f };
+        public static readonly float[] JudgeOfClick = { 0.2f, 0.08f, 0.06f };
+        public static readonly float[] JudgeOfSlide = { 0.2f, 0.08f, 0.08f };
+        public static readonly float[] JudgeOfHold = { 0.50f, 0.80f, 0.90f };
+        public static readonly float[] JudgeOfSwipe = { 0.3f, 0.15f, 0.1f };
 
         public static float[] ScoreRatioByJudges = { 1f, 1f, 0.75f, 0.25f, 0f };
         public static float[] AccuracyRatioByJudges = { 1f, 0.75f, 0.3f, 0.1f, 0f };
