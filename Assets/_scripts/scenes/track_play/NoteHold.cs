@@ -163,7 +163,7 @@ public class NoteHold : Note {
         }
     }
 
-    protected override void Judge() {
+    protected override void Judge(float judgeTime = -1) {
         if (judged) return;
 
         StartCoroutine(GiveJudged());

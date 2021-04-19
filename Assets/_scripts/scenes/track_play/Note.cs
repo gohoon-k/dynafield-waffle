@@ -52,7 +52,7 @@ public abstract class Note : MonoBehaviour {
         return xPos / 100f + sizeInWorld > inputX && xPos / 100f - sizeInWorld < inputX;
     }
 
-    protected virtual void Judge() {
+    protected virtual void Judge(float judgeTime = -1f) {
         if (judged) return;
 
         transform.parent = parent.GetNotesHolder().transform.GetChild(1);
@@ -62,9 +62,9 @@ public abstract class Note : MonoBehaviour {
         PlayDestroyAnim();
 
         StartCoroutine(GiveDestroyed());
-        
-        var result = DifferenceToJudge(Math.Abs(G.InGame.Time - time));
-        
+
+        var result = DifferenceToJudge(judgeTime < 0 ? Math.Abs(G.InGame.Time - time) : Math.Abs(judgeTime - time));
+
         CreateJudgeEffect(result);
         
         CreateDestroyEffect(result);
