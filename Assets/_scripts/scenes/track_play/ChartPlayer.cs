@@ -77,6 +77,9 @@ public class ChartPlayer : MonoBehaviour {
     private int _currentMoveYPos;
     private int _currentMoveZPos;
 
+    private readonly List<List<float>> _differenceBetweenSpeeds = new List<List<float>>();
+    private float _lastSpeedTime = 0f;
+
     private AudioSource _audio;
 
     private readonly AnimationCurve[] _curves = {
@@ -147,6 +150,10 @@ public class ChartPlayer : MonoBehaviour {
                 if (_chart.speed != null &&
                     _currentSpeedPos < _chart.speed.Length &&
                     _chart.speed[_currentSpeedPos].t <= G.InGame.Time) {
+                    
+                    _differenceBetweenSpeeds.Add(new List<float> {G.InGame.Time - _lastSpeedTime, _currentSpeed});
+                    _lastSpeedTime = G.InGame.Time;
+                    
                     _currentSpeed = _chart.speed[_currentSpeedPos].s;
                     _currentSpeedPos++;
                 }
@@ -191,19 +198,16 @@ public class ChartPlayer : MonoBehaviour {
     }
 
     private void MoveNotes() {
+        var pos = _differenceBetweenSpeeds.Sum(diff => diff[0] * diff[1] * constants.placingPrecision * G.PlaySettings.Speed);
+        pos += (G.InGame.Time - _lastSpeedTime) * constants.placingPrecision * _currentSpeed * G.PlaySettings.Speed;
+
         var positive = _notesHolder.transform.GetChild(0);
         var positiveBefore = positive.localPosition;
-        positive.localPosition =
-            new Vector3(positiveBefore.x,
-                positiveBefore.y - _currentSpeed * G.PlaySettings.Speed * constants.placingPrecision * Time.deltaTime,
-                positiveBefore.z);
+        positive.localPosition = new Vector3(positiveBefore.x, -pos, positiveBefore.z);
 
         var negative = _notesHolder.transform.GetChild(2);
         var negativeBefore = negative.localPosition;
-        negative.localPosition =
-            new Vector3(negativeBefore.x,
-                negativeBefore.y + _currentSpeed * G.PlaySettings.Speed * constants.placingPrecision * Time.deltaTime,
-                negativeBefore.z);
+        negative.localPosition = new Vector3(negativeBefore.x, pos, negativeBefore.z);
     }
 
     private void CreateNote(int id) {
@@ -453,6 +457,9 @@ public class ChartPlayer : MonoBehaviour {
         _notesHolder.transform.GetChild(2).localPosition = new Vector3(0, 0, 0);
 
         _notes.Clear();
+        _differenceBetweenSpeeds.Clear();
+
+        _lastSpeedTime = 0;
 
         _lastPlacedNoteId = 0;
         _currentSpeed = 1.0f;
