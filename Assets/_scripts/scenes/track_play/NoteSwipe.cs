@@ -48,7 +48,7 @@ public class NoteSwipe : Note {
         }
     }
 
-    protected override int DifferenceToJudge(float diff) {
+    protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
             if (diff > G.InternalSettings.JudgeOfSwipe[i])
                 return i;

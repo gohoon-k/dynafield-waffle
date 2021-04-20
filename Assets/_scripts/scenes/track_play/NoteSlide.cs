@@ -42,7 +42,7 @@ public class NoteSlide : Note {
         _pending = true;
     }
 
-    protected override int DifferenceToJudge(float diff) {
+    protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
             if (diff > G.InternalSettings.JudgeOfSlide[i])
                 return i;

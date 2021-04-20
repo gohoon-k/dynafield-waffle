@@ -63,7 +63,7 @@ public abstract class Note : MonoBehaviour {
 
         StartCoroutine(GiveDestroyed());
 
-        var result = DifferenceToJudge(judgeTime < 0 ? Math.Abs(G.InGame.Time - time) : Math.Abs(judgeTime - time));
+        var result = TimeDifferenceToJudge(judgeTime < 0 ? Math.Abs(G.InGame.Time - time) : Math.Abs(judgeTime - time));
 
         CreateJudgeEffect(result);
         
@@ -192,7 +192,7 @@ public abstract class Note : MonoBehaviour {
 
     protected abstract void HandleInput(Touch touch);
 
-    protected abstract int DifferenceToJudge(float diff);
+    protected abstract int TimeDifferenceToJudge(float diff);
 
     private bool Compare(Note other) {
         return other.id == id || other.time - time < 0.00001f;

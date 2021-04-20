@@ -40,7 +40,7 @@ public class NoteClick : Note {
         Judge();
     }
 
-    protected override int DifferenceToJudge(float diff) {
+    protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
             if (diff > G.InternalSettings.JudgeOfClick[i])
                 return i;

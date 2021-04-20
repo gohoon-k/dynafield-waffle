@@ -171,7 +171,7 @@ public class NoteHold : Note {
         // It's not error, but animation name is same with error animation.
         PlayErrorAnim();
 
-        var result = DifferenceToJudge((_endTime - _startTime) / duration);
+        var result = TimeDifferenceToJudge((_endTime - _startTime) / duration);
 
         if (result >= 2) _animationType = 1;
         else _animationType = -1;
@@ -184,7 +184,7 @@ public class NoteHold : Note {
     }
 
     protected override void CheckError() {
-        if (destroying || _handling || _startTime != 0) return;
+        if (destroying || _handling || _startTime + 1 > 0.001) return;
         
         if (G.InGame.Time - time < 0.35f) return;
 
@@ -200,7 +200,7 @@ public class NoteHold : Note {
         G.InGame.Combo = 0;
     }
 
-    protected override int DifferenceToJudge(float diff) {
+    protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
             if (diff < G.InternalSettings.JudgeOfHold[i])
                 return i;
