@@ -70,6 +70,8 @@ public abstract class Note : MonoBehaviour {
         CreateDestroyEffect(result);
 
         ApplyStatistics(result);
+        
+        parent.Pulse();
     }
 
     private void NoteUpdate() {
@@ -87,7 +89,7 @@ public abstract class Note : MonoBehaviour {
     }
 
     protected virtual void CheckError() {
-        if (destroying) return;
+        if (destroying || hasInput) return;
 
         if (G.InGame.Time - time < 0.35f) return;
 
@@ -185,6 +187,8 @@ public abstract class Note : MonoBehaviour {
         yield return new WaitForEndOfFrame();
         destroying = true;
     }
+
+    public virtual void SetRenderer(SpriteRenderer noteRenderer) { }
 
     protected abstract void PlayErrorAnim();
 
