@@ -7,8 +7,6 @@ public class NoteClick : Note {
     
     new void Start() {
         base.Start();
-
-        _renderer = GetComponent<SpriteRenderer>();
     }
 
     new void Update() {
@@ -17,6 +15,11 @@ public class NoteClick : Note {
         }
         
         base.Update();
+    }
+
+    public override void SetRenderer(SpriteRenderer noteRenderer) {
+        base.SetRenderer(noteRenderer);
+        _renderer = noteRenderer;
     }
 
     protected override void PlayErrorAnim() {

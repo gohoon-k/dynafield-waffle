@@ -7,8 +7,6 @@ public class NoteSlide : Note {
     
     new void Start() {
         base.Start();
-
-        _renderer = GetComponent<SpriteRenderer>();
     }
     
     new void Update() {
@@ -19,6 +17,11 @@ public class NoteSlide : Note {
         if (_pending && G.InGame.Time - time >= 0) Judge();
         
         base.Update();
+    }
+    
+    public override void SetRenderer(SpriteRenderer noteRenderer) {
+        base.SetRenderer(noteRenderer);
+        _renderer = noteRenderer;
     }
 
     protected override void PlayErrorAnim() {

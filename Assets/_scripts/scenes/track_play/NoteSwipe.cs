@@ -2,14 +2,12 @@ using UnityEngine;
 
 public class NoteSwipe : Note {
 
-    private SpriteRenderer _noteRenderer;
+    private SpriteRenderer _renderer;
 
     private float _judgeTime = -1;
 
     new void Start() {
         base.Start();
-
-        _noteRenderer = GetComponent<SpriteRenderer>();
     }
     
     new void Update() {
@@ -19,15 +17,20 @@ public class NoteSwipe : Note {
         
         base.Update();
     }
+    
+    public override void SetRenderer(SpriteRenderer noteRenderer) {
+        base.SetRenderer(noteRenderer);
+        _renderer = noteRenderer;
+    }
 
     protected override void PlayErrorAnim() {
-        AlphaAnim(_noteRenderer);
+        AlphaAnim(_renderer);
         // AlphaAnim(_arrowRenderer);
     }
 
     protected override void PlayDestroyAnim() {
         ScaleAnim();
-        AlphaAnim(_noteRenderer);
+        AlphaAnim(_renderer);
     }
 
     protected override void HandleInput(Touch touch) {
