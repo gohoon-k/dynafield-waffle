@@ -39,6 +39,7 @@ public class Animators {
 public class Effects {
     public GameObject counter;
     public GameObject judgeLinePulse;
+    public GameObject notifyFieldMove;
 }
 
 [Serializable]
@@ -64,6 +65,10 @@ public class ChartPlayer : MonoBehaviour {
     private GameObject _judgeLine;
     private Animator _judgeLinePulse;
     private Transform _judgeLinePulseEffectHolder;
+    private Animator _notifyFieldMoveUpAnimator;
+    private Animator _notifyFieldMoveDownAnimator;
+    private SpriteRenderer _notifyFieldMoveUpRenderer;
+    private SpriteRenderer _notifyFieldMoveDownRenderer;
 
     private readonly List<Note> _notes = new List<Note>();
     private Chart _chart;
@@ -79,6 +84,7 @@ public class ChartPlayer : MonoBehaviour {
     private float _currentSpeed = 1.0f;
 
     private bool _trackStarted;
+    private bool _synchronizing;
     private bool _syncFinished;
     private bool _gameFinished;
     private bool _outroPlayed;
@@ -87,9 +93,10 @@ public class ChartPlayer : MonoBehaviour {
     private int _currentMoveXPos;
     private int _currentMoveYPos;
     private int _currentMoveZPos;
+    private int _currentNotifiedMoveYPos;
 
     private readonly List<List<float>> _differenceBetweenSpeeds = new List<List<float>>();
-    private float _lastSpeedTime = 0f;
+    private float _lastSpeedTime;
 
     private AudioSource _audio;
 
@@ -99,22 +106,26 @@ public class ChartPlayer : MonoBehaviour {
         Interpolators.EaseOutCurve,
         Interpolators.EaseInOutCurve
     };
-
-    // Start is called before the first frame update
+    
     void Start() {
         G.InitTracks();
 
         G.InGame.CanBePaused = false;
 
-        _notesHolder = field.main.transform.GetChild(1).gameObject;
+        _notesHolder = field.main.transform.GetChild(2).gameObject;
         _judgeLine = field.main.transform.GetChild(0).gameObject;
 
         _judgeLinePulse = _judgeLine.transform.GetChild(0).GetComponent<Animator>();
         _judgeLinePulseEffectHolder = _judgeLine.transform.GetChild(3);
         
-        _keyBeamsHolder = field.main.transform.GetChild(2);
-        _judgeEffectsHolder = field.main.transform.GetChild(3);
+        _keyBeamsHolder = field.main.transform.GetChild(3);
+        _judgeEffectsHolder = field.main.transform.GetChild(4);
 
+        _notifyFieldMoveUpAnimator = effects.notifyFieldMove.transform.GetChild(0).GetComponent<Animator>();
+        _notifyFieldMoveDownAnimator = effects.notifyFieldMove.transform.GetChild(1).GetComponent<Animator>();
+        _notifyFieldMoveUpRenderer = effects.notifyFieldMove.transform.GetChild(0).GetComponent<SpriteRenderer>();
+        _notifyFieldMoveDownRenderer = effects.notifyFieldMove.transform.GetChild(1).GetComponent<SpriteRenderer>();
+        
         var chartJson = (TextAsset) Resources.Load(
             $"data/charts/{G.Tracks[G.PlaySettings.TrackId].internal_name}.{G.PlaySettings.Difficulty}", typeof(TextAsset)
             // "data/charts/test.1", typeof(TextAsset)
@@ -145,8 +156,7 @@ public class ChartPlayer : MonoBehaviour {
         StartCoroutine(Intro());
         
     }
-
-    // Update is called once per frame
+    
     void Update() {
         if (G.InGame.ReadyAnimated && !G.InGame.Paused) {
             if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -158,23 +168,16 @@ public class ChartPlayer : MonoBehaviour {
                 _trackStarted = true;
             }
 
-            if (!_syncFinished) {
+            if (!_syncFinished && !_synchronizing) {
+                _synchronizing = true;
                 StartCoroutine(AdjustSync());
-            } else {
+            } else if (_syncFinished) {
+
                 G.InGame.CanBePaused = true;
-
-                if (_chart.speed != null &&
-                    _currentSpeedPos < _chart.speed.Length &&
-                    _chart.speed[_currentSpeedPos].t <= G.InGame.Time) {
-                    
-                    _differenceBetweenSpeeds.Add(new List<float> {G.InGame.Time - _lastSpeedTime, _currentSpeed});
-                    _lastSpeedTime = G.InGame.Time;
-                    
-                    _currentSpeed = _chart.speed[_currentSpeedPos].s;
-                    _currentSpeedPos++;
-                }
-
-                // Notify line move code here
+                
+                ChangeSpeed();
+                
+                NotifyFieldMove();
 
                 MoveY();
                 MoveX();
@@ -267,7 +270,9 @@ public class ChartPlayer : MonoBehaviour {
                 start.size = new Vector2(holdScript.size / 10f, start.size.y);
                 end.size = new Vector2(holdScript.size / 10f, end.size.y);
                 progress.size = new Vector2(0, _holdHeights[id] * 2);
-                hold.size = new Vector2(holdScript.size / 10f, _holdHeights[id] * 2);
+                hold.size = new Vector2(1, _holdHeights[id] * 2 / (holdScript.size / 10f));
+
+                hold.gameObject.transform.localScale = new Vector3(holdScript.size / 20f, holdScript.size / 20f, 1);
 
                 holdScript.startRenderer = start;
                 holdScript.holdRenderer = hold;
@@ -378,6 +383,30 @@ public class ChartPlayer : MonoBehaviour {
         }
     }
 
+    private void ChangeSpeed() {
+        if (_chart.speed == null || _currentSpeedPos >= _chart.speed.Length ||
+            !(_chart.speed[_currentSpeedPos].t <= G.InGame.Time)) return;
+        
+        _differenceBetweenSpeeds.Add(new List<float> {G.InGame.Time - _lastSpeedTime, _currentSpeed});
+        _lastSpeedTime = G.InGame.Time;
+                    
+        _currentSpeed = _chart.speed[_currentSpeedPos].s;
+        _currentSpeedPos++;
+    }
+
+    private void NotifyFieldMove() {
+        if (_chart.move == null || _currentNotifiedMoveYPos >= _chart.move.Length ||
+            !(_chart.move[_currentNotifiedMoveYPos].t - 0.65f <= G.InGame.Time)) return;
+
+        var destination = -_chart.move[_currentMoveYPos].d / 100f;
+        var current = field.main.transform.position.y;
+        
+        (destination < current ? _notifyFieldMoveDownAnimator : _notifyFieldMoveUpAnimator)
+            .Play("notify_field_move_blink", -1, 0);
+
+        _currentNotifiedMoveYPos++;
+    }
+    
     private void MoveY() {
         if (_chart.move == null || _currentMoveYPos >= _chart.move.Length ||
             !(_chart.move[_currentMoveYPos].t <= G.InGame.Time)) return;
@@ -530,6 +559,7 @@ public class ChartPlayer : MonoBehaviour {
         _currentMoveXPos = 0;
         _currentMoveYPos = 0;
         _currentMoveZPos = 0;
+        _currentNotifiedMoveYPos = 0;
 
         for (var i = 0; i < Math.Min(_loadableNoteCount, _chart.chart.Length); i++) {
             CreateNote(_lastPlacedNoteId);
@@ -540,6 +570,7 @@ public class ChartPlayer : MonoBehaviour {
 
         _trackStarted = false;
         _syncFinished = false;
+        _synchronizing = false;
 
         G.InGame.ReadyAnimated = false;
         G.InGame.Paused = false;
@@ -600,6 +631,11 @@ public class ChartPlayer : MonoBehaviour {
         yield return new WaitForSeconds(1f);
 
         StartCoroutine(Ready());
+
+        yield return new WaitForSeconds(3f);
+
+        _notifyFieldMoveUpAnimator.Play("notify_field_move_intro");
+        _notifyFieldMoveDownAnimator.Play("notify_field_move_intro");
     }
 
     private IEnumerator Outro() {
