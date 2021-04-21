@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class NoteHold : Note {
@@ -20,8 +22,19 @@ public class NoteHold : Note {
 
     private bool _isAutoHandled;
 
+    private float _initHeight;
+    private float _initEnd;
+
+    private float _startPos = 1;
+    private Transform _notePositive;
+    
     new void Start() {
         base.Start();
+
+        _initHeight = holdRenderer.size.y;
+        _initEnd = endRenderer.gameObject.transform.localPosition.y;
+
+        _notePositive = parent.field.main.transform.GetChild(2).GetChild(0);
     }
 
     new void Update() {
@@ -42,6 +55,9 @@ public class NoteHold : Note {
             _endTime = G.InGame.Time;
             Judge();
         }
+
+        if (_startPos - 1 < 0.0001 && _startPos - 1 >= 0 && G.InGame.Time >= time)
+            _startPos = _notePositive.localPosition.y;
         
         base.Update();
 
@@ -89,22 +105,22 @@ public class NoteHold : Note {
     private void ResizeHold() {
         if (G.InGame.Time - time < 0) return;
 
+        var delta = _startPos - _notePositive.localPosition.y;
+
         var endTransform = transform.GetChild(3);
+        
+        endTransform.localPosition = new Vector3(0, _initEnd - delta, 0);
+        holdRenderer.size = new Vector2(1, _initHeight - delta / (size / 20f));
+        
         var beforeSize = holdRenderer.size;
         var beforeProgressSize = progressRenderer.size;
         if (beforeSize.y <= 0) {
             endTransform.localPosition = new Vector3(0, 0, 0);
-            holdRenderer.size = new Vector2(beforeSize.x, 0);
+            holdRenderer.size = new Vector2(1, 0);
             progressRenderer.size = new Vector2(beforeProgressSize.x, 0);
             return;
         }
 
-        endTransform.localPosition = new Vector3(0,
-            endTransform.localPosition.y - parent.GetCurrentSpeed() * G.PlaySettings.Speed * parent.constants.placingPrecision * Time.deltaTime, 0);
-        
-        holdRenderer.size = new Vector2(beforeSize.x,
-            beforeSize.y - 2 * parent.GetCurrentSpeed() * G.PlaySettings.Speed * parent.constants.placingPrecision * Time.deltaTime);
-        
         progressRenderer.size = new Vector2(
             beforeProgressSize.x,
             beforeProgressSize.y - 2 * parent.GetCurrentSpeed() * G.PlaySettings.Speed * parent.constants.placingPrecision * Time.deltaTime
