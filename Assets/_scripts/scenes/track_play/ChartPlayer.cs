@@ -17,6 +17,7 @@ public class NotePrefabs {
     public GameObject slide;
     public GameObject hold;
     public GameObject swipe;
+    public GameObject counter;
 }
 
 [Serializable]
@@ -35,6 +36,12 @@ public class Animators {
 }
 
 [Serializable]
+public class Effects {
+    public GameObject counter;
+    public GameObject judgeLinePulse;
+}
+
+[Serializable]
 public class Constants {
     public float placingPrecision;
     public bool viewMode;
@@ -46,6 +53,8 @@ public class ChartPlayer : MonoBehaviour {
 
     public NotePrefabs notePrefabs;
 
+    public Effects effects;
+    
     public Animators animators;
     public Scripts scripts;
     
@@ -53,6 +62,8 @@ public class ChartPlayer : MonoBehaviour {
     private Transform _keyBeamsHolder;
     private Transform _judgeEffectsHolder;
     private GameObject _judgeLine;
+    private Animator _judgeLinePulse;
+    private Transform _judgeLinePulseEffectHolder;
 
     private readonly List<Note> _notes = new List<Note>();
     private Chart _chart;
@@ -97,11 +108,16 @@ public class ChartPlayer : MonoBehaviour {
 
         _notesHolder = field.main.transform.GetChild(1).gameObject;
         _judgeLine = field.main.transform.GetChild(0).gameObject;
+
+        _judgeLinePulse = _judgeLine.transform.GetChild(0).GetComponent<Animator>();
+        _judgeLinePulseEffectHolder = _judgeLine.transform.GetChild(3);
+        
         _keyBeamsHolder = field.main.transform.GetChild(2);
         _judgeEffectsHolder = field.main.transform.GetChild(3);
 
         var chartJson = (TextAsset) Resources.Load(
             $"data/charts/{G.Tracks[G.PlaySettings.TrackId].internal_name}.{G.PlaySettings.Difficulty}", typeof(TextAsset)
+            // "data/charts/test.1", typeof(TextAsset)
         );
 
         _chart = JsonUtility.FromJson<Chart>(chartJson.ToString());
@@ -216,6 +232,7 @@ public class ChartPlayer : MonoBehaviour {
             1 => notePrefabs.slide,
             2 => notePrefabs.hold,
             3 => notePrefabs.swipe,
+            4 => notePrefabs.counter,
             _ => notePrefabs.click
         };
 
@@ -236,28 +253,51 @@ public class ChartPlayer : MonoBehaviour {
         script.xPos = _chart.chart[id].x;
         script.hasAnotherNote = _sHitData[id];
 
-        if (script is NoteHold holdScript) {
-            holdScript.duration = _chart.chart[id].dur;
+        switch (script) {
+            case NoteHold holdScript: {
+                holdScript.duration = _chart.chart[id].dur;
 
-            var start = note.transform.GetChild(0).GetComponent<SpriteRenderer>();
-            var hold = note.transform.GetChild(1).GetComponent<SpriteRenderer>();
-            var progress = note.transform.GetChild(2).GetComponent<SpriteRenderer>();
-            var end = note.transform.GetChild(3).GetComponent<SpriteRenderer>();
+                var start = note.transform.GetChild(0).GetComponent<SpriteRenderer>();
+                var hold = note.transform.GetChild(1).GetComponent<SpriteRenderer>();
+                var progress = note.transform.GetChild(2).GetComponent<SpriteRenderer>();
+                var end = note.transform.GetChild(3).GetComponent<SpriteRenderer>();
 
-            note.transform.GetChild(3).localPosition = new Vector3(0, _holdHeights[id], 0);
+                note.transform.GetChild(3).localPosition = new Vector3(0, _holdHeights[id], 0);
 
-            start.size = new Vector2(holdScript.size / 10f, start.size.y);
-            end.size = new Vector2(holdScript.size / 10f, end.size.y);
-            progress.size = new Vector2(0, _holdHeights[id] * 2);
-            hold.size = new Vector2(holdScript.size / 10f, _holdHeights[id] * 2);
+                start.size = new Vector2(holdScript.size / 10f, start.size.y);
+                end.size = new Vector2(holdScript.size / 10f, end.size.y);
+                progress.size = new Vector2(0, _holdHeights[id] * 2);
+                hold.size = new Vector2(holdScript.size / 10f, _holdHeights[id] * 2);
 
-            holdScript.startRenderer = start;
-            holdScript.holdRenderer = hold;
-            holdScript.progressRenderer = progress;
-            holdScript.endRenderer = end;
-        } else {
-            var spriteRenderer = note.GetComponent<SpriteRenderer>();
-            spriteRenderer.size = new Vector2(script.size / 10f, spriteRenderer.size.y);
+                holdScript.startRenderer = start;
+                holdScript.holdRenderer = hold;
+                holdScript.progressRenderer = progress;
+                holdScript.endRenderer = end;
+                break;
+            }
+            case NoteCounter counterScript: {
+                var mainRenderer = note.GetComponent<SpriteRenderer>();
+                var effectRenderer = note.transform.GetChild(0).GetComponent<SpriteRenderer>();
+
+                mainRenderer.size = new Vector2(script.size / 10f, mainRenderer.size.y);
+                effectRenderer.size = new Vector2(script.size / 10f, effectRenderer.size.y);
+                
+                counterScript.mainRenderer = mainRenderer;
+                counterScript.effectRenderer = effectRenderer;
+            
+                counterScript.timeout = _chart.chart[id].timeout;
+                counterScript.count = _chart.chart[id].counts;
+
+                counterScript.effectGroup = effects.counter;
+                break;
+            }
+            default: {
+                var spriteRenderer = note.GetComponent<SpriteRenderer>();
+                spriteRenderer.size = new Vector2(script.size / 10f, spriteRenderer.size.y);
+                
+                script.SetRenderer(spriteRenderer);
+                break;
+            }
         }
 
         note.transform.localPosition = new Vector2(script.xPos / 100f, _positions[id]);
@@ -293,22 +333,35 @@ public class ChartPlayer : MonoBehaviour {
                 _positions[currentNoteId] = pos;
 
                 if (_chart.chart[currentNoteId].dur > 0) {
-                    var subPos = pos;
+                    var subPos = 0f;
                     var subSpeed = currentSpeed;
                     var subSpeedId = currentSpeedId;
                     var holdLastFrame = frame + _chart.chart[currentNoteId].dur * constants.placingPrecision;
 
+                    var subDiffBetweenSpeeds = new List<List<float>>();
+                    var subLastSpeedFrame = 0;
+
+                    var subFrameFromZero = 0;
+
                     for (var subFrame = frame; subFrame <= holdLastFrame; subFrame++) {
                         if (subSpeedId < _chart.speed.Length &&
                             _chart.speed[subSpeedId].t <= subFrame / constants.placingPrecision) {
+                            subDiffBetweenSpeeds.Add(new List<float> {subFrameFromZero - subLastSpeedFrame, subSpeed});
+                            
                             subSpeed = _chart.speed[subSpeedId].s;
+                            subLastSpeedFrame = subFrameFromZero;
+                            
                             subSpeedId++;
                         }
 
-                        subPos += subSpeed * G.PlaySettings.Speed;
+                        subFrameFromZero++;
+
+                        // subPos += subSpeed * G.PlaySettings.Speed;
+                        subPos = subDiffBetweenSpeeds.Sum(diff => (int) diff[0] * diff[1] * G.PlaySettings.Speed);
+                        subPos += (subFrameFromZero - subLastSpeedFrame) * subSpeed * G.PlaySettings.Speed;
                     }
 
-                    _holdHeights[currentNoteId] = subPos - pos;
+                    _holdHeights[currentNoteId] = subPos;
                 }
 
                 currentNoteId++;
@@ -398,6 +451,12 @@ public class ChartPlayer : MonoBehaviour {
         }
     }
 
+    public void Pulse() {
+        _judgeLinePulse.Play("judge_line_pulse", -1, 0);
+
+        Instantiate(effects.judgeLinePulse, _judgeLinePulseEffectHolder, true).transform.localPosition = new Vector3(0, 0, 0);
+    }
+
     public void Pause() {
         if (!G.InGame.CanBePaused) return;
 
@@ -450,6 +509,10 @@ public class ChartPlayer : MonoBehaviour {
 
         for (var i = 0; i < _judgeEffectsHolder.childCount; i++) {
             Destroy(_judgeEffectsHolder.GetChild(i).gameObject);
+        }
+
+        for (var i = 0; i < effects.counter.transform.childCount; i++) {
+            Destroy(effects.counter.transform.GetChild(i).gameObject);
         }
 
         field.main.transform.position = new Vector3(0, 0, 0);
