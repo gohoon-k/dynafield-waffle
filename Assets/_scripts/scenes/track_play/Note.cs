@@ -49,7 +49,9 @@ public abstract class Note : MonoBehaviour {
     }
 
     protected bool IsTargeted(Vector3 input) {
-        return xPos / 100f + sizeInWorld > input.x && xPos / 100f - sizeInWorld < input.x && input.y >= -2 && input.y <= 2;
+        var fieldPosition = parent.field.main.transform.position;
+        return xPos / 100f + sizeInWorld > input.x && xPos / 100f - sizeInWorld < input.x && 
+               input.y - fieldPosition.y >= -3 && input.y - fieldPosition.y <= 3;
     }
 
     protected virtual void Judge(float judgeTime = -1f) {
