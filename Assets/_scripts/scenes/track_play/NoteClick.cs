@@ -36,8 +36,8 @@ public class NoteClick : Note {
 
         var inputPosition = GetInputPosition(touch);
 
-        if (!IsTargeted(inputPosition.x)) return;
-        if (IsHiddenByOtherNote(inputPosition.x)) return;
+        if (!IsTargeted(inputPosition)) return;
+        if (IsHiddenByOtherNote(inputPosition)) return;
 
         StartCoroutine(GiveInput());
         Judge();

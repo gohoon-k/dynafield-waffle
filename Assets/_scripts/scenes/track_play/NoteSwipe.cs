@@ -38,8 +38,8 @@ public class NoteSwipe : Note {
         
         var inputPosition = GetInputPosition(touch);
 
-        if (!IsTargeted(inputPosition.x)) return;
-        if (IsHiddenByOtherNote(inputPosition.x)) return;
+        if (!IsTargeted(inputPosition)) return;
+        if (IsHiddenByOtherNote(inputPosition)) return;
 
         if (touch.phase == TouchPhase.Began && !hasInput) {
             StartCoroutine(GiveInput());

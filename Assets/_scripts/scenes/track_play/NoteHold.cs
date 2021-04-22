@@ -138,15 +138,15 @@ public class NoteHold : Note {
 
         var inputPosition = GetInputPosition(touch);
 
-        if (_handling && touch.fingerId == _fingerId && !IsTargeted(inputPosition.x)) {
+        if (_handling && touch.fingerId == _fingerId && !IsTargeted(inputPosition)) {
             _handling = false;
             _fingerId = -1;
 
             Judge();
         }
 
-        if (!IsTargeted(inputPosition.x)) return;
-        if (IsHiddenByOtherNote(inputPosition.x)) return;
+        if (!IsTargeted(inputPosition)) return;
+        if (IsHiddenByOtherNote(inputPosition)) return;
 
         if (touch.phase == TouchPhase.Began) {
             if (G.InGame.Time - time < -0.35f) {

@@ -79,8 +79,8 @@ public class NoteCounter : Note {
 
         if (_handling) return;
 
-        if (!IsTargeted(inputPosition.x)) return;
-        if (IsHiddenByOtherNote(inputPosition.x)) return;
+        if (!IsTargeted(inputPosition)) return;
+        if (IsHiddenByOtherNote(inputPosition)) return;
         if (G.InGame.Time - time > 0.1f) return;
 
         StartCoroutine(GiveInput());
