@@ -37,9 +37,9 @@ public abstract class Note : MonoBehaviour {
         return parent.GetActiveNotes().Contains(this);
     }
 
-    protected bool IsHiddenByOtherNote(float inputX) {
+    protected bool IsHiddenByOtherNote(Vector3 input) {
         var activeNotes = parent.GetActiveNotes();
-        var targetNotes = activeNotes.FindAll(note => note.IsTargeted(inputX) && !note.destroying && !note.hasInput);
+        var targetNotes = activeNotes.FindAll(note => note.IsTargeted(input) && !note.destroying && !note.hasInput);
         
         targetNotes.Sort((a, b) => a.time < b.time ? -1 : Math.Abs(a.time - b.time) < 0.000000001f ? 0 : 1);
 
@@ -48,8 +48,8 @@ public abstract class Note : MonoBehaviour {
         return !targetNotes[0].Compare(this);
     }
 
-    protected bool IsTargeted(float inputX) {
-        return xPos / 100f + sizeInWorld > inputX && xPos / 100f - sizeInWorld < inputX;
+    protected bool IsTargeted(Vector3 input) {
+        return xPos / 100f + sizeInWorld > input.x && xPos / 100f - sizeInWorld < input.x && input.y >= -2 && input.y <= 2;
     }
 
     protected virtual void Judge(float judgeTime = -1f) {
