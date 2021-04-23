@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Net.Http.Headers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -96,8 +95,9 @@ public class UserInterfaceUpdater : MonoBehaviour {
     }
 
     public void Intro() {
-        int playCounts = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 1);
-        string unit = (playCounts % 10) switch {
+        var playCounts = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 0);
+        playCounts++;
+        var unit = (playCounts % 10) switch {
             1 => "st",
             2 => "nd",
             3 => "rd",
@@ -107,7 +107,7 @@ public class UserInterfaceUpdater : MonoBehaviour {
         introTrackInfo.text =
             $"{G.Tracks[G.PlaySettings.TrackId].title}\n<size=200>{G.Tracks[G.PlaySettings.TrackId].artist}</size>";
         introPlayInfo.text =
-            $"<size=150>play time:</size> {G.Tracks[G.PlaySettings.TrackId].length} <size=150>/ energy left:</size> {G.Items.Energy}\n{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 0) + 1}<size=150>{unit}</size> play";
+            $"<size=150>play time:</size> {G.Tracks[G.PlaySettings.TrackId].length} <size=150>/ energy left:</size> {G.Items.Energy}\n{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 0)}<size=150>{unit}</size> play";
     }
     
     public void Retry() {
