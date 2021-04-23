@@ -80,4 +80,8 @@ public class InputDetector : MonoBehaviour {
         _hasInput = true;
         StartCoroutine(TranslateToSelect());
     }
+    
+    public void OpenSoundCloud() {
+        Application.OpenURL("https://soundcloud.com/jake-francis-south/the-invasion");
+    }
 }

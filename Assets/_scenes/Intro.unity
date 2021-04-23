@@ -772,7 +772,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 41.54, y: 30.899994}
+  m_AnchoredPosition: {x: 41.54001, y: 30.899994}
   m_SizeDelta: {x: 525.14, y: 153.58}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &661834698
@@ -1938,7 +1938,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1989796750}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1840288857}
+        m_TargetAssemblyTypeName: InputDetector, Assembly-CSharp
+        m_MethodName: OpenSoundCloud
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
 --- !u!114 &1989796750
 MonoBehaviour:
   m_ObjectHideFlags: 0
