@@ -15,17 +15,23 @@ public class ScoreCalculator : MonoBehaviour {
     void Update() {
 
         G.InGame.ScoreByJudge =
-            (G.InGame.CountOfAccuracyPerfect + G.InGame.CountOfPerfect +
-             0.75f * G.InGame.CountOfGreat +
-             0.25f * G.InGame.CountOfBad) * (MAXHandlingScore / G.InGame.CountOfNotes);
+            (G.InternalSettings.ScoreRatioByJudges[0] * G.InGame.CountOfAccuracyPerfect + 
+             G.InternalSettings.ScoreRatioByJudges[1] * G.InGame.CountOfPerfect +
+             G.InternalSettings.ScoreRatioByJudges[2] * G.InGame.CountOfGreat +
+             G.InternalSettings.ScoreRatioByJudges[3] *  G.InGame.CountOfBad) * 
+            (MAXHandlingScore / G.InGame.CountOfNotes);
         
         G.InGame.Accuracy = 
-            (G.InGame.CountOfAccuracyPerfect + 
-             0.7f * G.InGame.CountOfPerfect +
-             0.3f * G.InGame.CountOfGreat +
-             0.1f * G.InGame.CountOfBad) * (100f / G.InGame.CountOfNotes);
+            (G.InternalSettings.AccuracyRatioByJudges[0] * G.InGame.CountOfAccuracyPerfect + 
+             G.InternalSettings.AccuracyRatioByJudges[1] *  G.InGame.CountOfPerfect +
+             G.InternalSettings.AccuracyRatioByJudges[2] *  G.InGame.CountOfGreat +
+             G.InternalSettings.AccuracyRatioByJudges[3] *  G.InGame.CountOfBad) * 
+            (100f / G.InGame.CountOfNotes);
 
         if (G.InGame.Combo != _calculatedCombo) {
+            if (G.InGame.MaxCombo < G.InGame.Combo)
+                G.InGame.MaxCombo = G.InGame.Combo;
+            
             if (G.InGame.Combo == 0) {
                 _brokenCombos.Add(_calculatedCombo);
             }
