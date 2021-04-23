@@ -1961,7 +1961,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1001425662}
   m_Layer: 0
-  m_Name: pulse_effects
+  m_Name: line_effect_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1979,7 +1979,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1227295498}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1022992845
 GameObject:
@@ -2491,9 +2491,9 @@ Transform:
   m_LocalScale: {x: 0, y: 1, z: 1}
   m_Children:
   - {fileID: 1652721932}
+  - {fileID: 1001425662}
   - {fileID: 1259913775}
   - {fileID: 1346212977}
-  - {fileID: 1001425662}
   m_Father: {fileID: 1601456208}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2526,7 +2526,7 @@ Transform:
   m_LocalScale: {x: 0.1, y: 0.15, z: 1}
   m_Children: []
   m_Father: {fileID: 1227295498}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1259913776
 SpriteRenderer:
@@ -2655,7 +2655,7 @@ Transform:
   m_LocalScale: {x: 0.1, y: 0.065, z: 1}
   m_Children: []
   m_Father: {fileID: 1227295498}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1346212978
 SpriteRenderer:
@@ -2855,6 +2855,8 @@ MonoBehaviour:
   constants:
     placingPrecision: 600
     viewMode: 0
+    autoPlay: 0
+    debug: 1
   notePrefabs:
     click: {fileID: 4191954091923668995, guid: c10a19e4a1a23504382f17f7fa6bbf06, type: 3}
     slide: {fileID: 3189764165758293691, guid: 42c59fe0bf6a4cc44af6c8ad2a7fcc78, type: 3}
@@ -3147,7 +3149,7 @@ GameObject:
   - component: {fileID: 1652721933}
   - component: {fileID: 1652721934}
   m_Layer: 0
-  m_Name: line_pulse
+  m_Name: line_effect_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
