@@ -162,7 +162,9 @@ public class NoteCounter : Note {
         );
         StartCoroutine(Interpolators.Linear(0.45f, 0, 0.25f,
                 step => { _countText.color = new Color(1, 1, 1, step); },
-                () => { }
+                () => {
+                    Destroy(_handlingEffectInstantiated);
+                }
             )
         );
     }
