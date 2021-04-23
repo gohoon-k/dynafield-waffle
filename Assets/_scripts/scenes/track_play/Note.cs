@@ -57,7 +57,7 @@ public abstract class Note : MonoBehaviour {
     protected virtual void Judge(float judgeTime = -1f) {
         if (judged) return;
 
-        transform.parent = parent.GetNotesHolder().transform.GetChild(1);
+        transform.parent = parent.GetNotesHolder().GetChild(1);
         
         StartCoroutine(GiveJudged());
 
