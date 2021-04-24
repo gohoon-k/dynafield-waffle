@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class NoteSwipe : Note {
@@ -5,6 +6,7 @@ public class NoteSwipe : Note {
     private SpriteRenderer _renderer;
 
     private float _judgeTime = -1;
+    private bool _pendingSwipe = false;
 
     new void Start() {
         base.Start();
@@ -41,12 +43,13 @@ public class NoteSwipe : Note {
         if (!IsTargeted(inputPosition)) return;
         if (IsHiddenByOtherNote(inputPosition)) return;
 
-        if (touch.phase == TouchPhase.Began && !hasInput) {
-            StartCoroutine(GiveInput());
+        if (touch.phase == TouchPhase.Began && !_pendingSwipe) {
+            StartCoroutine(GivePendingSwipe());
             _judgeTime = G.InGame.Time;
         }
 
         if (touch.phase == TouchPhase.Moved && _judgeTime > 0) {
+            StartCoroutine(GiveInput());
             Judge(_judgeTime);
         }
     }
@@ -57,6 +60,11 @@ public class NoteSwipe : Note {
                 return i;
 
         return 3;
+    }
+
+    private IEnumerator GivePendingSwipe() {
+        yield return new WaitForEndOfFrame();
+        _pendingSwipe = true;
     }
     
 }
