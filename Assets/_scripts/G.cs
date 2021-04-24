@@ -37,20 +37,17 @@ public static class G {
 
     public static class Items {
 
-        public static int Energy = 3;
+        public static int Energy = 15;
         public static long CoolDown = -1;
 
     }
 
     public static class PlaySettings {
-
         public static int TrackId = 0;
 
         public static int Difficulty = 1;
-        public static bool NotifyLineMove = false;
-        public static bool ShowEarlyLate = false;
 
-        public static float Sync = 165;
+        public static float Sync = 160;
         public static int DisplaySpeed = 3;
 
         public static bool AutoPlay = false;
@@ -66,8 +63,8 @@ public static class G {
         public static readonly float[] JudgeOfSwipe = { 0.3f, 0.15f, 0.1f };
         public static readonly float[] JudgeOfCounter = { 0.60f, 1f };
 
-        public static float[] ScoreRatioByJudges = { 1f, 1f, 0.75f, 0.25f, 0f };
-        public static float[] AccuracyRatioByJudges = { 1f, 0.75f, 0.3f, 0.1f, 0f };
+        public static readonly float[] ScoreRatioByJudges = { 1f, 1f, 0.75f, 0.25f, 0f };
+        public static readonly float[] AccuracyRatioByJudges = { 1f, 0.75f, 0.3f, 0.1f, 0f };
 
     }
 
@@ -80,26 +77,25 @@ public static class G {
 
         public static bool ReadyAnimated = false;
 
-        public static float Time = 0;
+        public static float Time;
 
         public static int CountOfNotes = 0;
-        public static int ScorePerNote = 0;
 
-        public static float ScoreByJudge = 0;
-        public static float ScoreByCombo = 0;
+        public static float ScoreByJudge;
+        public static float ScoreByCombo;
         
         public static float TotalScore => ScoreByJudge + ScoreByCombo;
 
-        public static float Accuracy = 0;
+        public static float Accuracy;
         
-        public static int Combo = 0;
-        public static int MaxCombo = 0;
+        public static int Combo;
+        public static int MaxCombo;
 
-        public static int CountOfAccuracyPerfect = 0;
-        public static int CountOfPerfect = 0;
-        public static int CountOfGreat = 0;
-        public static int CountOfBad = 0;
-        public static int CountOfError = 0;
+        public static int CountOfAccuracyPerfect;
+        public static int CountOfPerfect;
+        public static int CountOfGreat;
+        public static int CountOfBad;
+        public static int CountOfError;
 
         public static void Init() {
             Time = 0;
