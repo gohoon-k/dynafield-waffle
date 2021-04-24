@@ -47,7 +47,7 @@ public class Constants {
     public float placingPrecision;
     public bool viewMode;
     public bool autoPlay;
-    public bool debug;
+    public bool debugMode;
 }
 
 public class ChartPlayer : MonoBehaviour {
@@ -120,11 +120,11 @@ public class ChartPlayer : MonoBehaviour {
         G.InGame.CountOfNotes = _chart.chart.Length;
         G.InGame.CanBePaused = false;
 
-        if (constants.debug) {
+        if (constants.debugMode) {
             G.PlaySettings.AutoPlay = constants.autoPlay;
         }
         
-        if (!constants.debug) {
+        if (!constants.debugMode) {
             G.Items.Energy = PlayerPrefs.GetInt(G.Keys.Energy, 15);
 
             G.Items.Energy--;
@@ -533,7 +533,7 @@ public class ChartPlayer : MonoBehaviour {
         PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayTimes),
             PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 0) + 1);
 
-        if (!constants.debug) {
+        if (!constants.debugMode) {
             G.Items.Energy--;
             PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
         }
@@ -658,6 +658,9 @@ public class ChartPlayer : MonoBehaviour {
     private IEnumerator Outro() {
         yield return new WaitForSeconds(_chart.end_margin);
 
+        _notifyFieldUp.Play("notify_field_move_outro", -1, 0);
+        _notifyFieldDown.Play("notify_field_move_outro", -1, 0);
+        
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 375f, 0f, 0.35f,
             step => { _judgeLine.transform.localScale = new Vector3(step, 1f, 1f); },
             () => { }
