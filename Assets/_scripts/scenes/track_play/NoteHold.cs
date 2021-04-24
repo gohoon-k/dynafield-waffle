@@ -186,12 +186,12 @@ public class NoteHold : Note {
         }
     }
 
-    protected override void Judge(float judgeTime = -1) {
+    protected override void Judge() {
         if (judged) return;
 
         StartCoroutine(GiveJudged());
 
-        var result = TimeDifferenceToJudge((_endTime - _startTime) / duration);
+        var result = TimeDifferenceToJudge(GetTimeDifference());
 
         if (result >= 2) _animationType = 1;
         else _animationType = -1;
@@ -204,6 +204,10 @@ public class NoteHold : Note {
         CreateDestroyEffect(result);
 
         ApplyStatistics(result);
+    }
+
+    protected override float GetTimeDifference() {
+        return (_endTime - _startTime) / duration;
     }
 
     protected override void CheckError() {
@@ -221,6 +225,10 @@ public class NoteHold : Note {
         
         G.InGame.CountOfError++;
         G.InGame.Combo = 0;
+    }
+
+    protected override bool IsPending() {
+        return !destroying && !_handling && _startTime + 1 <= 0.001;
     }
 
     protected override int TimeDifferenceToJudge(float diff) {

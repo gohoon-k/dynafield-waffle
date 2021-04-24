@@ -31,6 +31,14 @@ public class NoteClick : Note {
         AlphaAnim(_renderer);
     }
 
+    protected override bool IsPending() {
+        return !destroying && !hasInput;
+    }
+
+    protected override float GetTimeDifference() {
+        return G.InGame.Time - time;
+    }
+
     protected override void HandleInput(Touch touch) {
         if (touch.phase != TouchPhase.Began) return;
 

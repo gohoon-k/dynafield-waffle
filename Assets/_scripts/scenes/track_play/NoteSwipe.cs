@@ -6,7 +6,6 @@ public class NoteSwipe : Note {
     private SpriteRenderer _renderer;
 
     private float _judgeTime = -1;
-    private bool _pendingSwipe = false;
 
     new void Start() {
         base.Start();
@@ -35,6 +34,10 @@ public class NoteSwipe : Note {
         AlphaAnim(_renderer);
     }
 
+    protected override bool IsPending() {
+        return !destroying;
+    }
+
     protected override void HandleInput(Touch touch) {
         if (touch.phase != TouchPhase.Began && touch.phase != TouchPhase.Moved) return;
         
@@ -43,15 +46,18 @@ public class NoteSwipe : Note {
         if (!IsTargeted(inputPosition)) return;
         if (IsHiddenByOtherNote(inputPosition)) return;
 
-        if (touch.phase == TouchPhase.Began && !_pendingSwipe) {
-            StartCoroutine(GivePendingSwipe());
+        if (touch.phase == TouchPhase.Began && !hasInput) {
+            StartCoroutine(GiveInput());
             _judgeTime = G.InGame.Time;
         }
 
         if (touch.phase == TouchPhase.Moved && _judgeTime > 0) {
-            StartCoroutine(GiveInput());
-            Judge(_judgeTime);
+            Judge();
         }
+    }
+
+    protected override float GetTimeDifference() {
+        return _judgeTime - time;
     }
 
     protected override int TimeDifferenceToJudge(float diff) {
@@ -62,9 +68,4 @@ public class NoteSwipe : Note {
         return 3;
     }
 
-    private IEnumerator GivePendingSwipe() {
-        yield return new WaitForEndOfFrame();
-        _pendingSwipe = true;
-    }
-    
 }

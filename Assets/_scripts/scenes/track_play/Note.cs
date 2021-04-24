@@ -53,7 +53,7 @@ public abstract class Note : MonoBehaviour {
                input.y - fieldPosition.y >= -3 && input.y - fieldPosition.y <= 3;
     }
 
-    protected virtual void Judge(float judgeTime = -1f) {
+    protected virtual void Judge() {
         if (judged) return;
 
         var tf = transform;
@@ -66,7 +66,7 @@ public abstract class Note : MonoBehaviour {
 
         StartCoroutine(GiveDestroyed());
 
-        var result = TimeDifferenceToJudge(judgeTime < 0 ? Math.Abs(G.InGame.Time - time) : Math.Abs(judgeTime - time));
+        var result = TimeDifferenceToJudge(GetTimeDifference());
 
         if (result == 3)
             StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, tf.localPosition.y, 0, 0.05f,
@@ -98,7 +98,7 @@ public abstract class Note : MonoBehaviour {
     }
 
     protected virtual void CheckError() {
-        if (destroying || hasInput) return;
+        if (!IsPending()) return;
 
         if (G.InGame.Time - time < 0.35f) return;
 
@@ -207,6 +207,10 @@ public abstract class Note : MonoBehaviour {
     protected abstract void HandleInput(Touch touch);
 
     protected abstract int TimeDifferenceToJudge(float diff);
+
+    protected abstract float GetTimeDifference();
+
+    protected abstract bool IsPending();
 
     private bool Compare(Note other) {
         return other.id == id || other.time - time < 0.00001f;

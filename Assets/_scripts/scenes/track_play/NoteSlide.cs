@@ -33,6 +33,14 @@ public class NoteSlide : Note {
         AlphaAnim(_renderer);
     }
 
+    protected override bool IsPending() {
+        return !destroying && !hasInput;
+    }
+
+    protected override float GetTimeDifference() {
+        return G.InGame.Time - time;
+    }
+
     protected override void HandleInput(Touch touch) {
         if (!(touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)) return;
 

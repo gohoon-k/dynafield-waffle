@@ -180,20 +180,13 @@ public class NoteCounter : Note {
         yield return new WaitForEndOfFrame();
         _handling = true;
     }
+    
+    protected override float GetTimeDifference() {
+        return (float) _handledCount / count;
+    }
 
-    protected override void Judge(float judgeTime = -1) {
-        if (judged) return;
-
-        StartCoroutine(GiveJudged());
-
-        PlayDestroyAnim();
-
-        var result = TimeDifferenceToJudge((float) _handledCount / count);
-
-        CreateJudgeEffect(result);
-        CreateDestroyEffect(result);
-
-        ApplyStatistics(result);
+    protected override bool IsPending() {
+        return !destroying && !hasInput;
     }
 
     protected override void PlayErrorAnim() {
