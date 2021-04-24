@@ -87,6 +87,13 @@ public class NoteHold : Note {
         DeactivateAnim(startRenderer);
         DeactivateAnim(holdRenderer);
         DeactivateAnim(endRenderer);
+        DeactivateAnim(progressRenderer);
+        if (_animationType == -1)
+            StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, progressRenderer.size.x, 0, 0.15f,
+                    step => { progressRenderer.size = new Vector2(step, progressRenderer.size.y); },
+                    () => { }
+                )
+            );
     }
 
     protected override void PlayDestroyAnim() {
@@ -184,13 +191,13 @@ public class NoteHold : Note {
 
         StartCoroutine(GiveJudged());
 
-        // It's not error, but animation name is same with error animation.
-        PlayErrorAnim();
-
         var result = TimeDifferenceToJudge((_endTime - _startTime) / duration);
 
         if (result >= 2) _animationType = 1;
         else _animationType = -1;
+        
+        // It's not error, but animation name is same with error animation.
+        PlayErrorAnim();
 
         CreateJudgeEffect(result);
 
