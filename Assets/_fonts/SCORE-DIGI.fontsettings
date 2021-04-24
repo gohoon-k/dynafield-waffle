@@ -30,8 +30,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -46,8 +46,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -62,8 +62,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -78,8 +78,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -94,8 +94,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -110,8 +110,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -126,8 +126,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -142,8 +142,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -158,8 +158,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   - serializedVersion: 2
@@ -174,8 +174,8 @@ Font:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 130
-      height: -200
+      width: 105
+      height: -173
     advance: 130
     flipped: 0
   m_KerningValues: []
