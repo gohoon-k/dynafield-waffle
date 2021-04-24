@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine;
 
 public abstract class Note : MonoBehaviour {
-    
     public ChartPlayer parent;
 
     public int id;
@@ -40,25 +39,27 @@ public abstract class Note : MonoBehaviour {
     protected bool IsHiddenByOtherNote(Vector3 input) {
         var activeNotes = parent.GetActiveNotes();
         var targetNotes = activeNotes.FindAll(note => note.IsTargeted(input) && !note.destroying && !note.hasInput);
-        
+
         targetNotes.Sort((a, b) => a.time < b.time ? -1 : Math.Abs(a.time - b.time) < 0.000000001f ? 0 : 1);
 
         if (targetNotes.Count == 0) return false;
-        
+
         return !targetNotes[0].Compare(this);
     }
 
     protected bool IsTargeted(Vector3 input) {
         var fieldPosition = parent.field.main.transform.position;
-        return xPos / 100f + sizeInWorld > input.x && xPos / 100f - sizeInWorld < input.x && 
+        return xPos / 100f + sizeInWorld > input.x && xPos / 100f - sizeInWorld < input.x &&
                input.y - fieldPosition.y >= -3 && input.y - fieldPosition.y <= 3;
     }
 
     protected virtual void Judge(float judgeTime = -1f) {
         if (judged) return;
 
-        transform.parent = parent.GetNotesHolder().GetChild(1);
-        
+        var tf = transform;
+
+        tf.parent = parent.GetNotesHolder().GetChild(1);
+
         StartCoroutine(GiveJudged());
 
         PlayDestroyAnim();
@@ -67,12 +68,18 @@ public abstract class Note : MonoBehaviour {
 
         var result = TimeDifferenceToJudge(judgeTime < 0 ? Math.Abs(G.InGame.Time - time) : Math.Abs(judgeTime - time));
 
+        if (result == 3)
+            StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, tf.localPosition.y, 0, 0.05f,
+                step => { tf.localPosition = new Vector3(tf.localPosition.x, step); },
+                () => { }
+            ));
+
         CreateJudgeEffect(result);
-        
+
         CreateDestroyEffect(result);
 
         ApplyStatistics(result);
-        
+
         parent.Pulse();
     }
 
@@ -84,7 +91,7 @@ public abstract class Note : MonoBehaviour {
         if (!IsActive()) return;
 
         if (G.PlaySettings.AutoPlay) return;
-        
+
         foreach (var touch in Input.touches) {
             HandleInput(touch);
         }
@@ -96,13 +103,13 @@ public abstract class Note : MonoBehaviour {
         if (G.InGame.Time - time < 0.35f) return;
 
         StartCoroutine(GiveDestroyed());
-        
+
         PlayErrorAnim();
-        
+
         CreateJudgeEffect(4);
-        
+
         CreateDestroyEffect(4);
-        
+
         G.InGame.CountOfError++;
         G.InGame.Combo = 0;
     }
@@ -123,7 +130,8 @@ public abstract class Note : MonoBehaviour {
 
     protected Vector3 GetInputPosition(Touch touch) {
         return parent.field.mainCamera.ScreenToWorldPoint(
-            new Vector3(touch.position.x, touch.position.y, -parent.field.mainCamera.transform.position.z - parent.field.main.transform.position.z)
+            new Vector3(touch.position.x, touch.position.y,
+                -parent.field.mainCamera.transform.position.z - parent.field.main.transform.position.z)
         );
     }
 
