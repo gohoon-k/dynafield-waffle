@@ -606,7 +606,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 239.09998, y: 732.0448}
+  m_AnchoredPosition: {x: 239.09998, y: 737.2}
   m_SizeDelta: {x: 1356.6533, y: 153.5411}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &545758436
@@ -1145,23 +1145,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ad83b258152bc949936a4fdc01d32ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  combo: {fileID: 887335616}
-  score: {fileID: 983204856}
-  trackInfo: {fileID: 460618662}
-  difficulty: {fileID: 530027282}
-  background: {fileID: 898778524}
-  backgroundBright: {fileID: 660627807}
-  preparePauseInfo: {fileID: 1974146130}
-  stopButtonImage: {fileID: 1671866406}
-  retryButtonImage: {fileID: 1758121905}
-  pauseButton: {fileID: 943083229}
-  stopButton: {fileID: 1671866405}
-  retryButton: {fileID: 1758121904}
-  retryEnergyLeftDes: {fileID: 900616589}
-  retryEnergyLeft: {fileID: 567729215}
-  retryInfo: {fileID: 1804098286}
-  introTrackInfo: {fileID: 1562299700}
-  introPlayInfo: {fileID: 1165223981}
+  introArea:
+    trackInformation: {fileID: 1562299700}
+    playInformation: {fileID: 1165223981}
+    retryInformation: {fileID: 1804098286}
+  scoreArea:
+    combo: {fileID: 887335616}
+    score: {fileID: 983204856}
+  trackInformationArea:
+    trackInformation: {fileID: 460618662}
+    difficulty: {fileID: 530027282}
+  backgroundArea:
+    background: {fileID: 898778524}
+    brightBackground: {fileID: 660627807}
+  menuArea:
+    pause:
+      button: {fileID: 943083229}
+      help: {fileID: 1974146130}
+    retry:
+      image: {fileID: 1758121905}
+      button: {fileID: 1758121904}
+      remainingEnergyDesc: {fileID: 900616589}
+      remainingEnergy: {fileID: 567729215}
+    stop:
+      image: {fileID: 1671866406}
+      button: {fileID: 1671866405}
 --- !u!1 &792128939
 GameObject:
   m_ObjectHideFlags: 0
@@ -1479,7 +1487,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 0000
+  m_Text: 0
 --- !u!222 &887335617
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2856,7 +2864,7 @@ MonoBehaviour:
     placingPrecision: 600
     viewMode: 0
     autoPlay: 0
-    debug: 1
+    debugMode: 1
   notePrefabs:
     click: {fileID: 4191954091923668995, guid: c10a19e4a1a23504382f17f7fa6bbf06, type: 3}
     slide: {fileID: 3189764165758293691, guid: 42c59fe0bf6a4cc44af6c8ad2a7fcc78, type: 3}
@@ -3113,7 +3121,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1610786218}
   m_Layer: 0
-  m_Name: scripts
+  m_Name: standalone_scripts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3616,7 +3624,7 @@ GameObject:
   - component: {fileID: 1804098286}
   - component: {fileID: 1804098288}
   m_Layer: 0
-  m_Name: retry
+  m_Name: retry_info
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4046,7 +4054,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -239.40002, y: -129.70001}
+  m_AnchoredPosition: {x: -261.3, y: -129.70001}
   m_SizeDelta: {x: 172.31, y: 70.6621}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2005365039
