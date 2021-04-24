@@ -38,6 +38,8 @@ public static class G {
     public static class Items {
 
         public static int Energy = 15;
+
+        public static int MaxEnergy = 15;
         public static long CoolDown = -1;
 
     }
@@ -47,12 +49,14 @@ public static class G {
 
         public static int Difficulty = 1;
 
-        public static float Sync = 160;
+        public static int DisplaySync = 5;
         public static int DisplaySpeed = 3;
 
         public static bool AutoPlay = false;
 
         public static float Speed => DisplaySpeed / 200f;
+
+        public static int Sync => (int) ((DisplaySync / 165f + 1) * 165f);
     }
 
     public static class InternalSettings {
