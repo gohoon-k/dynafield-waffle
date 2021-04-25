@@ -32,7 +32,7 @@ public class ScoreCalculator : MonoBehaviour {
             if (G.InGame.MaxCombo < G.InGame.Combo)
                 G.InGame.MaxCombo = G.InGame.Combo;
             
-            if (G.InGame.Combo == 0) {
+            if (G.InGame.Combo < _calculatedCombo) {
                 _brokenCombos.Add(_calculatedCombo);
             }
 
