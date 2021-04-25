@@ -34,6 +34,16 @@ public class TrackSelect : MonoBehaviour
     }
 
 
+
+
+
+
+
+    #region PlaybuttonList
+
+    
+
+    
     public void ToggleDifficulty()
     {
         if (G.PlaySettings.Difficulty == 0)
@@ -55,15 +65,24 @@ public class TrackSelect : MonoBehaviour
         }
     }
     
+    public void SetDifficulty(int delta)
+    {
+        G.PlaySettings.DisplaySpeed += delta;
+        speed.GetComponent<Text>().text = G.PlaySettings.DisplaySpeed.ToString();
+    }
     
     public void Back()
     {
         SceneManager.LoadScene("Intro");
     }
     
+    #endregion
+    
     // Start is called before the first frame update
     void Start()
     {
+        speed.GetComponent<Text>().text = G.PlaySettings.DisplaySpeed.ToString();
+        
         G.InitTracks();
 
         if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
@@ -71,7 +90,7 @@ public class TrackSelect : MonoBehaviour
             G.Items.CoolDown = DateTime.Now.AddMinutes(5).Ticks;
         }
         
-        CheckCooldownFinished();
+        //CheckCooldownFinished();
 
         UpdateEnergyUI();
 
@@ -80,7 +99,7 @@ public class TrackSelect : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckCooldownFinished();
+        //CheckCooldownFinished();
         UpdateEnergyUI();
     }
 }
