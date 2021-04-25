@@ -2466,6 +2466,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5fa3700b1c77d94e88193751e2c21dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  track_info: {fileID: 1415858134}
   max_score: {fileID: 1305040619}
   max_accuracy: {fileID: 942396693}
   energy_left: {fileID: 1382251677}

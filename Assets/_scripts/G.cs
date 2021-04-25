@@ -119,6 +119,13 @@ public static class G {
 
     }
 
+    public static class TracksRecord        //기록 저장용 클래스
+    {
+        public static float[,] tracksrecord = new float[G.Tracks.Length,4];
+        //y축 = 곡별로 구분(TrackId와 동일)
+        //x축 = 0=easy최대스코어  1=easy최대정확도 2=hard최대스코어 3=hard최대정확도
+    }
+    
     [Serializable]
     public class TrackList {
         public Track[] tracks;
@@ -133,5 +140,4 @@ public static class G {
         public int[] difficulty;
         public string length;
     }
-    
 }
