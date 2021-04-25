@@ -40,7 +40,10 @@ public class JudgeEffect : MonoBehaviour {
         if (_startFadeOut) {
             _startFadeOut = false;
             StartCoroutine(Interpolators.Linear(1, 0, 0.25f,
-                step => { _mainRenderer.color = new Color(1, 1, 1, step); },
+                    step => {
+                        _mainRenderer.color = new Color(1, 1, 1, step);
+                        _earlyLateMesh.color = new Color(1, 1, 1, step);
+                    },
                     () => { Destroy(gameObject); }
                 )
             );

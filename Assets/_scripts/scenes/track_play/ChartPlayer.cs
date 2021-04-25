@@ -17,6 +17,7 @@ public class NotePrefabs {
     public GameObject slide;
     public GameObject hold;
     public GameObject swipe;
+    public GameObject counter;
 }
 
 [Serializable]
@@ -35,9 +36,18 @@ public class Animators {
 }
 
 [Serializable]
+public class Effects {
+    public GameObject counter;
+    public GameObject judgeLinePulse;
+    public GameObject notifyFieldMove;
+}
+
+[Serializable]
 public class Constants {
     public float placingPrecision;
     public bool viewMode;
+    public bool autoPlay;
+    public bool debugMode;
 }
 
 public class ChartPlayer : MonoBehaviour {
@@ -46,13 +56,21 @@ public class ChartPlayer : MonoBehaviour {
 
     public NotePrefabs notePrefabs;
 
+    public Effects effects;
+    
     public Animators animators;
     public Scripts scripts;
     
-    private GameObject _notesHolder;
-    private Transform _keyBeamsHolder;
-    private Transform _judgeEffectsHolder;
-    private GameObject _judgeLine;
+    private Transform _notesParent;
+    private Transform _keyBeamsParent;
+    private Transform _judgeEffectsParent;
+    
+    private Transform _judgeLine;
+    private Animator _judgeLineEffect1;
+    private Transform _judgeLineEffect2Parent;
+    
+    private Animator _notifyFieldUp;
+    private Animator _notifyFieldDown;
 
     private readonly List<Note> _notes = new List<Note>();
     private Chart _chart;
@@ -60,22 +78,28 @@ public class ChartPlayer : MonoBehaviour {
     private readonly int[] _loadableNoteCountsPerSpeed = {200, 185, 170, 155, 140, 125, 110, 100};
     private int _loadableNoteCount;
 
-    private float[] _positions;
-    private float[] _holdHeights;
+    private float[] _notePositions;
+    private float[] _holdNoteHeights;
     private bool[] _sHitData;
 
     private int _lastPlacedNoteId;
     private float _currentSpeed = 1.0f;
 
     private bool _trackStarted;
+    private bool _synchronizing;
     private bool _syncFinished;
     private bool _gameFinished;
     private bool _outroPlayed;
 
-    private int _currentSpeedPos;
-    private int _currentMoveXPos;
-    private int _currentMoveYPos;
-    private int _currentMoveZPos;
+    private int _currentSpeedIndex;
+    private int _currentMoveXIndex;
+    private int _currentMoveYIndex;
+    private int _currentMoveZIndex;
+    
+    private int _notifiedMoveYIndex;
+
+    private readonly List<List<float>> _differenceBetweenSpeeds = new List<List<float>>();
+    private float _lastSpeedTime;
 
     private AudioSource _audio;
 
@@ -85,32 +109,48 @@ public class ChartPlayer : MonoBehaviour {
         Interpolators.EaseOutCurve,
         Interpolators.EaseInOutCurve
     };
-
-    // Start is called before the first frame update
+    
     void Start() {
         G.InitTracks();
-
-        G.InGame.CanBePaused = false;
-
-        _notesHolder = field.main.transform.GetChild(1).gameObject;
-        _judgeLine = field.main.transform.GetChild(0).gameObject;
-        _keyBeamsHolder = field.main.transform.GetChild(2);
-        _judgeEffectsHolder = field.main.transform.GetChild(3);
-
-        var chartJson = (TextAsset) Resources.Load(
+        
+        _chart = JsonUtility.FromJson<Chart>(((TextAsset) Resources.Load(
             $"data/charts/{G.Tracks[G.PlaySettings.TrackId].internal_name}.{G.PlaySettings.Difficulty}", typeof(TextAsset)
-        );
-
-        _chart = JsonUtility.FromJson<Chart>(chartJson.ToString());
+        )).ToString());
 
         G.InGame.CountOfNotes = _chart.chart.Length;
         G.InGame.CanBePaused = false;
 
-        _loadableNoteCount = (Application.isEditor && constants.viewMode) ? 2000 : _loadableNoteCountsPerSpeed[G.PlaySettings.DisplaySpeed];
+        if (constants.debugMode) {
+            G.PlaySettings.AutoPlay = constants.autoPlay;
+        }
+        
+        if (!constants.debugMode) {
+            G.Items.Energy = PlayerPrefs.GetInt(G.Keys.Energy, 15);
 
-        _positions = new float[G.InGame.CountOfNotes];
-        _holdHeights = new float[G.InGame.CountOfNotes];
+            G.Items.Energy--;
+            PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
+        }
+        
+        PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayTimes),
+            PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 0) + 1);
+        
+        _notePositions = new float[G.InGame.CountOfNotes];
+        _holdNoteHeights = new float[G.InGame.CountOfNotes];
         _sHitData = new bool[G.InGame.CountOfNotes];
+
+        _notesParent = field.main.transform.Find("notes");
+        _judgeLine = field.main.transform.Find("judge_line");
+
+        _judgeLineEffect1 = _judgeLine.Find("line_effect_1").GetComponent<Animator>();
+        _judgeLineEffect2Parent = _judgeLine.Find("line_effect_2");
+        
+        _keyBeamsParent = field.main.transform.Find("key_beam_effects");
+        _judgeEffectsParent = field.main.transform.Find("judge_effects");
+
+        _notifyFieldUp = effects.notifyFieldMove.transform.Find("move_to_up").GetComponent<Animator>();
+        _notifyFieldDown = effects.notifyFieldMove.transform.Find("move_to_down").GetComponent<Animator>();
+
+        _loadableNoteCount = Application.isEditor && constants.viewMode ? 2000 : _loadableNoteCountsPerSpeed[G.PlaySettings.DisplaySpeed];
 
         Calculate();
 
@@ -124,10 +164,8 @@ public class ChartPlayer : MonoBehaviour {
 
         animators.foreground.Play("ingame_foreground_fade_in", -1, 0);
         StartCoroutine(Intro());
-        
     }
-
-    // Update is called once per frame
+    
     void Update() {
         if (G.InGame.ReadyAnimated && !G.InGame.Paused) {
             if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -139,19 +177,15 @@ public class ChartPlayer : MonoBehaviour {
                 _trackStarted = true;
             }
 
-            if (!_syncFinished) {
+            if (!_syncFinished && !_synchronizing) {
+                _synchronizing = true;
                 StartCoroutine(AdjustSync());
-            } else {
+            } else if (_syncFinished) {
                 G.InGame.CanBePaused = true;
-
-                if (_chart.speed != null &&
-                    _currentSpeedPos < _chart.speed.Length &&
-                    _chart.speed[_currentSpeedPos].t <= G.InGame.Time) {
-                    _currentSpeed = _chart.speed[_currentSpeedPos].s;
-                    _currentSpeedPos++;
-                }
-
-                // Notify line move code here
+                
+                ChangeSpeed();
+                
+                NotifyFieldMove();
 
                 MoveY();
                 MoveX();
@@ -190,20 +224,22 @@ public class ChartPlayer : MonoBehaviour {
         }
     }
 
-    private void MoveNotes() {
-        var positive = _notesHolder.transform.GetChild(0);
-        var positiveBefore = positive.localPosition;
-        positive.localPosition =
-            new Vector3(positiveBefore.x,
-                positiveBefore.y - _currentSpeed * G.PlaySettings.Speed * constants.placingPrecision * Time.deltaTime,
-                positiveBefore.z);
+    private void OnApplicationQuit() {
+        if (G.Items.Energy == 0)
+            G.Items.CoolDown = DateTime.Now.AddMinutes(10).ToBinary();
+    }
 
-        var negative = _notesHolder.transform.GetChild(2);
+    private void MoveNotes() {
+        var pos = _differenceBetweenSpeeds.Sum(diff => diff[0] * diff[1] * constants.placingPrecision * G.PlaySettings.Speed);
+        pos += (G.InGame.Time - _lastSpeedTime) * constants.placingPrecision * _currentSpeed * G.PlaySettings.Speed;
+
+        var positive = _notesParent.GetChild(0);
+        var positiveBefore = positive.localPosition;
+        positive.localPosition = new Vector3(positiveBefore.x, -pos, positiveBefore.z);
+
+        var negative = _notesParent.GetChild(2);
         var negativeBefore = negative.localPosition;
-        negative.localPosition =
-            new Vector3(negativeBefore.x,
-                negativeBefore.y + _currentSpeed * G.PlaySettings.Speed * constants.placingPrecision * Time.deltaTime,
-                negativeBefore.z);
+        negative.localPosition = new Vector3(negativeBefore.x, pos, negativeBefore.z);
     }
 
     private void CreateNote(int id) {
@@ -212,12 +248,13 @@ public class ChartPlayer : MonoBehaviour {
             1 => notePrefabs.slide,
             2 => notePrefabs.hold,
             3 => notePrefabs.swipe,
+            4 => notePrefabs.counter,
             _ => notePrefabs.click
         };
 
         var note = Instantiate(
             targetNotePrefab,
-            _notesHolder.transform.GetChild(_chart.chart[id].d == 1 ? 0 : 2),
+            _notesParent.GetChild(_chart.chart[id].d == 1 ? 0 : 2),
             true
         );
         var script = note.GetComponent<Note>();
@@ -232,38 +269,64 @@ public class ChartPlayer : MonoBehaviour {
         script.xPos = _chart.chart[id].x;
         script.hasAnotherNote = _sHitData[id];
 
-        if (script is NoteHold holdScript) {
-            holdScript.duration = _chart.chart[id].dur;
+        switch (script) {
+            case NoteHold holdScript: {
+                holdScript.duration = _chart.chart[id].dur;
 
-            var start = note.transform.GetChild(0).GetComponent<SpriteRenderer>();
-            var hold = note.transform.GetChild(1).GetComponent<SpriteRenderer>();
-            var progress = note.transform.GetChild(2).GetComponent<SpriteRenderer>();
-            var end = note.transform.GetChild(3).GetComponent<SpriteRenderer>();
+                var start = note.transform.GetChild(0).GetComponent<SpriteRenderer>();
+                var hold = note.transform.GetChild(1).GetComponent<SpriteRenderer>();
+                var progress = note.transform.GetChild(2).GetComponent<SpriteRenderer>();
+                var end = note.transform.GetChild(3).GetComponent<SpriteRenderer>();
 
-            note.transform.GetChild(3).localPosition = new Vector3(0, _holdHeights[id], 0);
+                note.transform.GetChild(3).localPosition = new Vector3(0, _holdNoteHeights[id], 0);
 
-            start.size = new Vector2(holdScript.size / 10f, start.size.y);
-            end.size = new Vector2(holdScript.size / 10f, end.size.y);
-            progress.size = new Vector2(0, _holdHeights[id] * 2);
-            hold.size = new Vector2(holdScript.size / 10f, _holdHeights[id] * 2);
+                start.size = new Vector2(holdScript.size / 10f, start.size.y);
+                end.size = new Vector2(holdScript.size / 10f, end.size.y);
+                progress.size = new Vector2(0, _holdNoteHeights[id] * 2);
+                hold.size = new Vector2(1, _holdNoteHeights[id] * 2 / (holdScript.size / 10f));
 
-            holdScript.startRenderer = start;
-            holdScript.holdRenderer = hold;
-            holdScript.progressRenderer = progress;
-            holdScript.endRenderer = end;
-        } else {
-            var spriteRenderer = note.GetComponent<SpriteRenderer>();
-            spriteRenderer.size = new Vector2(script.size / 10f, spriteRenderer.size.y);
+                hold.gameObject.transform.localScale = new Vector3(holdScript.size / 20f, holdScript.size / 20f, 1);
+
+                holdScript.startRenderer = start;
+                holdScript.holdRenderer = hold;
+                holdScript.progressRenderer = progress;
+                holdScript.endRenderer = end;
+                break;
+            }
+            case NoteCounter counterScript: {
+                var mainRenderer = note.GetComponent<SpriteRenderer>();
+                var effectRenderer = note.transform.GetChild(0).GetComponent<SpriteRenderer>();
+
+                mainRenderer.size = new Vector2(script.size / 10f, mainRenderer.size.y);
+                effectRenderer.size = new Vector2(script.size / 10f, effectRenderer.size.y);
+                
+                counterScript.mainRenderer = mainRenderer;
+                counterScript.effectRenderer = effectRenderer;
+            
+                counterScript.timeout = _chart.chart[id].timeout;
+                counterScript.count = _chart.chart[id].counts;
+
+                counterScript.effectGroup = effects.counter;
+                break;
+            }
+            default: {
+                var spriteRenderer = note.GetComponent<SpriteRenderer>();
+                spriteRenderer.size = new Vector2(script.size / 10f, spriteRenderer.size.y);
+                
+                script.SetRenderer(spriteRenderer);
+                break;
+            }
         }
 
-        note.transform.localPosition = new Vector2(script.xPos / 100f, _positions[id]);
+        note.transform.localPosition = new Vector2(script.xPos / 100f, _notePositions[id]);
 
         _notes.Add(script);
     }
 
     private void Calculate() {
+        var placingCursor = 0f;
+        
         var currentSpeed = 1.0f;
-        var pos = 0f;
         var currentNoteId = 0;
         var currentSpeedId = 0;
 
@@ -286,29 +349,41 @@ public class ChartPlayer : MonoBehaviour {
 
             var loop = 0;
             while (currentNoteId < G.InGame.CountOfNotes && _chart.chart[currentNoteId].t <= time) {
-                _positions[currentNoteId] = pos;
-
-                if (_chart.chart[currentNoteId].dur > 0) {
-                    var subPos = pos;
-                    var subSpeed = currentSpeed;
-                    var subSpeedId = currentSpeedId;
-                    var holdLastFrame = frame + _chart.chart[currentNoteId].dur * constants.placingPrecision;
-
-                    for (var subFrame = frame; subFrame <= holdLastFrame; subFrame++) {
-                        if (subSpeedId < _chart.speed.Length &&
-                            _chart.speed[subSpeedId].t <= subFrame / constants.placingPrecision) {
-                            subSpeed = _chart.speed[subSpeedId].s;
-                            subSpeedId++;
-                        }
-
-                        subPos += subSpeed * G.PlaySettings.Speed;
-                    }
-
-                    _holdHeights[currentNoteId] = subPos - pos;
-                }
-
+                _notePositions[currentNoteId] = placingCursor;
+                
                 currentNoteId++;
                 loop++;
+
+                if (_chart.chart[currentNoteId - 1].ty != 2) continue;
+                
+                var subPlacingCursor = 0f;
+                var subSpeed = currentSpeed;
+                var subSpeedId = currentSpeedId;
+                var holdLastFrame = frame + _chart.chart[currentNoteId - 1].dur * constants.placingPrecision;
+
+                var subDiffBetweenSpeeds = new List<List<float>>();
+                var subLastSpeedFrame = 0;
+
+                var subFrameFromZero = 0;
+
+                for (var subFrame = frame; subFrame <= holdLastFrame; subFrame++) {
+                    if (subSpeedId < _chart.speed.Length &&
+                        _chart.speed[subSpeedId].t <= subFrame / constants.placingPrecision) {
+                        subDiffBetweenSpeeds.Add(new List<float> {subFrameFromZero - subLastSpeedFrame, subSpeed});
+                            
+                        subSpeed = _chart.speed[subSpeedId].s;
+                        subLastSpeedFrame = subFrameFromZero;
+                            
+                        subSpeedId++;
+                    }
+
+                    subFrameFromZero++;
+                        
+                    subPlacingCursor = subDiffBetweenSpeeds.Sum(diff => (int) diff[0] * diff[1] * G.PlaySettings.Speed);
+                    subPlacingCursor += (subFrameFromZero - subLastSpeedFrame) * subSpeed * G.PlaySettings.Speed;
+                }
+
+                _holdNoteHeights[currentNoteId - 1] = subPlacingCursor;
             }
 
             while (loop > 0) {
@@ -316,21 +391,45 @@ public class ChartPlayer : MonoBehaviour {
                 _sHitData[currentNoteId - loop - 1] = true;
             }
 
-            pos = diffBetweenSpeeds.Sum(diff => (int) diff[0] * diff[1] * G.PlaySettings.Speed);
-            pos += (frame - lastSpeedFrame) * currentSpeed * G.PlaySettings.Speed;
+            placingCursor = diffBetweenSpeeds.Sum(diff => (int) diff[0] * diff[1] * G.PlaySettings.Speed);
+            placingCursor += (frame - lastSpeedFrame) * currentSpeed * G.PlaySettings.Speed;
         }
     }
 
+    private void ChangeSpeed() {
+        if (_chart.speed == null || _currentSpeedIndex >= _chart.speed.Length ||
+            !(_chart.speed[_currentSpeedIndex].t <= G.InGame.Time)) return;
+        
+        _differenceBetweenSpeeds.Add(new List<float> {G.InGame.Time - _lastSpeedTime, _currentSpeed});
+        _lastSpeedTime = G.InGame.Time;
+                    
+        _currentSpeed = _chart.speed[_currentSpeedIndex].s;
+        _currentSpeedIndex++;
+    }
+
+    private void NotifyFieldMove() {
+        if (_chart.move == null || _notifiedMoveYIndex >= _chart.move.Length ||
+            !(_chart.move[_notifiedMoveYIndex].t - 0.65f <= G.InGame.Time)) return;
+
+        var destination = -_chart.move[_currentMoveYIndex].d / 100f;
+        var current = field.main.transform.position.y;
+        
+        (destination < current ? _notifyFieldDown : _notifyFieldUp)
+            .Play("notify_field_move_blink", -1, 0);
+
+        _notifiedMoveYIndex++;
+    }
+    
     private void MoveY() {
-        if (_chart.move == null || _currentMoveYPos >= _chart.move.Length ||
-            !(_chart.move[_currentMoveYPos].t <= G.InGame.Time)) return;
+        if (_chart.move == null || _currentMoveYIndex >= _chart.move.Length ||
+            !(_chart.move[_currentMoveYIndex].t <= G.InGame.Time)) return;
 
         StartCoroutine(
             Interpolators.Curve(
-                _curves[_chart.move[_currentMoveYPos].i],
+                _curves[_chart.move[_currentMoveYIndex].i],
                 field.main.transform.position.y,
-                -_chart.move[_currentMoveYPos].d / 100f,
-                _chart.move[_currentMoveYPos].dur,
+                -_chart.move[_currentMoveYIndex].d / 100f,
+                _chart.move[_currentMoveYIndex].dur,
                 step => {
                     var before = field.main.transform.position;
                     field.main.transform.position = new Vector3(before.x, step, before.z);
@@ -338,19 +437,19 @@ public class ChartPlayer : MonoBehaviour {
                 () => { }
             )
         );
-        _currentMoveYPos++;
+        _currentMoveYIndex++;
     }
 
     private void MoveX() {
-        if (_chart.move_x == null || _currentMoveXPos >= _chart.move_x.Length ||
-            !(_chart.move_x[_currentMoveXPos].t <= G.InGame.Time)) return;
+        if (_chart.move_x == null || _currentMoveXIndex >= _chart.move_x.Length ||
+            !(_chart.move_x[_currentMoveXIndex].t <= G.InGame.Time)) return;
 
         StartCoroutine(
             Interpolators.Curve(
-                _curves[_chart.move_x[_currentMoveXPos].i],
+                _curves[_chart.move_x[_currentMoveXIndex].i],
                 field.main.transform.position.x,
-                _chart.move_x[_currentMoveXPos].d / 500f,
-                _chart.move_x[_currentMoveXPos].dur,
+                _chart.move_x[_currentMoveXIndex].d / 500f,
+                _chart.move_x[_currentMoveXIndex].dur,
                 step => {
                     var before = field.main.transform.position;
                     field.main.transform.position = new Vector3(step, before.y, before.z);
@@ -358,19 +457,19 @@ public class ChartPlayer : MonoBehaviour {
                 () => { }
             )
         );
-        _currentMoveXPos++;
+        _currentMoveXIndex++;
     }
 
     private void MoveZ() {
-        if (_chart.zoom == null || _currentMoveZPos >= _chart.zoom.Length ||
-            !(_chart.zoom[_currentMoveZPos].t <= G.InGame.Time)) return;
+        if (_chart.zoom == null || _currentMoveZIndex >= _chart.zoom.Length ||
+            !(_chart.zoom[_currentMoveZIndex].t <= G.InGame.Time)) return;
 
         StartCoroutine(
             Interpolators.Curve(
-                _curves[_chart.zoom[_currentMoveZPos].i],
+                _curves[_chart.zoom[_currentMoveZIndex].i],
                 field.main.transform.position.z,
-                _chart.zoom[_currentMoveZPos].d / 100f - 10,
-                _chart.zoom[_currentMoveZPos].dur,
+                _chart.zoom[_currentMoveZIndex].d / 100f - 10,
+                _chart.zoom[_currentMoveZIndex].dur,
                 step => {
                     var before = field.main.transform.position;
                     field.main.transform.position = new Vector3(before.x, before.y, step);
@@ -378,20 +477,26 @@ public class ChartPlayer : MonoBehaviour {
                 () => { }
             )
         );
-        _currentMoveZPos++;
+        _currentMoveZIndex++;
     }
 
     private void MoveNotesToZero() {
         var zeroNotes = GetZeroNotes();
         var validZeroNotes =
-            zeroNotes.FindAll(note => note.transform.parent != _notesHolder.transform.GetChild(1).transform);
+            zeroNotes.FindAll(note => note.transform.parent != _notesParent.GetChild(1).transform);
 
         foreach (var note in validZeroNotes) {
             Transform noteTransform;
-            (noteTransform = note.transform).parent = _notesHolder.transform.GetChild(1).transform;
+            (noteTransform = note.transform).parent = _notesParent.GetChild(1).transform;
             var before = noteTransform.localPosition;
             noteTransform.localPosition = new Vector3(before.x, 0, before.z);
         }
+    }
+
+    public void Pulse() {
+        _judgeLineEffect1.Play("judge_line_pulse", -1, 0);
+
+        Instantiate(effects.judgeLinePulse, _judgeLineEffect2Parent, true).transform.localPosition = new Vector3(0, 0, 0);
     }
 
     public void Pause() {
@@ -422,13 +527,18 @@ public class ChartPlayer : MonoBehaviour {
     }
 
     public void Retry() {
-        scripts.userInterfaceUpdater.Retry();
         if (G.Items.Energy <= 0) return;
 
         PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayTimes),
             PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 0) + 1);
-        G.Items.Energy--;
+
+        if (!constants.debugMode) {
+            G.Items.Energy--;
+            PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
+        }
         
+        scripts.userInterfaceUpdater.Retry();
+
         StopAllCoroutines();
 
         G.InGame.CanBePaused = false;
@@ -440,26 +550,34 @@ public class ChartPlayer : MonoBehaviour {
             Destroy(note.gameObject);
         }
 
-        for (var i = 0; i < _keyBeamsHolder.childCount; i++) {
-            Destroy(_keyBeamsHolder.GetChild(i).gameObject);
+        for (var i = 0; i < _keyBeamsParent.childCount; i++) {
+            Destroy(_keyBeamsParent.GetChild(i).gameObject);
         }
 
-        for (var i = 0; i < _judgeEffectsHolder.childCount; i++) {
-            Destroy(_judgeEffectsHolder.GetChild(i).gameObject);
+        for (var i = 0; i < _judgeEffectsParent.childCount; i++) {
+            Destroy(_judgeEffectsParent.GetChild(i).gameObject);
+        }
+
+        for (var i = 0; i < effects.counter.transform.childCount; i++) {
+            Destroy(effects.counter.transform.GetChild(i).gameObject);
         }
 
         field.main.transform.position = new Vector3(0, 0, 0);
-        _notesHolder.transform.GetChild(0).localPosition = new Vector3(0, 0, 0);
-        _notesHolder.transform.GetChild(2).localPosition = new Vector3(0, 0, 0);
+        _notesParent.GetChild(0).localPosition = new Vector3(0, 0, 0);
+        _notesParent.GetChild(2).localPosition = new Vector3(0, 0, 0);
 
         _notes.Clear();
+        _differenceBetweenSpeeds.Clear();
+
+        _lastSpeedTime = 0;
 
         _lastPlacedNoteId = 0;
         _currentSpeed = 1.0f;
-        _currentSpeedPos = 0;
-        _currentMoveXPos = 0;
-        _currentMoveYPos = 0;
-        _currentMoveZPos = 0;
+        _currentSpeedIndex = 0;
+        _currentMoveXIndex = 0;
+        _currentMoveYIndex = 0;
+        _currentMoveZIndex = 0;
+        _notifiedMoveYIndex = 0;
 
         for (var i = 0; i < Math.Min(_loadableNoteCount, _chart.chart.Length); i++) {
             CreateNote(_lastPlacedNoteId);
@@ -470,6 +588,7 @@ public class ChartPlayer : MonoBehaviour {
 
         _trackStarted = false;
         _syncFinished = false;
+        _synchronizing = false;
 
         G.InGame.ReadyAnimated = false;
         G.InGame.Paused = false;
@@ -530,11 +649,19 @@ public class ChartPlayer : MonoBehaviour {
         yield return new WaitForSeconds(1f);
 
         StartCoroutine(Ready());
+
+        yield return new WaitForSeconds(3f);
+
+        _notifyFieldUp.Play("notify_field_move_intro");
+        _notifyFieldDown.Play("notify_field_move_intro");
     }
 
     private IEnumerator Outro() {
         yield return new WaitForSeconds(_chart.end_margin);
 
+        _notifyFieldUp.Play("notify_field_move_outro", -1, 0);
+        _notifyFieldDown.Play("notify_field_move_outro", -1, 0);
+        
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 375f, 0f, 0.35f,
             step => { _judgeLine.transform.localScale = new Vector3(step, 1f, 1f); },
             () => { }
@@ -591,16 +718,16 @@ public class ChartPlayer : MonoBehaviour {
         return _currentSpeed;
     }
 
-    public GameObject GetNotesHolder() {
-        return _notesHolder;
+    public Transform GetNotesHolder() {
+        return _notesParent;
     }
 
     public Transform GetKeyBeamsHolder() {
-        return _keyBeamsHolder;
+        return _keyBeamsParent;
     }
 
     public Transform GetJudgeEffectsHolder() {
-        return _judgeEffectsHolder;
+        return _judgeEffectsParent;
     }
 
     private List<Note> GetNotes() {

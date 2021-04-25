@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine;
 
 public abstract class Note : MonoBehaviour {
-    
     public ChartPlayer parent;
 
     public int id;
@@ -37,39 +36,51 @@ public abstract class Note : MonoBehaviour {
         return parent.GetActiveNotes().Contains(this);
     }
 
-    protected bool IsHiddenByOtherNote(float inputX) {
+    protected bool IsHiddenByOtherNote(Vector3 input) {
         var activeNotes = parent.GetActiveNotes();
-        var targetNotes = activeNotes.FindAll(note => note.IsTargeted(inputX) && !note.destroying && !note.hasInput);
-        
+        var targetNotes = activeNotes.FindAll(note => note.IsTargeted(input) && !note.destroying && !note.hasInput);
+
         targetNotes.Sort((a, b) => a.time < b.time ? -1 : Math.Abs(a.time - b.time) < 0.000000001f ? 0 : 1);
 
         if (targetNotes.Count == 0) return false;
-        
+
         return !targetNotes[0].Compare(this);
     }
 
-    protected bool IsTargeted(float inputX) {
-        return xPos / 100f + sizeInWorld > inputX && xPos / 100f - sizeInWorld < inputX;
+    protected bool IsTargeted(Vector3 input) {
+        var fieldPosition = parent.field.main.transform.position;
+        return xPos / 100f + sizeInWorld > input.x && xPos / 100f - sizeInWorld < input.x &&
+               input.y - fieldPosition.y >= -3 && input.y - fieldPosition.y <= 3;
     }
 
-    protected virtual void Judge(float judgeTime = -1f) {
+    protected virtual void Judge() {
         if (judged) return;
 
-        transform.parent = parent.GetNotesHolder().transform.GetChild(1);
-        
+        var tf = transform;
+
+        tf.parent = parent.GetNotesHolder().GetChild(1);
+
         StartCoroutine(GiveJudged());
 
         PlayDestroyAnim();
 
         StartCoroutine(GiveDestroyed());
 
-        var result = DifferenceToJudge(judgeTime < 0 ? Math.Abs(G.InGame.Time - time) : Math.Abs(judgeTime - time));
+        var result = TimeDifferenceToJudge(GetTimeDifference());
+
+        if (result == 3)
+            StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, tf.localPosition.y, 0, 0.05f,
+                step => { tf.localPosition = new Vector3(tf.localPosition.x, step); },
+                () => { }
+            ));
 
         CreateJudgeEffect(result);
-        
+
         CreateDestroyEffect(result);
 
         ApplyStatistics(result);
+
+        parent.Pulse();
     }
 
     private void NoteUpdate() {
@@ -80,25 +91,25 @@ public abstract class Note : MonoBehaviour {
         if (!IsActive()) return;
 
         if (G.PlaySettings.AutoPlay) return;
-        
+
         foreach (var touch in Input.touches) {
             HandleInput(touch);
         }
     }
 
     protected virtual void CheckError() {
-        if (destroying) return;
+        if (!IsPending()) return;
 
         if (G.InGame.Time - time < 0.35f) return;
 
         StartCoroutine(GiveDestroyed());
-        
+
         PlayErrorAnim();
-        
+
         CreateJudgeEffect(4);
-        
+
         CreateDestroyEffect(4);
-        
+
         G.InGame.CountOfError++;
         G.InGame.Combo = 0;
     }
@@ -119,7 +130,8 @@ public abstract class Note : MonoBehaviour {
 
     protected Vector3 GetInputPosition(Touch touch) {
         return parent.field.mainCamera.ScreenToWorldPoint(
-            new Vector3(touch.position.x, touch.position.y, -parent.field.mainCamera.transform.position.z - parent.field.main.transform.position.z)
+            new Vector3(touch.position.x, touch.position.y,
+                -parent.field.mainCamera.transform.position.z - parent.field.main.transform.position.z)
         );
     }
 
@@ -186,13 +198,19 @@ public abstract class Note : MonoBehaviour {
         destroying = true;
     }
 
+    public virtual void SetRenderer(SpriteRenderer noteRenderer) { }
+
     protected abstract void PlayErrorAnim();
 
     protected abstract void PlayDestroyAnim();
 
     protected abstract void HandleInput(Touch touch);
 
-    protected abstract int DifferenceToJudge(float diff);
+    protected abstract int TimeDifferenceToJudge(float diff);
+
+    protected abstract float GetTimeDifference();
+
+    protected abstract bool IsPending();
 
     private bool Compare(Note other) {
         return other.id == id || other.time - time < 0.00001f;

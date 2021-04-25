@@ -16,7 +16,13 @@ class Chart {
         public short s;
         public byte ty;
         public sbyte d;
+        
+        /* Hold only */
         public float dur;
+        
+        /* Counter only */
+        public float timeout;
+        public int counts;
     }
 
     [System.Serializable]

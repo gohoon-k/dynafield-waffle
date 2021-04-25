@@ -7,8 +7,6 @@ public class NoteClick : Note {
     
     new void Start() {
         base.Start();
-
-        _renderer = GetComponent<SpriteRenderer>();
     }
 
     new void Update() {
@@ -17,6 +15,11 @@ public class NoteClick : Note {
         }
         
         base.Update();
+    }
+
+    public override void SetRenderer(SpriteRenderer noteRenderer) {
+        base.SetRenderer(noteRenderer);
+        _renderer = noteRenderer;
     }
 
     protected override void PlayErrorAnim() {
@@ -28,19 +31,27 @@ public class NoteClick : Note {
         AlphaAnim(_renderer);
     }
 
+    protected override bool IsPending() {
+        return !destroying && !hasInput;
+    }
+
+    protected override float GetTimeDifference() {
+        return G.InGame.Time - time;
+    }
+
     protected override void HandleInput(Touch touch) {
         if (touch.phase != TouchPhase.Began) return;
 
         var inputPosition = GetInputPosition(touch);
 
-        if (!IsTargeted(inputPosition.x)) return;
-        if (IsHiddenByOtherNote(inputPosition.x)) return;
+        if (!IsTargeted(inputPosition)) return;
+        if (IsHiddenByOtherNote(inputPosition)) return;
 
         StartCoroutine(GiveInput());
         Judge();
     }
 
-    protected override int DifferenceToJudge(float diff) {
+    protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
             if (diff > G.InternalSettings.JudgeOfClick[i])
                 return i;

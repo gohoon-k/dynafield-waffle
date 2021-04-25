@@ -1,15 +1,14 @@
+using System.Collections;
 using UnityEngine;
 
 public class NoteSwipe : Note {
 
-    private SpriteRenderer _noteRenderer;
+    private SpriteRenderer _renderer;
 
     private float _judgeTime = -1;
 
     new void Start() {
         base.Start();
-
-        _noteRenderer = GetComponent<SpriteRenderer>();
     }
     
     new void Update() {
@@ -19,15 +18,24 @@ public class NoteSwipe : Note {
         
         base.Update();
     }
+    
+    public override void SetRenderer(SpriteRenderer noteRenderer) {
+        base.SetRenderer(noteRenderer);
+        _renderer = noteRenderer;
+    }
 
     protected override void PlayErrorAnim() {
-        AlphaAnim(_noteRenderer);
+        AlphaAnim(_renderer);
         // AlphaAnim(_arrowRenderer);
     }
 
     protected override void PlayDestroyAnim() {
         ScaleAnim();
-        AlphaAnim(_noteRenderer);
+        AlphaAnim(_renderer);
+    }
+
+    protected override bool IsPending() {
+        return !destroying;
     }
 
     protected override void HandleInput(Touch touch) {
@@ -35,8 +43,8 @@ public class NoteSwipe : Note {
         
         var inputPosition = GetInputPosition(touch);
 
-        if (!IsTargeted(inputPosition.x)) return;
-        if (IsHiddenByOtherNote(inputPosition.x)) return;
+        if (!IsTargeted(inputPosition)) return;
+        if (IsHiddenByOtherNote(inputPosition)) return;
 
         if (touch.phase == TouchPhase.Began && !hasInput) {
             StartCoroutine(GiveInput());
@@ -44,16 +52,20 @@ public class NoteSwipe : Note {
         }
 
         if (touch.phase == TouchPhase.Moved && _judgeTime > 0) {
-            Judge(_judgeTime);
+            Judge();
         }
     }
 
-    protected override int DifferenceToJudge(float diff) {
+    protected override float GetTimeDifference() {
+        return _judgeTime - time;
+    }
+
+    protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
             if (diff > G.InternalSettings.JudgeOfSwipe[i])
                 return i;
 
         return 3;
     }
-    
+
 }

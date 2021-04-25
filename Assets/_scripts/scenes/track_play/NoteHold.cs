@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class NoteHold : Note {
@@ -20,8 +22,19 @@ public class NoteHold : Note {
 
     private bool _isAutoHandled;
 
+    private float _initHeight;
+    private float _initEnd;
+
+    private float _startPos = 1;
+    private Transform _notePositive;
+    
     new void Start() {
         base.Start();
+
+        _initHeight = holdRenderer.size.y;
+        _initEnd = endRenderer.gameObject.transform.localPosition.y;
+
+        _notePositive = parent.field.main.transform.GetChild(2).GetChild(0);
     }
 
     new void Update() {
@@ -42,6 +55,9 @@ public class NoteHold : Note {
             _endTime = G.InGame.Time;
             Judge();
         }
+
+        if (_startPos - 1 < 0.0001 && _startPos - 1 >= 0 && G.InGame.Time >= time)
+            _startPos = _notePositive.localPosition.y;
         
         base.Update();
 
@@ -71,6 +87,13 @@ public class NoteHold : Note {
         DeactivateAnim(startRenderer);
         DeactivateAnim(holdRenderer);
         DeactivateAnim(endRenderer);
+        DeactivateAnim(progressRenderer);
+        if (_animationType == -1)
+            StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, progressRenderer.size.x, 0, 0.15f,
+                    step => { progressRenderer.size = new Vector2(step, progressRenderer.size.y); },
+                    () => { }
+                )
+            );
     }
 
     protected override void PlayDestroyAnim() {
@@ -89,22 +112,22 @@ public class NoteHold : Note {
     private void ResizeHold() {
         if (G.InGame.Time - time < 0) return;
 
+        var delta = _startPos - _notePositive.localPosition.y;
+
         var endTransform = transform.GetChild(3);
+        
+        endTransform.localPosition = new Vector3(0, _initEnd - delta, 0);
+        holdRenderer.size = new Vector2(1, _initHeight - delta / (size / 20f));
+        
         var beforeSize = holdRenderer.size;
         var beforeProgressSize = progressRenderer.size;
         if (beforeSize.y <= 0) {
             endTransform.localPosition = new Vector3(0, 0, 0);
-            holdRenderer.size = new Vector2(beforeSize.x, 0);
+            holdRenderer.size = new Vector2(1, 0);
             progressRenderer.size = new Vector2(beforeProgressSize.x, 0);
             return;
         }
 
-        endTransform.localPosition = new Vector3(0,
-            endTransform.localPosition.y - parent.GetCurrentSpeed() * G.PlaySettings.Speed * parent.constants.placingPrecision * Time.deltaTime, 0);
-        
-        holdRenderer.size = new Vector2(beforeSize.x,
-            beforeSize.y - 2 * parent.GetCurrentSpeed() * G.PlaySettings.Speed * parent.constants.placingPrecision * Time.deltaTime);
-        
         progressRenderer.size = new Vector2(
             beforeProgressSize.x,
             beforeProgressSize.y - 2 * parent.GetCurrentSpeed() * G.PlaySettings.Speed * parent.constants.placingPrecision * Time.deltaTime
@@ -122,15 +145,15 @@ public class NoteHold : Note {
 
         var inputPosition = GetInputPosition(touch);
 
-        if (_handling && touch.fingerId == _fingerId && !IsTargeted(inputPosition.x)) {
+        if (_handling && touch.fingerId == _fingerId && !IsTargeted(inputPosition)) {
             _handling = false;
             _fingerId = -1;
 
             Judge();
         }
 
-        if (!IsTargeted(inputPosition.x)) return;
-        if (IsHiddenByOtherNote(inputPosition.x)) return;
+        if (!IsTargeted(inputPosition)) return;
+        if (IsHiddenByOtherNote(inputPosition)) return;
 
         if (touch.phase == TouchPhase.Began) {
             if (G.InGame.Time - time < -0.35f) {
@@ -163,18 +186,18 @@ public class NoteHold : Note {
         }
     }
 
-    protected override void Judge(float judgeTime = -1) {
+    protected override void Judge() {
         if (judged) return;
 
         StartCoroutine(GiveJudged());
 
-        // It's not error, but animation name is same with error animation.
-        PlayErrorAnim();
-
-        var result = DifferenceToJudge((_endTime - _startTime) / duration);
+        var result = TimeDifferenceToJudge(GetTimeDifference());
 
         if (result >= 2) _animationType = 1;
         else _animationType = -1;
+        
+        // It's not error, but animation name is same with error animation.
+        PlayErrorAnim();
 
         CreateJudgeEffect(result);
 
@@ -183,8 +206,12 @@ public class NoteHold : Note {
         ApplyStatistics(result);
     }
 
+    protected override float GetTimeDifference() {
+        return (_endTime - _startTime) / duration;
+    }
+
     protected override void CheckError() {
-        if (destroying || _handling || _startTime != 0) return;
+        if (destroying || _handling || _startTime + 1 > 0.001) return;
         
         if (G.InGame.Time - time < 0.35f) return;
 
@@ -200,7 +227,11 @@ public class NoteHold : Note {
         G.InGame.Combo = 0;
     }
 
-    protected override int DifferenceToJudge(float diff) {
+    protected override bool IsPending() {
+        return !destroying && !_handling && _startTime + 1 <= 0.001;
+    }
+
+    protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
             if (diff < G.InternalSettings.JudgeOfHold[i])
                 return i;

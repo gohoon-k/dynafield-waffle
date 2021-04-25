@@ -7,8 +7,6 @@ public class NoteSlide : Note {
     
     new void Start() {
         base.Start();
-
-        _renderer = GetComponent<SpriteRenderer>();
     }
     
     new void Update() {
@@ -20,6 +18,11 @@ public class NoteSlide : Note {
         
         base.Update();
     }
+    
+    public override void SetRenderer(SpriteRenderer noteRenderer) {
+        base.SetRenderer(noteRenderer);
+        _renderer = noteRenderer;
+    }
 
     protected override void PlayErrorAnim() {
         AlphaAnim(_renderer);
@@ -30,19 +33,27 @@ public class NoteSlide : Note {
         AlphaAnim(_renderer);
     }
 
+    protected override bool IsPending() {
+        return !destroying && !hasInput;
+    }
+
+    protected override float GetTimeDifference() {
+        return G.InGame.Time - time;
+    }
+
     protected override void HandleInput(Touch touch) {
         if (!(touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)) return;
 
         var inputPosition = GetInputPosition(touch);
 
-        if (!IsTargeted(inputPosition.x)) return;
-        if (IsHiddenByOtherNote(inputPosition.x)) return;
+        if (!IsTargeted(inputPosition)) return;
+        if (IsHiddenByOtherNote(inputPosition)) return;
 
         StartCoroutine(GiveInput());
         _pending = true;
     }
 
-    protected override int DifferenceToJudge(float diff) {
+    protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
             if (diff > G.InternalSettings.JudgeOfSlide[i])
                 return i;
