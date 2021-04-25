@@ -170,7 +170,7 @@ public class UserInterfaceUpdater : MonoBehaviour {
     public void Retry() {
         introArea.retryInformation.text = 
             G.Items.Energy > 0 ? 
-                $"<size=180>energy left:</size> {G.Items.Energy - 1}" : 
+                $"<size=180>energy left:</size> {G.Items.Energy}" : 
                 "<size=180>you don't have enough energy!</size>";
         _retryInfoAnimator.Play("ingame_effect_retry_blink", -1, 0);
     }

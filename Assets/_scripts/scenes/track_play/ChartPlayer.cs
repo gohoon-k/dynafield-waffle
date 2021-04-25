@@ -527,7 +527,6 @@ public class ChartPlayer : MonoBehaviour {
     }
 
     public void Retry() {
-        scripts.userInterfaceUpdater.Retry();
         if (G.Items.Energy <= 0) return;
 
         PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayTimes),
@@ -537,6 +536,8 @@ public class ChartPlayer : MonoBehaviour {
             G.Items.Energy--;
             PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
         }
+        
+        scripts.userInterfaceUpdater.Retry();
 
         StopAllCoroutines();
 
