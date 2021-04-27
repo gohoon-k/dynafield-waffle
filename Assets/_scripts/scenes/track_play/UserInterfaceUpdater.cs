@@ -78,11 +78,11 @@ public class UserInterfaceUpdater : MonoBehaviour {
         trackInformationArea.difficulty.text = G.PlaySettings.Difficulty == 0 ? "easy" : "hard";
 
         backgroundArea.background.sprite =
-            (Sprite) Resources.Load($"textures/tracks/track_{G.Tracks[G.PlaySettings.TrackId].internal_name}",
+            (Sprite) Resources.Load($"textures/tracks/normal/{G.Tracks[G.PlaySettings.TrackId].id}",
                 typeof(Sprite));
         
         backgroundArea.brightBackground.sprite =
-            (Sprite) Resources.Load($"textures/tracks/track_{G.Tracks[G.PlaySettings.TrackId].internal_name}_bright",
+            (Sprite) Resources.Load($"textures/tracks/bright/{G.Tracks[G.PlaySettings.TrackId].id}",
                 typeof(Sprite));
 
         _retryInfoAnimator = introArea.retryInformation.gameObject.GetComponent<Animator>();

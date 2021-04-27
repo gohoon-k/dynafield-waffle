@@ -112,6 +112,8 @@ public class ChartPlayer : MonoBehaviour {
     
     void Start() {
         G.InitTracks();
+
+        G.PlaySettings.FromTrackPlay = true;
         
         _chart = JsonUtility.FromJson<Chart>(((TextAsset) Resources.Load(
             $"data/charts/{G.Tracks[G.PlaySettings.TrackId].internal_name}.{G.PlaySettings.Difficulty}", typeof(TextAsset)
@@ -615,12 +617,20 @@ public class ChartPlayer : MonoBehaviour {
         }
 
         scripts.userInterfaceUpdater.ShowPauseMenu(false);
+        
+        _notifyFieldUp.Play("notify_field_move_outro", -1, 0);
+        _notifyFieldDown.Play("notify_field_move_outro", -1, 0);
 
         animators.foreground.Play("ingame_foreground_fade_out", -1, 0);
         animators.ui.Play("ingame_ui_fade_out", -1, 0);
 
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 375f, 0f, 0.5f,
             step => { _judgeLine.transform.localScale = new Vector3(step, 1f, 1f); },
+            () => { }
+        ));
+        
+        StartCoroutine(Interpolators.Linear(1f, 0f, 0.35f,
+            step => { scripts.userInterfaceUpdater.backgroundArea.brightBackground.color = new Color(1, 1, 1, step); },
             () => { }
         ));
 
@@ -664,6 +674,11 @@ public class ChartPlayer : MonoBehaviour {
         
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 375f, 0f, 0.35f,
             step => { _judgeLine.transform.localScale = new Vector3(step, 1f, 1f); },
+            () => { }
+        ));
+        
+        StartCoroutine(Interpolators.Linear(1f, 0f, 0.35f,
+            step => { scripts.userInterfaceUpdater.backgroundArea.brightBackground.color = new Color(1, 1, 1, step); },
             () => { }
         ));
 

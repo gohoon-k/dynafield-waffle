@@ -9,154 +9,319 @@ public class TrackSelect : MonoBehaviour
 {
 
     #region UIObj
+
+    public Sprite[] backgrounds;
+    public Sprite[] brightBackgrounds;
+
+    public Image trackBackground;
+    public Image trackBackgroundBright;
+    public Image virtualBackground;
+    public Image virtualBackgroundBright;
     
-    public Text track_info;       //곡 정보
-    public Text best_score;        //최고 스코어
-    public Text best_accuracy;     //최고 정확도
-    public Text energy_left;      //현재 에너지
-    public Text energy_max;       //최대 에너지
-    public Text energy_timer;     //에너지 충전 대기시간
+    public Text trackInfo;       //곡 정보
+    public Text bastScore;        //최고 스코어
+    public Text bestAccuracy;     //최고 정확도
+    public Text remainingEnergy;      //현재 에너지
+    public Text maxEnergy;       //최대 에너지
+    public Text energyTimer;     //에너지 충전 대기시간
     public Text difficulty;       //난이도 숫자
-    public Text difficulty_easy;  //난이도 easy
-    public Text difficulty_hard;  //난이도 hard
+    public Text[] difficultyDescriptions;  //난이도 easy
     public Text speed;            //채보속도 숫자
+    public Button speedIncrease;
+    public Text speedIncreaseText;
+    public Button speedDecrease;
+    public Text speedDecreaseText;
     public Image start_toggle;
     public Text start_message;
     public Image prepareplay;
     
-    
-    
     #endregion
+
+    public RectTransform scalableArea;
+    public RectTransform scalableAreaPrepare;
+    public Animator prepareBack;
+    public Animator preparePlay;
+    public Image startGameEffectImage;
+
+    private bool _trackSelectable = true;
+    private bool _canStartGame = false;
+    private bool _prepareAnimating = false;
+    private bool _starting = false;
     
-    void UpdateEnergyUI()
+    void Start()
     {
-        if (G.Items.CoolDown == -1)
-        {
-            energy_left.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 1.0f);
-            energy_max.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 1.0f);
-            energy_timer.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 0.0f);
-        }
-        else
-        {
-            
-            DateTime difference = new DateTime(G.Items.CoolDown - DateTime.Now.Ticks);
-            energy_timer.text = difference.ToString("mm:ss");
-            energy_left.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 0.15f);
-            energy_max.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 0.15f);
-            energy_timer.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 1.0f);
-        }
+        #region Initialization
+
+        if (!PlayerPrefs.HasKey("initialized")) 
+            InitializePlayerPrefs();
         
-    }
-    void CheckCooldownFinished()
-    {
-        if (G.Items.CoolDown != -1 && G.Items.CoolDown - DateTime.Now.Ticks < 0)
-        {
-            G.Items.Energy = 15;
-            G.Items.CoolDown = -1;
-        }
-    }
+        G.InitTracks();
+        
+        G.PlaySettings.TrackId = PlayerPrefs.GetInt(G.Keys.SelectedTrack);
+        G.PlaySettings.DisplaySpeed = PlayerPrefs.GetInt(G.Keys.Speed);
+        G.PlaySettings.DisplaySync = PlayerPrefs.GetInt(G.Keys.Sync);
+        G.PlaySettings.Difficulty = PlayerPrefs.GetInt(G.Keys.Difficulty);
+        ToggleDifficulty();
+        ToggleDifficulty();
 
-    void PreparePlay()
-    {
-        prepareplay.gameObject.SetActive(true);
-        start_toggle.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-            difficulty_easy.color.b, 0.3f);
-    }
-
-    public void  Account()
-    {
-        PlayerPrefs.SetInt(G.Keys.Speed, 5);
-        PlayerPrefs.SetInt(G.Keys.Sync, 3);
-        PlayerPrefs.SetInt(G.Keys.Energy,15);
-        PlayerPrefs.SetInt(G.Keys.CoolDown,-1);
-        PlayerPrefs.SetInt("initialized", 1);
+        G.Items.MaxEnergy = PlayerPrefs.GetInt(G.Keys.MaxEnergy);
+        G.Items.Energy = PlayerPrefs.GetInt(G.Keys.Energy);
+        G.Items.CoolDown = (long) PlayerPrefs.GetFloat(G.Keys.CoolDown);
+        
         PlayerPrefs.Save();
-    }
-    
-    #region PlaybuttonList  //버튼용 함수 모음
-    public void SelectTrack(int dir)        //트랙변경
-    {
-        G.PlaySettings.TrackId += dir;      //TrackId 더하는부분
-        if (G.PlaySettings.TrackId == -1) G.PlaySettings.TrackId = G.Tracks.Length - 1;
-        if (G.PlaySettings.TrackId == G.Tracks.Length) G.PlaySettings.TrackId = 0;
+
+        backgrounds = Resources.LoadAll<Sprite>("textures/tracks/normal");
+        Array.Sort(backgrounds, (a, b) => int.Parse(a.name) - int.Parse(b.name));
+        brightBackgrounds = Resources.LoadAll<Sprite>("textures/tracks/bright");
+        Array.Sort(brightBackgrounds, (a, b) => int.Parse(a.name) - int.Parse(b.name));
+
+        SelectTrack();
+
+        CheckCooldownFinished();
+        UpdateEnergyUI();
         
-        //곡에 따라 UI 수정
-        track_info.GetComponent<Text>().text = String.Format("{0} <size=40>{1}</size>",
-               G.Tracks[G.PlaySettings.TrackId].title, G.Tracks[G.PlaySettings.TrackId].artist);
-        difficulty.text = G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty].ToString();
-        
-        //값이 없으면 0 반환
-        best_score.text = PlayerPrefs.HasKey(G.Keys.FormatKey(G.Keys.BestScore))
-            ? PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore)).ToString()
-            : "0";
-        best_accuracy.text = PlayerPrefs.HasKey(G.Keys.FormatKey(G.Keys.BestAccuracy))
-            ? PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy)).ToString()
-            : "0%";
-    }
-    public void ToggleDifficulty()              //난이도 변경
-    {
-        if (G.PlaySettings.Difficulty == 0)     //난이도가 easy였을때 hard로 변경
-        {
-            G.PlaySettings.Difficulty = 1;
-            difficulty_easy.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 0.4f);
-            difficulty_hard.color = new Color(difficulty_hard.color.r, difficulty_hard.color.g,
-                difficulty_hard.color.b, 1.0f);
-        }
-        else
-        {
-            G.PlaySettings.Difficulty = 0;      //난이도가 hard였을때 easy로 변경
-            difficulty_easy.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 1.0f);
-            difficulty_hard.color = new Color(difficulty_hard.color.r, difficulty_hard.color.g,
-                difficulty_hard.color.b, 0.4f);
-        }
-        difficulty.GetComponent<Text>().text = G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty].ToString();
-    }
-    public void SetDisplayspeed(int delta)      //DisplaySpeed 변경   
-    {
-        G.PlaySettings.DisplaySpeed += delta;
         speed.text = G.PlaySettings.DisplaySpeed.ToString();
-    }
+        
+        startGameEffectImage = preparePlay.gameObject.transform.GetChild(0).gameObject.GetComponent<Image>();
 
-    public void PusyBack()
-    {
-        if (start_toggle.gameObject.activeSelf != true)
+        #endregion
+        
+        
+        
+        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 2, 1, 1f, step => {
+            scalableArea.localScale = new Vector3(step, step, 1);
+            scalableAreaPrepare.localScale = new Vector3(step, step, 1);
+        }, () => { }));
+        
+        if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
         {
-            start_toggle.gameObject.SetActive(true);
-            start_message.gameObject.SetActive(true);
-            if (G.Items.Energy == 0)
-            {
-                PreparePlay();
-            }
-        }
-        else
-        {
-            start_toggle.gameObject.SetActive(false);
-            start_message.gameObject.SetActive(false);
-            start_toggle.color = new Color(difficulty_easy.color.r, difficulty_easy.color.g,
-                difficulty_easy.color.b, 1.0f);
-            prepareplay.gameObject.SetActive(false);
+            G.Items.CoolDown = DateTime.Now.AddMinutes(5).Ticks;
         }
     }
-
-    public void StartPlay()
+    
+    void Update()
     {
-        G.Items.Energy--;
-        PlayerPrefs.SetInt(G.Keys.SelectedTrack,G.PlaySettings.TrackId);
-        PlayerPrefs.SetInt(G.Keys.Speed, G.PlaySettings.DisplaySpeed);
-        PlayerPrefs.SetInt(G.Keys.Sync, G.PlaySettings.DisplaySync);
-        PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
+        if (G.Items.CoolDown != -1) {
+            CheckCooldownFinished();
+            UpdateEnergyUI();
+        }
+    }
+    
+    private void UpdateEnergyUI()
+    {
+        if (G.Items.CoolDown != -1) {
+            var difference = new DateTime(G.Items.CoolDown - DateTime.Now.Ticks);
+            energyTimer.text = difference.ToString("mm:ss");
+        }
+
+        remainingEnergy.text = $"{G.Items.Energy}";
+        
+        remainingEnergy.color = new Color(remainingEnergy.color.r, remainingEnergy.color.g,
+            remainingEnergy.color.b, G.Items.CoolDown == -1 ? 1.0f : 0.15f);
+        
+        maxEnergy.color = new Color(maxEnergy.color.r, maxEnergy.color.g,
+            maxEnergy.color.b, G.Items.CoolDown == -1 ? 1.0f : 0.15f);
+
+        maxEnergy.text = $"/{G.Items.MaxEnergy}";
+        
+        energyTimer.color = new Color(energyTimer.color.r, energyTimer.color.g,
+            energyTimer.color.b, G.Items.CoolDown == -1 ? 0.0f : 1.0f);
+    }
+    
+    private void CheckCooldownFinished() {
+        if (G.Items.CoolDown == -1 || G.Items.CoolDown - DateTime.Now.Ticks >= 0) return;
+        
+        G.Items.Energy = G.Items.MaxEnergy;
+        G.Items.CoolDown = -1;
+
+        PlayerPrefs.SetInt(G.Keys.Energy, G.Items.MaxEnergy);
+        PlayerPrefs.SetFloat(G.Keys.CoolDown, G.Items.CoolDown);
         PlayerPrefs.Save();
+
+        UpdateEnergyUI();
+    }
+
+    public void PreparePlay()
+    {
+        // prepareplay.gameObject.SetActive(true);
+        // start_toggle.color = new Color(start_toggle.color.r, start_toggle.color.g,
+        //     start_toggle.color.b, 0.3f);
+        
+        if (_prepareAnimating || _starting) return;
+        
+        _prepareAnimating = true;
+        
+        prepareBack.gameObject.SetActive(true);
+        preparePlay.gameObject.SetActive(true);
+        prepareBack.SetFloat("speed", 1f);
+        preparePlay.SetFloat("speed", 1f);
+        prepareBack.Play("track_select_prepare_back", -1, 0);
+        preparePlay.Play("track_select_prepare_play", -1, 0);
+        StartCoroutine(SetGameCanStart(0.5f));
+    }
+
+    public void CancelPrepare(bool slow = false) {
+        if (_prepareAnimating) return;
+        _prepareAnimating = true;
+        
+        
+        _canStartGame = false;
+        
+        prepareBack.Play("track_select_prepare_back", -1, 1);
+        preparePlay.Play("track_select_prepare_play", -1, 1);
+        prepareBack.SetFloat("speed", slow ? -0.75f : -2f);
+        preparePlay.SetFloat("speed", slow ? -0.75f : -2f);
+        StartCoroutine(DeactivatePrepare(1));
+    }
+
+    private IEnumerator SetGameCanStart(float length) {
+        yield return new WaitForSeconds(length);
+        _canStartGame = true;
+        _prepareAnimating = false;
+    }
+
+    private IEnumerator DeactivatePrepare(float length) {
+        yield return new WaitForSeconds(length);
+        prepareBack.gameObject.SetActive(false);
+        preparePlay.gameObject.SetActive(false);
+        _prepareAnimating = false;
+    }
+
+    public void StartGame() {
+        if (_starting || !_canStartGame) return;
+        _starting = true;
+
+        StartCoroutine(Enter());
+    }
+
+    private IEnumerator Enter() {
+        
+        var backgroundBrightAnimator = trackBackgroundBright.GetComponent<Animator>();
+        backgroundBrightAnimator.enabled = false;
+
+        StartCoroutine(Interpolators.Linear(1, 0, 0.15f, step => {
+            startGameEffectImage.color = new Color(1, 1, 1, step);
+            trackBackgroundBright.color = new Color(1, 1, 1, step);
+        }, () => { }));
+        
+        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 1, 2f, 1f, step => {
+            scalableArea.localScale = new Vector3(step, step, 1);
+            scalableAreaPrepare.localScale = new Vector3(step, step, 1);
+        }, () => { }));
+
+        CancelPrepare(true);
+
+        yield return new WaitForSeconds(2f);
+
+
         SceneManager.LoadScene("TrackPlay");
     }
     
+    private void InitializePlayerPrefs()
+    {
+        PlayerPrefs.SetInt(G.Keys.Speed, 5);
+        PlayerPrefs.SetInt(G.Keys.Sync, 3);
+        PlayerPrefs.SetInt(G.Keys.MaxEnergy, 10);
+        PlayerPrefs.SetInt(G.Keys.Energy, 10);
+        PlayerPrefs.SetInt(G.Keys.CoolDown, -1);
+        PlayerPrefs.SetInt("initialized", 1);
+        PlayerPrefs.Save();
+    }
+
+    private void SelectTrack() {
+        if (!G.PlaySettings.FromTrackPlay) {
+            trackBackground.color = new Color(1, 1, 1, 0);
+            trackBackgroundBright.color = new Color(1, 1, 1, 0);
+            
+            StartCoroutine(Interpolators.Linear(0, 1, 1f, step => {
+                trackBackground.color = new Color(1, 1, 1, step);
+                trackBackgroundBright.color = new Color(1, 1, 1, step);
+            }, () => {}));
+        }
+        
+        trackBackground.sprite = backgrounds[G.PlaySettings.TrackId];
+        trackBackgroundBright.sprite = brightBackgrounds[G.PlaySettings.TrackId];
+
+        trackInfo.GetComponent<Text>().text =
+            $"{G.Tracks[G.PlaySettings.TrackId].title}   <size=40>{G.Tracks[G.PlaySettings.TrackId].artist}</size>";
+        difficulty.text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
+
+        bastScore.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
+        bestAccuracy.text = $"{PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0):F2}%";
+    }
+    
+    public void SelectTrack(int dir)        //트랙변경
+    {
+        if (!_trackSelectable) return;
+
+        trackBackground.sprite = backgrounds[G.PlaySettings.TrackId];
+        trackBackgroundBright.sprite = brightBackgrounds[G.PlaySettings.TrackId];
+
+        G.PlaySettings.TrackId += dir;
+        if (G.PlaySettings.TrackId == -1) G.PlaySettings.TrackId = G.Tracks.Length - 1;
+        if (G.PlaySettings.TrackId == G.Tracks.Length) G.PlaySettings.TrackId = 0;
+
+        virtualBackground.sprite = backgrounds[G.PlaySettings.TrackId];
+        virtualBackgroundBright.sprite = brightBackgrounds[G.PlaySettings.TrackId];
+        
+        trackInfo.GetComponent<Text>().text =
+            $"{G.Tracks[G.PlaySettings.TrackId].title}   <size=40>{G.Tracks[G.PlaySettings.TrackId].artist}</size>";
+        difficulty.text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
+
+        bastScore.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
+        bestAccuracy.text = $"{PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0):F2}%";
+
+        _trackSelectable = false;
+        
+        StartCoroutine(Interpolators.Linear(0, 1, 0.15f, step => {
+            trackBackground.color = new Color(1, 1, 1, 1 - step);
+            trackBackgroundBright.color = new Color(1, 1, 1, 1 - step);
+            virtualBackground.color = new Color(1, 1, 1, step);
+            virtualBackgroundBright.color = new Color(1, 1, 1, step);
+        }, () => {
+            trackBackground.sprite = virtualBackground.sprite;
+            trackBackgroundBright.sprite = virtualBackgroundBright.sprite;
+            
+            trackBackground.color = new Color(1, 1, 1, 1);
+            trackBackgroundBright.color = new Color(1, 1, 1, 1);
+            virtualBackground.color = new Color(1, 1, 1, 0);
+            virtualBackgroundBright.color = new Color(1, 1, 1, 0);
+
+            _trackSelectable = true;
+        }));
+    }
+    
+    public void ToggleDifficulty()              //난이도 변경
+    {
+        var previousDifficulty = difficultyDescriptions[G.PlaySettings.Difficulty];
+        previousDifficulty.color = new Color(
+            previousDifficulty.color.r, previousDifficulty.color.g, previousDifficulty.color.b, 0.4f
+        );
+        G.PlaySettings.Difficulty = G.PlaySettings.Difficulty == 0 ? 1 : 0;
+        var currentDifficulty = difficultyDescriptions[G.PlaySettings.Difficulty];
+        currentDifficulty.color = new Color(
+            currentDifficulty.color.r, currentDifficulty.color.g, currentDifficulty.color.b, 1f
+        );
+        
+        difficulty.GetComponent<Text>().text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
+        
+        PlayerPrefs.SetInt(G.Keys.Difficulty, G.PlaySettings.Difficulty);
+    }
+    
+    public void SetDisplaySpeed(int delta)      //DisplaySpeed 변경   
+    {
+        G.PlaySettings.DisplaySpeed += delta;
+        speed.text = $"{G.PlaySettings.DisplaySpeed}";
+
+        PlayerPrefs.SetInt(G.Keys.Speed, G.PlaySettings.DisplaySpeed);
+        
+        speedIncrease.interactable = G.PlaySettings.DisplaySpeed != 9;
+        speedDecrease.interactable = G.PlaySettings.DisplaySpeed != 1;
+
+        speedIncreaseText.color = new Color(1, 1, 1, speedIncrease.interactable ? 1f : 0.5f);
+        speedDecreaseText.color = new Color(1, 1, 1, speedDecrease.interactable ? 1f : 0.5f);
+    }
+
     public void Back()                          //뒤로가기 버튼
     {
         PlayerPrefs.SetInt(G.Keys.SelectedTrack,G.PlaySettings.TrackId);
@@ -166,39 +331,5 @@ public class TrackSelect : MonoBehaviour
         PlayerPrefs.Save();
         SceneManager.LoadScene("Intro");
     }
-    
-    #endregion
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-        #region Initialization  //초기화
 
-        if (PlayerPrefs.HasKey("initialized") == false) {Account();}
-        G.InitTracks();
-        G.PlaySettings.TrackId = PlayerPrefs.GetInt(G.Keys.SelectedTrack);
-        G.PlaySettings.DisplaySpeed = PlayerPrefs.GetInt(G.Keys.Speed);
-        G.PlaySettings.DisplaySync = PlayerPrefs.GetInt(G.Keys.Sync);
-        G.Items.Energy = PlayerPrefs.GetInt(G.Keys.Energy);
-        G.Items.CoolDown = PlayerPrefs.GetInt(G.Keys.CoolDown);
-        PlayerPrefs.Save();
-        SelectTrack(G.PlaySettings.TrackId);
-        CheckCooldownFinished();
-        UpdateEnergyUI();
-        speed.text = G.PlaySettings.DisplaySpeed.ToString();
-        #endregion
-        
-        if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
-        {
-            G.Items.CoolDown = DateTime.Now.AddMinutes(5).Ticks;
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        CheckCooldownFinished();
-        UpdateEnergyUI();
-    }
 }
