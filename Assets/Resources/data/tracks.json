@@ -5,16 +5,16 @@
       "title": "art for rest",
       "artist": "arforest",
       "id": 0,
-      "difficulty": [6, 9],
+      "difficulty": [4, 9],
       "length": "3:17"
     },
     {
-      "internal_name": "awaken",
-      "title": "awaken",
+      "internal_name": "dream_world_diary",
+      "title": "dream world diary",
       "artist": "plum",
       "id": 1,
-      "difficulty": [3, 8],
-      "length": "2:32"
+      "difficulty": [2, 7],
+      "length": "3:07"
     }
   ]
 }
