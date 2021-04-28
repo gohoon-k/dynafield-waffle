@@ -21,7 +21,7 @@ public static class G {
         public const string Sync = "sync";
         public const string Speed = "speed";
 
-        public const string MaxEnergy = "max_energy";
+        public const string MaxEnergyStep = "max_energy_step";
         public const string Energy = "energy";
         public const string CoolDown = "cool_down";
 
@@ -37,21 +37,72 @@ public static class G {
     }
 
     public static class Items {
+        public static int Energy {
+            get => _energy;
+            set {
+                _energy = value;
+                PlayerPrefs.SetInt(Keys.Energy, _energy);
+            }
+        }
+        private static int _energy = 10;
 
-        public static int Energy = 10;
+        public static readonly int[] MaxEnergy = { 10, 15, 20 };
 
-        public static int MaxEnergy = 10;
-        public static long CoolDown = -1;
-
+        public static int MaxEnergyStep {
+            get => _maxEnergyStep;
+            set {
+                _maxEnergyStep = value;
+                PlayerPrefs.SetInt(Keys.MaxEnergyStep, _maxEnergyStep);
+            }
+        }
+        private static int _maxEnergyStep;
+        
+        public static long CoolDown {
+            get => _coolDown;
+            set {
+                _coolDown = value;
+                PlayerPrefs.SetString(Keys.CoolDown, $"{_coolDown}");
+            }
+        }
+        private static long _coolDown = -1;
     }
 
     public static class PlaySettings {
-        public static int TrackId = 0;
+        public static int TrackId {
+            get => _trackId;
+            set {
+                _trackId = value;
+                PlayerPrefs.SetInt(Keys.SelectedTrack, _trackId);
+            }
+        }
+        private static int _trackId = 0;
 
-        public static int Difficulty = 1;
+        public static int Difficulty {
+            get => _difficulty;
+            set {
+                _difficulty = value;
+                PlayerPrefs.SetInt(Keys.Difficulty, _difficulty);
+            }
+        }
+        private static int _difficulty = 1;
 
-        public static int DisplaySync = 3;
-        public static int DisplaySpeed = 3;
+        public static int DisplaySync {
+            get => _displaySync;
+            set {
+                _displaySync = value;
+                PlayerPrefs.SetInt(Keys.Sync, _displaySync);
+            }
+        }
+        private static int _displaySync = 3;
+
+        public static int DisplaySpeed {
+            get => _displaySpeed;
+            set {
+                _displaySpeed = value;
+                PlayerPrefs.SetInt(Keys.Speed, _displaySpeed);
+            }
+        }
+        private static int _displaySpeed = 3;
 
         public static bool AutoPlay = false;
 
