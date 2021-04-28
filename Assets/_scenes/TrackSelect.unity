@@ -2761,6 +2761,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackBackground: {fileID: 1749477988}
   trackBackgroundBright: {fileID: 533701327}
+  trackBackgroundBrightAnimator: {fileID: 533701329}
   virtualBackground: {fileID: 1482483635}
   virtualBackgroundBright: {fileID: 2014579935}
   trackInfo: {fileID: 1415858134}
