@@ -1158,6 +1158,7 @@ MonoBehaviour:
   backgroundArea:
     background: {fileID: 898778524}
     brightBackground: {fileID: 660627807}
+    brightBackgroundAnimator: {fileID: 660627806}
   menuArea:
     pause:
       button: {fileID: 943083229}
@@ -2864,7 +2865,7 @@ MonoBehaviour:
     placingPrecision: 600
     viewMode: 0
     autoPlay: 0
-    debugMode: 1
+    debugMode: 0
   notePrefabs:
     click: {fileID: 4191954091923668995, guid: c10a19e4a1a23504382f17f7fa6bbf06, type: 3}
     slide: {fileID: 3189764165758293691, guid: 42c59fe0bf6a4cc44af6c8ad2a7fcc78, type: 3}
