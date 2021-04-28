@@ -26,6 +26,7 @@ public class TrackInformationArea {
 public class BackgroundArea {
     public Image background;
     public Image brightBackground;
+    public Animator brightBackgroundAnimator;
 }
 
 [Serializable]
@@ -168,10 +169,12 @@ public class UserInterfaceUpdater : MonoBehaviour {
     }
     
     public void Retry() {
-        introArea.retryInformation.text = 
-            G.Items.Energy > 0 ? 
-                $"<size=180>energy left:</size> {G.Items.Energy}" : 
-                "<size=180>you don't have enough energy!</size>";
+        introArea.retryInformation.text = $"<size=180>energy left:</size> {G.Items.Energy}";
+                _retryInfoAnimator.Play("ingame_effect_retry_blink", -1, 0);
+    }
+
+    public void NotEnoughEnergy() {
+        introArea.retryInformation.text = "<size=180>you don't have enough energy!</size>";
         _retryInfoAnimator.Play("ingame_effect_retry_blink", -1, 0);
     }
     
