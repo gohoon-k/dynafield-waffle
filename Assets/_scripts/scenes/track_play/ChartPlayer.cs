@@ -162,7 +162,7 @@ public class ChartPlayer : MonoBehaviour {
         }
 
         _audio = GetComponent<AudioSource>();
-        _audio.clip = (AudioClip) Resources.Load($"tracks/{G.Tracks[G.PlaySettings.TrackId].internal_name}", typeof(AudioClip));
+        _audio.clip = (AudioClip) Resources.Load($"tracks/{G.Tracks[G.PlaySettings.TrackId].id}", typeof(AudioClip));
 
         animators.foreground.Play("ingame_foreground_fade_in", -1, 0);
         StartCoroutine(Intro());
@@ -529,7 +529,10 @@ public class ChartPlayer : MonoBehaviour {
     }
 
     public void Retry() {
-        if (G.Items.Energy <= 0) return;
+        if (G.Items.Energy <= 0) {
+            scripts.userInterfaceUpdater.NotEnoughEnergy();
+            return;
+        }
 
         PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayTimes),
             PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 0) + 1);
@@ -628,9 +631,15 @@ public class ChartPlayer : MonoBehaviour {
             step => { _judgeLine.transform.localScale = new Vector3(step, 1f, 1f); },
             () => { }
         ));
+
+        scripts.userInterfaceUpdater.backgroundArea.brightBackgroundAnimator.enabled =
+            false;
         
-        StartCoroutine(Interpolators.Linear(1f, 0f, 0.35f,
-            step => { scripts.userInterfaceUpdater.backgroundArea.brightBackground.color = new Color(1, 1, 1, step); },
+        StartCoroutine(Interpolators.Linear(scripts.userInterfaceUpdater.backgroundArea.brightBackground.color.a, 0f, 0.35f,
+            step => {
+                scripts.userInterfaceUpdater.backgroundArea.brightBackground.color = 
+                    new Color(1, 1, 1, step);
+            },
             () => { }
         ));
 
@@ -677,8 +686,14 @@ public class ChartPlayer : MonoBehaviour {
             () => { }
         ));
         
-        StartCoroutine(Interpolators.Linear(1f, 0f, 0.35f,
-            step => { scripts.userInterfaceUpdater.backgroundArea.brightBackground.color = new Color(1, 1, 1, step); },
+        scripts.userInterfaceUpdater.backgroundArea.brightBackgroundAnimator.enabled =
+            false;
+        
+        StartCoroutine(Interpolators.Linear(scripts.userInterfaceUpdater.backgroundArea.brightBackground.color.a, 0f, 0.35f,
+            step => {
+                scripts.userInterfaceUpdater.backgroundArea.brightBackground.color = 
+                    new Color(1, 1, 1, step);
+            },
             () => { }
         ));
 
