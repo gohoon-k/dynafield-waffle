@@ -2863,7 +2863,7 @@ MonoBehaviour:
     main: {fileID: 1601456207}
   constants:
     placingPrecision: 600
-    viewMode: 0
+    viewMode: 1
     autoPlay: 0
     debugMode: 0
   notePrefabs:
