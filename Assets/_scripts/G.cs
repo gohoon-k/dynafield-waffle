@@ -12,6 +12,8 @@ public static class G {
     
     public static class Keys {
 
+        public const string FirstExecution = "first_execution";
+
         public const string SelectedTrack = "selected_track";
         
         public const string Difficulty = "difficulty";
@@ -24,6 +26,7 @@ public static class G {
         public const string MaxEnergyStep = "max_energy_step";
         public const string Energy = "energy";
         public const string CoolDown = "cool_down";
+        public const string Key = "key";
 
         public const string BestScore = "score_{0}_{1}";
         public const string BestAccuracy = "accuracy_{0}_{1}";
@@ -46,7 +49,7 @@ public static class G {
         }
         private static int _energy = 10;
 
-        public static readonly int[] MaxEnergy = { 10, 15, 20 };
+        public static readonly int[] MaxEnergy = { 5, 7, 10, 25 };
 
         public static int MaxEnergyStep {
             get => _maxEnergyStep;
@@ -65,6 +68,15 @@ public static class G {
             }
         }
         private static long _coolDown = -1;
+        
+        public static int Key {
+            get => _key;
+            set {
+                _key = value;
+                PlayerPrefs.SetInt(Keys.Key, _key);
+            }
+        }
+        private static int _key = 0;
     }
 
     public static class PlaySettings {
