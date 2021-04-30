@@ -28,6 +28,8 @@ public class TrackSelect : MonoBehaviour {
     public Button speedDecrease;
     public Text speedDecreaseText;
 
+    public Text keysUI;
+
     #endregion
 
     public RectTransform scalableArea;
@@ -64,7 +66,8 @@ public class TrackSelect : MonoBehaviour {
 
         G.Items.MaxEnergyStep = PlayerPrefs.GetInt(G.Keys.MaxEnergyStep);
         G.Items.Energy = PlayerPrefs.GetInt(G.Keys.Energy);
-        G.Items.CoolDown =long.Parse(PlayerPrefs.GetString(G.Keys.CoolDown));
+        G.Items.CoolDown = long.Parse(PlayerPrefs.GetString(G.Keys.CoolDown));
+        G.Items.Key = PlayerPrefs.GetInt(G.Keys.Key);
 
         _backgrounds = Resources.LoadAll<Sprite>("textures/tracks/normal");
         Array.Sort(_backgrounds, (a, b) => int.Parse(a.name) - int.Parse(b.name));
@@ -92,6 +95,8 @@ public class TrackSelect : MonoBehaviour {
 
         if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
             G.Items.CoolDown = DateTime.Now.AddMinutes(5).ToBinary();
+        
+        UpdateKeyUI(0);
     }
 
     void Update() {
@@ -101,7 +106,7 @@ public class TrackSelect : MonoBehaviour {
         }
     }
 
-    private void UpdateEnergyUI() {
+    public void UpdateEnergyUI() {
         if (G.Items.CoolDown != -1) {
             var difference = new DateTime(G.Items.CoolDown - DateTime.Now.ToBinary());
             energyTimer.text = difference.ToString("m:ss");
@@ -132,6 +137,12 @@ public class TrackSelect : MonoBehaviour {
         UpdateEnergyUI();
     }
 
+    public void UpdateKeyUI(int before) {
+        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, before, G.Items.Key, 0.5f, step => {
+            keysUI.text = $"<size=50>you have</size>\n{(int) step} key(s)";
+        }, () => {}));
+    }
+    
     public void PreparePlay() {
         if (_prepareAnimating || _starting) return;
 
@@ -226,6 +237,7 @@ public class TrackSelect : MonoBehaviour {
         G.Items.MaxEnergyStep = 0;
         G.Items.Energy = G.Items.MaxEnergy[G.Items.MaxEnergyStep];
         G.Items.CoolDown = -1;
+        G.Items.Key = 0;
         PlayerPrefs.SetInt("initialized", 1);
         PlayerPrefs.Save();
     }
@@ -328,6 +340,17 @@ public class TrackSelect : MonoBehaviour {
 
         speedIncreaseText.color = new Color(1, 1, 1, speedIncrease.interactable ? 1f : 0.5f);
         speedDecreaseText.color = new Color(1, 1, 1, speedDecrease.interactable ? 1f : 0.5f);
+    }
+
+    public void RefillEnergy() {
+        G.Items.Energy = G.Items.MaxEnergy[G.Items.MaxEnergyStep];
+        G.Items.CoolDown = -1;
+        UpdateEnergyUI();
+    }
+
+    public void StartCooldownNow() {
+        G.Items.Energy = 0;
+        G.Items.CoolDown = DateTime.Now.AddMinutes(5).ToBinary();
     }
 
     public void Back() //뒤로가기 버튼
