@@ -32,7 +32,7 @@ public class StoreManager : MonoBehaviour {
         G.Items.CoolDown = -1;
         G.Items.Energy = G.Items.MaxEnergy[G.Items.MaxEnergyStep];
 
-        selector.UpdateEnergyUI();
+        selector.UpdateEnergyUI(G.Items.MaxEnergy[G.Items.MaxEnergyStep]);
     }
 
     private IEnumerator ChargeKey(int counts) {
