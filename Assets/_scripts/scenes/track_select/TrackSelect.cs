@@ -228,6 +228,8 @@ public class TrackSelect : MonoBehaviour {
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 1, 2f, 1f, step => {
             scalableArea.localScale = new Vector3(step, step, 1);
             scalableAreaPrepare.localScale = new Vector3(step, step, 1);
+
+            _previewPlayer.volume = 2 - step;
         }, () => { }));
 
         CancelPrepare(true);
@@ -378,11 +380,7 @@ public class TrackSelect : MonoBehaviour {
 
     public void Back() //뒤로가기 버튼
     {
-        PlayerPrefs.SetInt(G.Keys.SelectedTrack, G.PlaySettings.TrackId);
-        PlayerPrefs.SetInt(G.Keys.Speed, G.PlaySettings.DisplaySpeed);
-        PlayerPrefs.SetInt(G.Keys.Sync, G.PlaySettings.DisplaySync);
-        PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
-        PlayerPrefs.Save();
+        
         SceneManager.LoadScene("Intro");
     }
 }

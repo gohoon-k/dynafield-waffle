@@ -12,25 +12,10 @@ public class LockedBarrier : MonoBehaviour {
     public Button unlockButton;
     public Text unlockText;
 
-    public DialogManager dialogManager;
-
     [HideInInspector]
     public bool showing;
 
     private RectTransform _rect;
-
-    private bool _beforeDialogState;
-
-    void Update() {
-        if (_beforeDialogState != dialogManager.DialogShowing) {
-            _beforeDialogState = dialogManager.DialogShowing;
-            
-            StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 
-                dialogManager.DialogShowing ? 1 : 0.1f, dialogManager.DialogShowing ? 0.1f : 1f, 0.25f, step => {
-                locker.color = description.color = unlockText.color = new Color(1, 1, 1, step * 0.8f);
-            }, () => { }));
-        }
-    }
 
     public void Show() {
         gameObject.SetActive(true);
