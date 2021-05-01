@@ -9,10 +9,18 @@
       "length": "3:17"
     },
     {
+      "internal_name": "dash_out",
+      "title": "dash out!",
+      "artist": "cansol",
+      "id": 1,
+      "difficulty": [2, 5],
+      "length": "2:18"
+    },
+    {
       "internal_name": "dream_world_diary",
       "title": "dream world diary",
       "artist": "plum",
-      "id": 1,
+      "id": 2,
       "difficulty": [2, 7],
       "length": "3:07"
     }
