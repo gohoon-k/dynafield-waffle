@@ -50,7 +50,7 @@ class Chart {
     [System.Serializable]
     public class Zoom {
         public float t;
-        public int d;
+        public float d;
         public float dur;
         public byte i;
     }

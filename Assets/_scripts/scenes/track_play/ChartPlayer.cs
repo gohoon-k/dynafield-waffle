@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class Field {
     public Camera mainCamera;
     public GameObject main;
+    public GameObject scaler;
 }
 
 [Serializable]
@@ -429,12 +430,12 @@ public class ChartPlayer : MonoBehaviour {
         StartCoroutine(
             Interpolators.Curve(
                 _curves[_chart.move[_currentMoveYIndex].i],
-                field.main.transform.position.y,
+                field.main.transform.localPosition.y,
                 -_chart.move[_currentMoveYIndex].d / 100f,
                 _chart.move[_currentMoveYIndex].dur,
                 step => {
-                    var before = field.main.transform.position;
-                    field.main.transform.position = new Vector3(before.x, step, before.z);
+                    var before = field.main.transform.localPosition;
+                    field.main.transform.localPosition = new Vector3(before.x, step, before.z);
                 },
                 () => { }
             )
@@ -469,14 +470,13 @@ public class ChartPlayer : MonoBehaviour {
         StartCoroutine(
             Interpolators.Curve(
                 _curves[_chart.zoom[_currentMoveZIndex].i],
-                field.main.transform.position.z,
-                _chart.zoom[_currentMoveZIndex].d / 100f - 10,
+                field.scaler.transform.localScale.x,
+                _chart.zoom[_currentMoveZIndex].d,
                 _chart.zoom[_currentMoveZIndex].dur,
                 step => {
-                    var before = field.main.transform.position;
-                    field.main.transform.position = new Vector3(before.x, before.y, step);
+                    field.scaler.transform.localScale = new Vector3(step, step, 1);
                 },
-                () => { }
+                () => {  }
             )
         );
         _currentMoveZIndex++;
@@ -703,7 +703,7 @@ public class ChartPlayer : MonoBehaviour {
 
         yield return new WaitForSeconds(0.4f);
 
-        animators.foreground.Play("ingame_foreground_fade_out", -1, 0);
+        // animators.foreground.Play("ingame_foreground_fade_out", -1, 0);
 
         yield return new WaitForSeconds(2f);
     }
