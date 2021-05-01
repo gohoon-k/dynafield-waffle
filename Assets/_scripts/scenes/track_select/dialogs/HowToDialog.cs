@@ -45,6 +45,8 @@ public class HowToDialog : MonoBehaviour
     public int currentPage;
     public bool isOpen;
 
+    public bool isActive;
+
     private bool _animating;
 
     public int tipSize = 8;
@@ -76,7 +78,7 @@ public class HowToDialog : MonoBehaviour
 
         _closeAction = closeAction;
 
-        isOpen = true;
+        isActive = isOpen = true;
 
         currentPage = 0;
         pageIndicator.text = $"{currentPage + 1}/{tipSize}";
@@ -122,6 +124,8 @@ public class HowToDialog : MonoBehaviour
     }
 
     public void Close(bool deactivateDialogs) {
+        isActive = false;
+        
         StartCoroutine(Interpolators.Linear(1, 0, 0.25f, step => {
             background.color = new Color(0, 0, 0, step * 0.8f);
             

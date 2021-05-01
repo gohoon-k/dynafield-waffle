@@ -14,8 +14,10 @@ public class StoreDialog : MonoBehaviour {
 
     public bool isOpen;
 
+    public bool isActive;
+
     public void Open() {
-        isOpen = true;
+        isActive = isOpen = true;
         
         background.color = new Color(0, 0, 0, 0);
         foreach (var text in texts) {
@@ -50,6 +52,8 @@ public class StoreDialog : MonoBehaviour {
     }
 
     public void Close(bool deactivateDialogs) {
+        isActive = false;
+        
         StartCoroutine(Interpolators.Linear(1, 0, 0.25f, step => {
             background.color = new Color(0, 0, 0, step * 0.8f);
             foreach (var text in texts) {

@@ -10,7 +10,10 @@ public class DialogManager : MonoBehaviour {
 
     public BaseDialog energyRefillDialog;
     public BaseDialog startCooldownNowDialog;
+    public BaseDialog trackUnlockDialog;
 
+    public BaseDialog fakePurchasingDialog;
+    public BaseDialog fakePurchaseSuccessDialog;
     public BaseDialog adDialog;
 
     public StoreDialog storeDialog;
@@ -18,6 +21,11 @@ public class DialogManager : MonoBehaviour {
     public HowToDialog howToDialog;
 
     public DailyRewardsDialog dailyRewardsDialog;
+    
+    public bool DialogShowing => 
+        energyRefillDialog.isActive || startCooldownNowDialog.isActive || trackUnlockDialog.isActive || adDialog.isActive ||
+        fakePurchasingDialog.isActive || fakePurchaseSuccessDialog.isActive ||
+        storeDialog.isActive || calibrationDialog.isActive || howToDialog.isActive || dailyRewardsDialog.isActive;
 
     void Start() {
         if (PlayerPrefs.GetInt(G.Keys.FirstExecution, 0) == 0) {
@@ -94,4 +102,10 @@ public class DialogManager : MonoBehaviour {
         dialogs.SetActive(true);
         dailyRewardsDialog.Open();
     }
+
+    public void OpenUnlockTrackDialog() {
+        dialogs.SetActive(true);
+        trackUnlockDialog.Open();
+    }
+    
 }

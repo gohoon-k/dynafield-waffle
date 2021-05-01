@@ -20,18 +20,21 @@ public class DailyRewardsDialog : MonoBehaviour {
     public Text closeButton;
     public Text receiveText;
     public Button receiveButton;
+    public Text description;
 
     public GameObject rewardsParent;
 
     public string forceToday;
 
+    public bool isActive;
+
     private readonly List<RewardObject> _rewards = new List<RewardObject>();
 
     private bool _init;
-    
-    private const float PresentReceivedAlpha = 0.9f;
-    private const float PastAlpha = 0.8f;
-    private const float FutureAlpha = 0.4f;
+
+    private const float PresentReceivedAlpha = 0.7f;
+    private const float PastAlpha = 0.45f;
+    private const float FutureAlpha = 0.2f;
 
     private void Init() {
         for (var i = 0; i < rewardsParent.transform.childCount; i++) {
@@ -51,6 +54,8 @@ public class DailyRewardsDialog : MonoBehaviour {
     public void Open() {
         if (!_init) Init();
 
+        isActive = true;
+        
         gameObject.SetActive(true);
 
         var checkedDate = PlayerPrefs.GetString(G.Keys.CheckedDate, "1990-01-01");
@@ -71,7 +76,7 @@ public class DailyRewardsDialog : MonoBehaviour {
             }
         }
 
-        title.color = closeButton.color = receiveText.color = new Color(1, 1, 1, 0);
+        title.color = closeButton.color = receiveText.color = description.color = new Color(1, 1, 1, 0);
 
         background.color = new Color(0, 0, 0, 0);
 
@@ -93,7 +98,7 @@ public class DailyRewardsDialog : MonoBehaviour {
                 );
             });
 
-            title.color = closeButton.color = receiveText.color =  new Color(1, 1, 1, step);
+            title.color = closeButton.color = receiveText.color = description.color =  new Color(1, 1, 1, step);
 
             background.color = new Color(0, 0, 0, step * 0.85f);
             content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
@@ -101,6 +106,8 @@ public class DailyRewardsDialog : MonoBehaviour {
     }
 
     public void Close() {
+        isActive = false;
+        
         var currentReward = PlayerPrefs.GetInt(G.Keys.RewardIndex, -1);
         var received = PlayerPrefs.GetInt(G.Keys.ReceivedPreviousReward, 1) == 1;
 
@@ -116,7 +123,7 @@ public class DailyRewardsDialog : MonoBehaviour {
                 );
             });
 
-            title.color = closeButton.color = receiveText.color = new Color(1, 1, 1, step);
+            title.color = closeButton.color = receiveText.color = description.color = new Color(1, 1, 1, step);
 
             background.color = new Color(0, 0, 0, step * 0.85f);
             content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);

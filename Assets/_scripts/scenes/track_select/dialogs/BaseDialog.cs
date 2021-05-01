@@ -15,8 +15,13 @@ public class BaseDialog : MonoBehaviour {
 
     public bool isOpen;
 
-    public void Open() {
-        isOpen = true;
+    public bool isActive;
+
+    [HideInInspector]
+    public float backgroundAlpha = 0.6f;
+
+    public virtual void Open() {
+        isActive = isOpen = true;
         
         background.color = new Color(0, 0, 0, 0);
         message.color = new Color(1, 1, 1, 0);
@@ -32,7 +37,7 @@ public class BaseDialog : MonoBehaviour {
         gameObject.SetActive(true);
         
         StartCoroutine(Interpolators.Linear(0, 1, 0.4f, step => {
-            background.color = new Color(0, 0, 0, step * 0.6f);
+            background.color = new Color(0, 0, 0, step * backgroundAlpha);
             message.color = new Color(1, 1, 1, step);
             if (!(positive is null)) {
                 positive.color = new Color(1, 1, 1, step);
@@ -45,9 +50,11 @@ public class BaseDialog : MonoBehaviour {
         }, () => { }));
     }
 
-    public void Close(bool deactivateDialogs) {
+    public virtual void Close(bool deactivateDialogs) {
+        isActive = false;
+        
         StartCoroutine(Interpolators.Linear(1, 0, 0.25f, step => {
-            background.color = new Color(0, 0, 0, step * 0.6f);
+            background.color = new Color(0, 0, 0, step * backgroundAlpha);
             message.color = new Color(1, 1, 1, step);
             if (!(positive is null)) {
                 positive.color = new Color(1, 1, 1, step);

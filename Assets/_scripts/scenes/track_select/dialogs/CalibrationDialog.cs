@@ -16,8 +16,10 @@ public class CalibrationDialog : MonoBehaviour
 
     public bool isOpen;
 
+    [HideInInspector] public bool isActive;
+
     public void Open() {
-        isOpen = true;
+        isActive = isOpen = true;
 
         texts[1].text = $"{G.PlaySettings.DisplaySync}";
         
@@ -47,6 +49,8 @@ public class CalibrationDialog : MonoBehaviour
     }
 
     public void Close(bool deactivateDialogs) {
+        isActive = false;
+        
         StartCoroutine(Interpolators.Linear(1, 0, 0.25f, step => {
             background.color = new Color(0, 0, 0, step * 0.8f);
             foreach (var text in texts) {
