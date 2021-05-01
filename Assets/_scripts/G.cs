@@ -28,6 +28,10 @@ public static class G {
         public const string CoolDown = "cool_down";
         public const string Key = "key";
 
+        public const string ReceivedPreviousReward = "received_date";
+        public const string CheckedDate = "checked_date";
+        public const string RewardIndex = "reward_index";
+
         public const string BestScore = "score_{0}_{1}";
         public const string BestAccuracy = "accuracy_{0}_{1}";
         public const string SuperPlay = "super_play_{0}_{1}";
@@ -136,6 +140,9 @@ public static class G {
 
         public static readonly float[] ScoreRatioByJudges = { 1f, 1f, 0.75f, 0.25f, 0f };
         public static readonly float[] AccuracyRatioByJudges = { 1f, 0.75f, 0.3f, 0.1f, 0f };
+
+        public static readonly int[] rewardAmount = {2, 1, 3, 1, 4, 1};
+        public static readonly int[] rewardType = {0, 1, 0, 1, 0, 1};
 
     }
 
