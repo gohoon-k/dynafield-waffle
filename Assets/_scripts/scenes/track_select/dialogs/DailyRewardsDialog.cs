@@ -98,7 +98,8 @@ public class DailyRewardsDialog : MonoBehaviour {
                 );
             });
 
-            title.color = closeButton.color = receiveText.color = description.color =  new Color(1, 1, 1, step);
+            title.color = closeButton.color = receiveText.color = new Color(1, 1, 1, step);
+            description.color = new Color(1, 1, 1, step * 0.45f);
 
             background.color = new Color(0, 0, 0, step * 0.85f);
             content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
@@ -123,9 +124,10 @@ public class DailyRewardsDialog : MonoBehaviour {
                 );
             });
 
-            title.color = closeButton.color = receiveText.color = description.color = new Color(1, 1, 1, step);
+            title.color = closeButton.color = receiveText.color = new Color(1, 1, 1, step);
+            description.color = new Color(1, 1, 1, step * 0.7f);
 
-            background.color = new Color(0, 0, 0, step * 0.85f);
+            background.color = new Color(0, 0, 0, step * 0.45f);
             content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
         }, () => {
             gameObject.SetActive(false);
