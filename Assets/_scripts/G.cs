@@ -4,10 +4,27 @@ using UnityEngine;
 public static class G {
     
     public static Track[] Tracks;
+    public static bool[] TrackUnlockData;
     
     public static void InitTracks() {
         if (Tracks != null) return;
         Tracks = JsonUtility.FromJson<TrackList>(Resources.Load("data/tracks", typeof(TextAsset)).ToString()).tracks;
+        if (PlayerPrefs.GetString(Keys.TrackUnlockData, "") == string.Empty) {
+            TrackUnlockData = new bool[Tracks.Length];
+            for (var i = 0; i < 2; i++) {
+                TrackUnlockData[i] = true;
+            }
+
+            SaveTrackUnlockData();
+        } else {
+            TrackUnlockData = JsonUtility.FromJson<TrackUnlockDataRaw>(PlayerPrefs.GetString(Keys.TrackUnlockData, "")).data;
+        }
+    }
+
+    public static void SaveTrackUnlockData() {
+        var dat = new TrackUnlockDataRaw {data = TrackUnlockData};
+        PlayerPrefs.SetString(Keys.TrackUnlockData, JsonUtility.ToJson(dat));
+        PlayerPrefs.Save();
     }
     
     public static class Keys {
@@ -31,6 +48,8 @@ public static class G {
         public const string ReceivedPreviousReward = "received_date";
         public const string CheckedDate = "checked_date";
         public const string RewardIndex = "reward_index";
+
+        public const string TrackUnlockData = "track_unlock_data";
 
         public const string BestScore = "score_{0}_{1}";
         public const string BestAccuracy = "accuracy_{0}_{1}";
@@ -205,4 +224,9 @@ public static class G {
         public int[] difficulty;
         public string length;
     }
+
+    public class TrackUnlockDataRaw {
+        public bool[] data;
+    }
+    
 }

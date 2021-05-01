@@ -49,5 +49,15 @@ public class StoreManager : MonoBehaviour {
         
         selector.UpdateKeyUI(before);
     }
+
+    public void UnlockTrack(LockedBarrier barrier) {
+
+        G.TrackUnlockData[G.PlaySettings.TrackId] = true;
+        
+        G.SaveTrackUnlockData();
+        
+        StartCoroutine(barrier.Unlock());
+
+    }
     
 }

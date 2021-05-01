@@ -16,7 +16,8 @@ public class TrackSelect : MonoBehaviour {
 
     public Text trackInfo; //곡 정보
     public Text bastScore; //최고 스코어
-    public Text bestAccuracy; //최고 정확도
+    public Text bestAccuracyInteger; //최고 정확도
+    public Text bestAccuracyFloat; //최고 정확도
     public Text remainingEnergy; //현재 에너지
     public Text maxEnergy; //최대 에너지
     public Text energyTimer; //에너지 충전 대기시간
@@ -36,7 +37,10 @@ public class TrackSelect : MonoBehaviour {
     public RectTransform scalableAreaPrepare;
     public Animator prepareBack;
     public Animator preparePlay;
-    public Image startGameEffectImage;
+
+    public LockedBarrier barrier;
+    
+    private Image _startGameEffectImage;
 
     private AudioSource _previewPlayer;
     private AudioClip[] _previewClips;
@@ -76,7 +80,7 @@ public class TrackSelect : MonoBehaviour {
 
         speed.text = G.PlaySettings.DisplaySpeed.ToString();
 
-        startGameEffectImage = preparePlay.gameObject.transform.GetChild(0).gameObject.GetComponent<Image>();
+        _startGameEffectImage = preparePlay.gameObject.transform.GetChild(0).gameObject.GetComponent<Image>();
 
         #endregion
 
@@ -161,11 +165,11 @@ public class TrackSelect : MonoBehaviour {
 
         preparePlay.transform.GetChild(4).gameObject.SetActive(G.Items.Energy == 0);
 
-        prepareBack.SetFloat("speed", 1f);
-        preparePlay.SetFloat("speed", 1f);
+        prepareBack.SetFloat("speed", 3f);
+        preparePlay.SetFloat("speed", 3f);
         prepareBack.Play("track_select_prepare_back", -1, 0);
         preparePlay.Play("track_select_prepare_play", -1, 0);
-        StartCoroutine(SetGameCanStart(0.5f));
+        StartCoroutine(SetGameCanStart(0.2f));
     }
 
     public void CancelPrepare(bool slow = false) {
@@ -179,7 +183,7 @@ public class TrackSelect : MonoBehaviour {
         preparePlay.Play("track_select_prepare_play", -1, 1);
         prepareBack.SetFloat("speed", slow ? -0.75f : -2f);
         preparePlay.SetFloat("speed", slow ? -0.75f : -2f);
-        StartCoroutine(DeactivatePrepare(1));
+        StartCoroutine(DeactivatePrepare(slow ? 0.6f : 0.2f));
     }
 
     private IEnumerator SetGameCanStart(float length) {
@@ -217,7 +221,7 @@ public class TrackSelect : MonoBehaviour {
         trackBackgroundBrightAnimator.enabled = false;
 
         StartCoroutine(Interpolators.Linear(1, 0, 0.15f, step => {
-            startGameEffectImage.color = new Color(1, 1, 1, step);
+            _startGameEffectImage.color = new Color(1, 1, 1, step);
             trackBackgroundBright.color = new Color(1, 1, 1, step * trackBackgroundBright.color.a);
         }, () => { }));
 
@@ -255,6 +259,9 @@ public class TrackSelect : MonoBehaviour {
                 trackBackgroundBright.color = new Color(1, 1, 1, step);
             }, () => { }));
         }
+        
+        if (!G.TrackUnlockData[G.PlaySettings.TrackId])
+            barrier.Show();
 
         trackBackground.sprite = _backgrounds[G.PlaySettings.TrackId];
         trackBackgroundBright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
@@ -264,7 +271,11 @@ public class TrackSelect : MonoBehaviour {
         difficulty.text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
 
         bastScore.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
-        bestAccuracy.text = $"{PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0):F2}%";
+        var bestAc = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0);
+        var bestAcInt = Math.Floor(bestAc);
+        var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
+        bestAccuracyInteger.text = $"{bestAcInt:00}";
+        bestAccuracyFloat.text = $"{bestAcFloat:00}";
 
         _previewPlayer.clip = _previewClips[G.PlaySettings.TrackId];
         _previewPlayer.PlayDelayed(1.0f);
@@ -280,6 +291,11 @@ public class TrackSelect : MonoBehaviour {
         G.PlaySettings.TrackId += dir;
         if (G.PlaySettings.TrackId == -1) G.PlaySettings.TrackId = G.Tracks.Length - 1;
         if (G.PlaySettings.TrackId == G.Tracks.Length) G.PlaySettings.TrackId = 0;
+        
+        if (!G.TrackUnlockData[G.PlaySettings.TrackId] && !barrier.showing)
+            barrier.Show();
+        else if(G.TrackUnlockData[G.PlaySettings.TrackId] && barrier.showing)
+            barrier.Hide();
 
         virtualBackground.sprite = _backgrounds[G.PlaySettings.TrackId];
         virtualBackgroundBright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
@@ -289,8 +305,12 @@ public class TrackSelect : MonoBehaviour {
         difficulty.text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
 
         bastScore.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
-        bestAccuracy.text = $"{PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0):F2}%";
-
+        var bestAc = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0);
+        var bestAcInt = Math.Floor(bestAc);
+        var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
+        bestAccuracyInteger.text = $"{bestAcInt:00}";
+        bestAccuracyFloat.text = $"{bestAcFloat:00}";
+        
         _trackSelectable = false;
 
         StartCoroutine(Interpolators.Linear(0, 1, 0.15f, step => {
