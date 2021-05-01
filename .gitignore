@@ -71,3 +71,9 @@ InitTestScene*.unity
 
 
 # End of https://www.toptal.com/developers/gitignore/api/unity
+/Assets/_scripts/scenes/track_play/ChartConverter.cs
+/Assets/_scripts/scenes/track_play/ChartConverter.cs.meta
+/ProjectSettings/SceneTemplateSettings.json
+/Assets/Resources/data/charts/test.1.json
+/Assets/Resources/data/charts/test.1.json.meta
+/ProjectSettings/TimelineSettings.asset
