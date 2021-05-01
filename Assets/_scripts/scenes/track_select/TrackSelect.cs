@@ -86,7 +86,7 @@ public class TrackSelect : MonoBehaviour {
         SelectTrack();
 
         CheckCooldownFinished();
-        UpdateEnergyUI();
+        UpdateEnergyUI(G.Items.Energy);
 
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 2, 1, 1f, step => {
             scalableArea.localScale = new Vector3(step, step, 1);
@@ -95,24 +95,28 @@ public class TrackSelect : MonoBehaviour {
 
         if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
             G.Items.CoolDown = DateTime.Now.AddMinutes(5).ToBinary();
-        
+
         UpdateKeyUI(0);
     }
 
     void Update() {
         if (G.Items.CoolDown != -1) {
             CheckCooldownFinished();
-            UpdateEnergyUI();
+            UpdateEnergyUI(0, false);
         }
     }
 
-    public void UpdateEnergyUI() {
+    public void UpdateEnergyUI(int delta, bool energyChanged = true) {
         if (G.Items.CoolDown != -1) {
             var difference = new DateTime(G.Items.CoolDown - DateTime.Now.ToBinary());
             energyTimer.text = difference.ToString("m:ss");
         }
 
-        remainingEnergy.text = $"{G.Items.Energy}";
+        if (energyChanged)
+            StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, G.Items.Energy - delta, G.Items.Energy,
+                0.35f,
+                step => { remainingEnergy.text = $"{(int) step}"; }, () => { })
+            );
 
         remainingEnergy.color = new Color(remainingEnergy.color.r, remainingEnergy.color.g,
             remainingEnergy.color.b, G.Items.CoolDown == -1 ? 1.0f : 0.15f);
@@ -134,15 +138,14 @@ public class TrackSelect : MonoBehaviour {
 
         PlayerPrefs.Save();
 
-        UpdateEnergyUI();
+        UpdateEnergyUI(G.Items.MaxEnergy[G.Items.MaxEnergyStep]);
     }
 
     public void UpdateKeyUI(int before) {
-        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, before, G.Items.Key, 0.5f, step => {
-            keysUI.text = $"<size=50>you have</size>\n{(int) step} key(s)";
-        }, () => {}));
+        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, before, G.Items.Key, 0.5f,
+            step => { keysUI.text = $"<size=50>you have</size>\n{(int) step} key(s)"; }, () => { }));
     }
-    
+
     public void PreparePlay() {
         if (_prepareAnimating || _starting) return;
 
@@ -212,7 +215,7 @@ public class TrackSelect : MonoBehaviour {
         backgroundBrightAnimator.enabled = false;
 
         trackBackgroundBrightAnimator.enabled = false;
-        
+
         StartCoroutine(Interpolators.Linear(1, 0, 0.15f, step => {
             startGameEffectImage.color = new Color(1, 1, 1, step);
             trackBackgroundBright.color = new Color(1, 1, 1, step * trackBackgroundBright.color.a);
@@ -345,7 +348,7 @@ public class TrackSelect : MonoBehaviour {
     public void RefillEnergy() {
         G.Items.Energy = G.Items.MaxEnergy[G.Items.MaxEnergyStep];
         G.Items.CoolDown = -1;
-        UpdateEnergyUI();
+        UpdateEnergyUI(G.Items.MaxEnergy[G.Items.MaxEnergyStep]);
     }
 
     public void StartCooldownNow() {
