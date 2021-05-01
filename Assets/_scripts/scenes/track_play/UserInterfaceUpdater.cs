@@ -90,7 +90,7 @@ public class UserInterfaceUpdater : MonoBehaviour {
         _retryInfoAnimator = introArea.retryInformation.gameObject.GetComponent<Animator>();
         
         StartCoroutine(Interpolators.Linear(0, 12, 0.4f, step => {
-            backgroundArea.blur.material.SetInteger(Shader.PropertyToID("_Radius"), (int) step);
+            // backgroundArea.blur.material.SetInteger(Shader.PropertyToID("_Radius"), (int) step);
         }, () => { }));
     }
 

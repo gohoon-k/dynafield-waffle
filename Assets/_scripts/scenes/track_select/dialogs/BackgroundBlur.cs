@@ -26,7 +26,7 @@ public class BackgroundBlur : MonoBehaviour {
     private void BlurBackground() {
         _image ??= GetComponent<Image>();
         
-        _image.color = new Color(1, 1, 1, 1);
+        // _image.color = new Color(1, 1, 1, 1);
         
         StartCoroutine(Interpolators.Linear(0, blurRadius, 0.4f, step => {
             _image.material.SetInteger(Shader.PropertyToID("_Radius"), (int) step);
@@ -39,7 +39,7 @@ public class BackgroundBlur : MonoBehaviour {
         StartCoroutine(Interpolators.Linear(blurRadius, 0, 0.25f, step => {
             _image.material.SetInteger(Shader.PropertyToID("_Radius"), (int) step);
         }, () => {
-            _image.color = new Color(1, 1, 1, 0);
+            // _image.color = new Color(1, 1, 1, 0);
         }));
     }
     

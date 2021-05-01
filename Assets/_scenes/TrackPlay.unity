@@ -1187,7 +1187,7 @@ MonoBehaviour:
     trackInformation: {fileID: 460618662}
     difficulty: {fileID: 530027282}
   backgroundArea:
-    blur: {fileID: 784859731}
+    blur: {fileID: 0}
     background: {fileID: 898778524}
     brightBackground: {fileID: 660627807}
     brightBackgroundAnimator: {fileID: 660627806}
@@ -1219,7 +1219,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!224 &784859729
 RectTransform:
@@ -1260,8 +1260,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 2100000, guid: 9eb2d84149960934ea34c3118450a1b1, type: 2}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2971,7 +2971,7 @@ MonoBehaviour:
     scaler: {fileID: 277181710}
   constants:
     placingPrecision: 600
-    viewMode: 1
+    viewMode: 0
     autoPlay: 0
     debugMode: 0
   notePrefabs:
