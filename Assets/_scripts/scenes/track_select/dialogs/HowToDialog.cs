@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,9 @@ public class HowToDialog : MonoBehaviour
 
     public int tipSize = 8;
 
-    public void Open() {
+    private Action _closeAction;
+
+    public void Open(Action closeAction = null) {
         if (!_init) {
             _texts.Add(textsIn00);
             _texts.Add(textsIn06);
@@ -71,12 +74,15 @@ public class HowToDialog : MonoBehaviour
             _init = true;
         }
 
+        _closeAction = closeAction;
+
         isOpen = true;
 
         currentPage = 0;
         pageIndicator.text = $"{currentPage + 1}/{tipSize}";
         
         prev.interactable = false;
+        next.interactable = true;
 
         background.color = new Color(0, 0, 0, 0);
 
@@ -94,6 +100,8 @@ public class HowToDialog : MonoBehaviour
         content.localScale = new Vector3(1.5f, 1.5f, 1);
 
         gameObject.SetActive(true);
+        tips[0].gameObject.SetActive(true);
+        tips[0].anchoredPosition = new Vector2(0, tips[0].anchoredPosition.y);
         
         StartCoroutine(Interpolators.Linear(0, 1, 0.4f, step => {
             background.color = new Color(0, 0, 0, step * 0.8f);
@@ -134,6 +142,9 @@ public class HowToDialog : MonoBehaviour
             isOpen = false;
             if (deactivateDialogs)
                 dialogs.SetActive(false);
+            
+            _closeAction?.Invoke();
+            _closeAction = null;
         }));
     }
 

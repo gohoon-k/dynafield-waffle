@@ -17,17 +17,27 @@ public class DialogManager : MonoBehaviour {
     public CalibrationDialog calibrationDialog;
     public HowToDialog howToDialog;
 
+    public DailyRewardsDialog dailyRewardsDialog;
+
     void Start() {
         if (PlayerPrefs.GetInt(G.Keys.FirstExecution, 0) == 0) {
             StartCoroutine(ShowHowToWithDelay());
+        } else if (PlayerPrefs.GetString(G.Keys.CheckedDate, "1990-01-01") != DateTime.Now.ToString("yyyy-MM-dd")) {
+            StartCoroutine(ShowDailyRewardWithDelay());
         }
     }
 
     private IEnumerator ShowHowToWithDelay() {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.25f);
 
-        OpenHowToDialog();
+        OpenHowToDialogWithDailyReward();
         PlayerPrefs.SetInt(G.Keys.FirstExecution, 1);
+    }
+
+    private IEnumerator ShowDailyRewardWithDelay() {
+        yield return new WaitForSeconds(1.25f);
+        
+        OpenDailyRewardsDialog();
     }
 
     public void EnergyButtonAction() {
@@ -70,5 +80,18 @@ public class DialogManager : MonoBehaviour {
     public void OpenHowToDialog() {
         dialogs.SetActive(true);
         howToDialog.Open();
+    }
+
+    private void OpenHowToDialogWithDailyReward() {
+        dialogs.SetActive(true);
+        howToDialog.Open(() => {
+            dialogs.SetActive(true); 
+            dailyRewardsDialog.Open();
+        });
+    }
+
+    public void OpenDailyRewardsDialog() {
+        dialogs.SetActive(true);
+        dailyRewardsDialog.Open();
     }
 }
