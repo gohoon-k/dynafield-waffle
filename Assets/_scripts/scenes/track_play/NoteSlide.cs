@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class NoteSlide : Note {
@@ -38,7 +39,7 @@ public class NoteSlide : Note {
     }
 
     protected override float GetTimeDifference() {
-        return G.InGame.Time - time;
+        return Math.Abs(G.InGame.Time - time);
     }
 
     protected override void HandleInput(Touch touch) {

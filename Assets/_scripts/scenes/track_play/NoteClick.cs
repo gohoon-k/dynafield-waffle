@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ public class NoteClick : Note {
     }
 
     protected override float GetTimeDifference() {
-        return G.InGame.Time - time;
+        return Math.Abs(G.InGame.Time - time);
     }
 
     protected override void HandleInput(Touch touch) {

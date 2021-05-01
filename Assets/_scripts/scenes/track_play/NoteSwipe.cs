@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -57,7 +58,7 @@ public class NoteSwipe : Note {
     }
 
     protected override float GetTimeDifference() {
-        return _judgeTime - time;
+        return Math.Abs(_judgeTime - time);
     }
 
     protected override int TimeDifferenceToJudge(float diff) {
