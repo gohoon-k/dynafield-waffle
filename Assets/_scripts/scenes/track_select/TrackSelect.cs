@@ -48,6 +48,7 @@ public class TrackSelect : MonoBehaviour {
     private Sprite[] _backgrounds;
     private Sprite[] _brightBackgrounds;
 
+    private bool _canPrepare = false;
     private bool _trackSelectable = true;
     private bool _canStartGame;
     private bool _prepareAnimating;
@@ -95,7 +96,9 @@ public class TrackSelect : MonoBehaviour {
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 2, 1, 1f, step => {
             scalableArea.localScale = new Vector3(step, step, 1);
             scalableAreaPrepare.localScale = new Vector3(step, step, 1);
-        }, () => { }));
+        }, () => {
+            _canPrepare = true;
+        }));
 
         if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
             G.Items.CoolDown = DateTime.Now.AddMinutes(5).ToBinary();
@@ -151,7 +154,7 @@ public class TrackSelect : MonoBehaviour {
     }
 
     public void PreparePlay() {
-        if (_prepareAnimating || _starting) return;
+        if (_prepareAnimating || _starting || !_canPrepare) return;
 
         _prepareAnimating = true;
 
