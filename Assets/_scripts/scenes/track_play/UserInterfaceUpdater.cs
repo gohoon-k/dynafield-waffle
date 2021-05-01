@@ -95,9 +95,8 @@ public class UserInterfaceUpdater : MonoBehaviour {
             _scoreAnimatedCount++;
             AnimateScore(_animatedScore, intScore, _scoreAnimatedCount);
             _animatedScore = intScore;
-            
-            scoreArea.combo.text = $"{G.InGame.Combo}";
         }
+        scoreArea.combo.text = $"{G.InGame.Combo}";
 
         menuArea.pause.help.color = new Color(1, 1, 1, G.InGame.PreparePause ? 1 : 0);
         
