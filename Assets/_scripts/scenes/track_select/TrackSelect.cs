@@ -342,6 +342,15 @@ public class TrackSelect : MonoBehaviour {
         PlayerPrefs.Save();
     }
 
+    private void UpdateScoreUI() {
+        uiElements.records.score.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
+        var bestAc = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0);
+        var bestAcInt = Math.Floor(bestAc);
+        var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
+        uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
+        uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
+    }
+
     private void SelectTrack() {
         if (!G.PlaySettings.FromTrackPlay) {
             uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, 0);
@@ -366,12 +375,7 @@ public class TrackSelect : MonoBehaviour {
         uiElements.playSettings.difficulty.value.text =
             $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
 
-        uiElements.records.score.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
-        var bestAc = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0);
-        var bestAcInt = Math.Floor(bestAc);
-        var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
-        uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
-        uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
+        UpdateScoreUI();
 
         _previewPlayer.clip = _previewClips[G.PlaySettings.TrackId];
         _previewPlayer.PlayDelayed(1.0f);
@@ -402,12 +406,7 @@ public class TrackSelect : MonoBehaviour {
         uiElements.playSettings.difficulty.value.text =
             $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
 
-        uiElements.records.score.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
-        var bestAc = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0);
-        var bestAcInt = Math.Floor(bestAc);
-        var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
-        uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
-        uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
+        UpdateScoreUI();
 
         _trackSelectable = false;
 
@@ -450,6 +449,8 @@ public class TrackSelect : MonoBehaviour {
 
         uiElements.playSettings.difficulty.value.text =
             $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
+        
+        UpdateScoreUI();
     }
 
     public void SetDisplaySpeed(int delta) //DisplaySpeed 변경   
