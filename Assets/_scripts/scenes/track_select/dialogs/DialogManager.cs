@@ -18,7 +18,7 @@ public class DialogManager : MonoBehaviour {
     public BaseDialog fakePurchaseSuccessDialog;
     public BaseDialog adDialog;
 
-    public BaseDialog playTypeRewardDialog;
+    public PlayTypeRewardDialog playTypeRewardDialog;
 
     public StoreDialog storeDialog;
     public CalibrationDialog calibrationDialog;
@@ -142,19 +142,32 @@ public class DialogManager : MonoBehaviour {
         trackUnlockDialog.Open();
     }
 
-    public void OpenPlayTypeRewardDialog(List<int> rewards, IEnumerable<int> types) {
+    public void OpenPlayTypeRewardDialog(List<int> rewards, List<int> types) {
+        dialogs.SetActive(true);
+
         var typeString = string.Join(" / ", types.Select(type => G.InternalSettings.PlayTypeNames[type]));
         var amountString = string.Join(" + ", rewards);
         var amount = rewards.Sum();
-        playTypeRewardDialog.message.text = 
-            $"처음으로 {typeString}를 달성하여 다음 보상을 지급합니다!\n<size=130>{amountString}</size>  <size=90>key(s)</size>";
+        var difficultyName = G.PlaySettings.Difficulty == 0 ? "EASY" : "HARD";
+        playTypeRewardDialog.SetTitle(
+            $"<size=150>{G.Tracks[G.PlaySettings.TrackId].title}</size>\n" +
+            $"<size=90>{difficultyName} {G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}</size>\n"
+        );
+        playTypeRewardDialog.message.text =
+            $"처음으로 {typeString}를 달성하여 다음 보상을 지급합니다!";
+        playTypeRewardDialog.SetReward(
+            $"<size=130>{amountString}</size>  <size=90>key(s)</size>"
+        );
         playTypeRewardDialog.AddPositiveCallback(() => {
             G.Items.Key += amount;
             selector.UpdateKeyUI(amount);
+
+            types.ForEach(type => PlayerPrefs.SetInt(G.Keys.FormatPlayTypeRewards(type), 1));
+            PlayerPrefs.Save();
+
             playTypeRewardDialog.Close(true);
             playTypeRewardDialog.RemoveAllPositiveCallbacks();
         });
         playTypeRewardDialog.Open();
     }
-    
 }
