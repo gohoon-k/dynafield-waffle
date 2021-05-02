@@ -14,6 +14,7 @@ public class NoteSwipe : Note {
     
     new void Update() {
         if (G.PlaySettings.AutoPlay && G.InGame.Time >= time) {
+            _judgeTime = G.InGame.Time;
             Judge();
         }
         
