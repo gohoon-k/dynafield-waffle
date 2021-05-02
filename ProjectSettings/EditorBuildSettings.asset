@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_scenes/Eins.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/_scenes/Intro.unity
+    guid: 304d789c5fdb0e94cbdc9f6214d0acba
+  - enabled: 1
     path: Assets/_scenes/TrackSelect.unity
     guid: 5ca5cad9fd1ec804992222ab8445da86
   - enabled: 1
@@ -14,10 +20,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_scenes/TrackResult.unity
     guid: 46f49e02f5332d2418e215d9253ad1a9
-  - enabled: 1
-    path: Assets/_scenes/Eins.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
-    path: Assets/_scenes/Intro.unity
-    guid: 304d789c5fdb0e94cbdc9f6214d0acba
   m_configObjects: {}
