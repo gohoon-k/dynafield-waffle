@@ -118,12 +118,12 @@ public class DailyRewardsDialog : MonoBehaviour {
         var currentReward = PlayerPrefs.GetInt(G.Keys.RewardIndex, -1);
 
         if (currentReward != 6) {
-            if (G.InternalSettings.rewardType[currentReward] == 0) {
-                G.Items.Energy += G.InternalSettings.rewardAmount[currentReward];
-                selector.UpdateEnergyUI(G.InternalSettings.rewardAmount[currentReward]);
-            } else if (G.InternalSettings.rewardType[currentReward] == 1) {
+            if (G.InternalSettings.DailyRewardType[currentReward] == 0) {
+                G.Items.Energy += G.InternalSettings.DailyRewardAmount[currentReward];
+                selector.UpdateEnergyUI(G.InternalSettings.DailyRewardAmount[currentReward]);
+            } else if (G.InternalSettings.DailyRewardType[currentReward] == 1) {
                 var beforeKey = G.Items.Key;
-                G.Items.Key += G.InternalSettings.rewardAmount[currentReward];
+                G.Items.Key += G.InternalSettings.DailyRewardAmount[currentReward];
                 selector.UpdateKeyUI(beforeKey);
             }
         } else {
