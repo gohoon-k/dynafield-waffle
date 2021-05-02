@@ -17,6 +17,7 @@ public class UIElements {
     [Serializable]
     public class Scalable {
         public RectTransform main;
+        public CanvasGroup mainGroup;
         public RectTransform prepare;
     }
     
@@ -107,6 +108,7 @@ public class TrackSelect : MonoBehaviour {
 
     private Sprite[] _backgrounds;
     private Sprite[] _brightBackgrounds;
+    private Sprite[] _blurBackgrounds;
 
     private bool _canPrepare;
     private bool _trackSelectable = true;
@@ -138,6 +140,8 @@ public class TrackSelect : MonoBehaviour {
         Array.Sort(_backgrounds, (a, b) => int.Parse(a.name) - int.Parse(b.name));
         _brightBackgrounds = Resources.LoadAll<Sprite>("textures/tracks/bright");
         Array.Sort(_brightBackgrounds, (a, b) => int.Parse(a.name) - int.Parse(b.name));
+        _blurBackgrounds = Resources.LoadAll<Sprite>("textures/tracks/blur");
+        Array.Sort(_blurBackgrounds, (a, b) => int.Parse(a.name) - int.Parse(b.name));
 
         uiElements.playSettings.speed.value.text = $"{G.PlaySettings.DisplaySpeed}";
 
@@ -330,6 +334,7 @@ public class TrackSelect : MonoBehaviour {
 
         uiElements.backgrounds.main.normal.sprite = _backgrounds[G.PlaySettings.TrackId];
         uiElements.backgrounds.main.bright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.main.blur.sprite = _blurBackgrounds[G.PlaySettings.TrackId];
 
         uiElements.trackInformation.text.text =
             $"{G.Tracks[G.PlaySettings.TrackId].title}   <size=40>{G.Tracks[G.PlaySettings.TrackId].artist}</size>";
@@ -352,6 +357,7 @@ public class TrackSelect : MonoBehaviour {
 
         uiElements.backgrounds.main.normal.sprite = _backgrounds[G.PlaySettings.TrackId];
         uiElements.backgrounds.main.bright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.main.blur.sprite = _blurBackgrounds[G.PlaySettings.TrackId];
 
         G.PlaySettings.TrackId += dir;
         if (G.PlaySettings.TrackId == -1) G.PlaySettings.TrackId = G.Tracks.Length - 1;
@@ -386,6 +392,7 @@ public class TrackSelect : MonoBehaviour {
         }, () => {
             uiElements.backgrounds.main.normal.sprite = uiElements.backgrounds.virtual_.normal.sprite;
             uiElements.backgrounds.main.bright.sprite = uiElements.backgrounds.virtual_.bright.sprite;
+            uiElements.backgrounds.main.blur.sprite = _blurBackgrounds[G.PlaySettings.TrackId];
 
             uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, 1);
             uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, 1);

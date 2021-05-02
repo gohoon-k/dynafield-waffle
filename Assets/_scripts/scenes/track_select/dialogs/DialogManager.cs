@@ -7,8 +7,6 @@ using UnityEngine.UI;
 public class DialogManager : MonoBehaviour {
     public TrackSelect selector;
 
-    public Image blurBack;
-    
     public GameObject dialogs;
 
     public BaseDialog energyRefillDialog;
@@ -24,17 +22,37 @@ public class DialogManager : MonoBehaviour {
     public HowToDialog howToDialog;
 
     public DailyRewardsDialog dailyRewardsDialog;
-    
-    public bool DialogShowing => 
-        energyRefillDialog.isActive || startCooldownNowDialog.isActive || trackUnlockDialog.isActive || adDialog.isActive ||
+
+    public bool DialogShowing =>
+        energyRefillDialog.isActive || startCooldownNowDialog.isActive || trackUnlockDialog.isActive ||
+        adDialog.isActive ||
         fakePurchasingDialog.isActive || fakePurchaseSuccessDialog.isActive ||
         storeDialog.isActive || calibrationDialog.isActive || howToDialog.isActive || dailyRewardsDialog.isActive;
+
+    private bool _beforeDialogState = false;
 
     void Start() {
         if (PlayerPrefs.GetInt(G.Keys.FirstExecution, 0) == 0) {
             StartCoroutine(ShowHowToWithDelay());
         } else if (PlayerPrefs.GetString(G.Keys.CheckedDate, "1990-01-01") != DateTime.Now.ToString("yyyy-MM-dd")) {
             StartCoroutine(ShowDailyRewardWithDelay());
+        }
+    }
+
+    private void Update() {
+        if (_beforeDialogState != DialogShowing) {
+            _beforeDialogState = DialogShowing;
+
+            StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve,
+                DialogShowing ? 0 : 1,
+                DialogShowing ? 1 : 0,
+                DialogShowing ? 0.4f : 0.25f, step => {
+                    selector.uiElements.backgrounds.main.blur.color = new Color(1, 1, 1, step);
+                    selector.uiElements.scalable.main.localScale = new Vector3(
+                        1 + step / 7.5f, 1 + step / 7.5f
+                    );
+                    selector.uiElements.scalable.mainGroup.alpha = 1 - step;
+                }, () => { }));
         }
     }
 
@@ -47,7 +65,7 @@ public class DialogManager : MonoBehaviour {
 
     private IEnumerator ShowDailyRewardWithDelay() {
         yield return new WaitForSeconds(1.25f);
-        
+
         OpenDailyRewardsDialog();
     }
 
@@ -96,7 +114,7 @@ public class DialogManager : MonoBehaviour {
     private void OpenHowToDialogWithDailyReward() {
         dialogs.SetActive(true);
         howToDialog.Open(() => {
-            dialogs.SetActive(true); 
+            dialogs.SetActive(true);
             dailyRewardsDialog.Open();
         });
     }
@@ -110,5 +128,4 @@ public class DialogManager : MonoBehaviour {
         dialogs.SetActive(true);
         trackUnlockDialog.Open();
     }
-    
 }
