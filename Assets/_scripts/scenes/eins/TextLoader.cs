@@ -11,6 +11,8 @@ public class TextLoader : MonoBehaviour {
     private Animator _textAnimator;
 
     void Start() {
+        Application.targetFrameRate = 60;
+        
         LoadingTexts texts = JsonUtility.FromJson<LoadingTexts>(
             ((TextAsset) Resources.Load("texts/eins", typeof(TextAsset))).ToString()
         );
