@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,8 @@ public class DialogManager : MonoBehaviour {
     public BaseDialog fakePurchaseSuccessDialog;
     public BaseDialog adDialog;
 
+    public BaseDialog playTypeRewardDialog;
+
     public StoreDialog storeDialog;
     public CalibrationDialog calibrationDialog;
     public HowToDialog howToDialog;
@@ -25,7 +28,7 @@ public class DialogManager : MonoBehaviour {
 
     public bool DialogShowing =>
         energyRefillDialog.isActive || startCooldownNowDialog.isActive || trackUnlockDialog.isActive ||
-        adDialog.isActive ||
+        adDialog.isActive || playTypeRewardDialog.isActive ||
         fakePurchasingDialog.isActive || fakePurchaseSuccessDialog.isActive ||
         storeDialog.isActive || calibrationDialog.isActive || howToDialog.isActive || dailyRewardsDialog.isActive;
 
@@ -138,4 +141,20 @@ public class DialogManager : MonoBehaviour {
         dialogs.SetActive(true);
         trackUnlockDialog.Open();
     }
+
+    public void OpenPlayTypeRewardDialog(List<int> rewards, IEnumerable<int> types) {
+        var typeString = string.Join(" / ", types.Select(type => G.InternalSettings.PlayTypeNames[type]));
+        var amountString = string.Join(" + ", rewards);
+        var amount = rewards.Sum();
+        playTypeRewardDialog.message.text = 
+            $"처음으로 {typeString}를 달성하여 다음 보상을 지급합니다!\n<size=130>{amountString}</size>  <size=90>key(s)</size>";
+        playTypeRewardDialog.AddPositiveCallback(() => {
+            G.Items.Key += amount;
+            selector.UpdateKeyUI(amount);
+            playTypeRewardDialog.Close(true);
+            playTypeRewardDialog.RemoveAllPositiveCallbacks();
+        });
+        playTypeRewardDialog.Open();
+    }
+    
 }

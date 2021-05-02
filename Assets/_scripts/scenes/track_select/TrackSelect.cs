@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -51,6 +52,7 @@ public class UIElements {
         public Text score;
         public Text accuracyInt;
         public Text accuracyFloat;
+        public Text playType;
     }
 
     [Serializable]
@@ -349,6 +351,27 @@ public class TrackSelect : MonoBehaviour {
         var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
         uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
         uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
+
+        var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType));
+        uiElements.records.playType.text = G.InternalSettings.PlayTypeNames[playType];
+        
+        CheckPlayTypeReward(playType);
+    }
+
+    private void CheckPlayTypeReward(int playType) {
+        if (playType < 1 || playType > 3) return;
+
+        var types = new List<int>();
+        var rewards = new List<int>();
+        for (var i = 1; i <= playType; i++) {
+            if (PlayerPrefs.GetInt(G.Keys.FormatPlayTypeRewards(i), 0) == 0) {
+                types.Add(i);
+                rewards.Add(G.InternalSettings.PlayTypeRewards[G.PlaySettings.Difficulty][i]);
+            }
+        }
+        
+        if (types.Count > 0 && rewards.Count > 0)
+            others.dialogManager.OpenPlayTypeRewardDialog(rewards, types);
     }
 
     private void SelectTrack() {

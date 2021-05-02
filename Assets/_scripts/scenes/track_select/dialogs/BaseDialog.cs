@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,8 @@ using UnityEngine.UI;
 public class BaseDialog : MonoBehaviour {
 
     public Text message;
+
+    public Button positive;
 
     [HideInInspector] public bool isOpen;
     [HideInInspector] public bool isActive;
@@ -56,6 +59,14 @@ public class BaseDialog : MonoBehaviour {
             if (deactivateDialogs)
                 _dialogs.SetActive(false);
         }));
+    }
+
+    public void AddPositiveCallback(Action action) {
+        positive.onClick.AddListener(() => action());
+    }
+
+    public void RemoveAllPositiveCallbacks() {
+        positive.onClick.RemoveAllListeners();
     }
     
 }
