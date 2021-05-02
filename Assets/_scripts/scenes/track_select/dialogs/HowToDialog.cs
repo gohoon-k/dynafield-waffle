@@ -7,119 +7,70 @@ using UnityEngine.UI;
 
 public class HowToDialog : MonoBehaviour
 {
-    public GameObject dialogs;
-    
-    public RectTransform content;
-    public Image background;
-
-    public List<Text> otherTexts;
-    
-    public List<Text> textsIn00;
-    public List<Text> textsIn01;
-    public List<Text> textsIn02;
-    public List<Text> textsIn03;
-    public List<Text> textsIn04;
-    public List<Text> textsIn05;
-    public List<Text> textsIn06;
-    public List<Text> textsIn07;
-
-    public List<Image> imagesIn00;
-    public List<Image> imagesIn01;
-    public List<Image> imagesIn02;
-    public List<Image> imagesIn03;
-    public List<Image> imagesIn04;
-    public List<Image> imagesIn05;
-    public List<Image> imagesIn06;
-    public List<Image> imagesIn07;
-    
-    private readonly List<List<Text>> _texts = new List<List<Text>>();
-    private readonly List<List<Image>> _images = new List<List<Image>>();
-    public List<RectTransform> tips;
-
+    public List<GameObject> pages;
     public Text pageIndicator;
-    
     public Button prev, next;
     
-    private bool _init;
+    [HideInInspector] public bool isOpen;
+    [HideInInspector] public bool isActive;
+
+    private GameObject _dialogs;
     
-    public int currentPage;
-    public bool isOpen;
+    private RectTransform _content;
+    private CanvasGroup _group;
 
-    public bool isActive;
+    private readonly List<RectTransform> _pageTransforms = new List<RectTransform>(); 
+    private readonly List<CanvasGroup> _pageGroups = new List<CanvasGroup>(); 
 
+    private int _pageSize;
+    
+    private bool _init;
+    private int _page;
     private bool _animating;
-
-    public int tipSize = 8;
 
     private Action _closeAction;
 
     public void Open(Action closeAction = null) {
         if (!_init) {
-            _texts.Add(textsIn00);
-            _texts.Add(textsIn06);
-            _texts.Add(textsIn07);
-            _texts.Add(textsIn01);
-            _texts.Add(textsIn02);
-            _texts.Add(textsIn03);
-            _texts.Add(textsIn04);
-            _texts.Add(textsIn05);
+            _dialogs = transform.parent.gameObject;
+            _content = transform.GetChild(0).GetComponent<RectTransform>();
+            _group = GetComponent<CanvasGroup>();
+
+            _pageSize = pages.Count;
             
-            _images.Add(imagesIn00);
-            _images.Add(imagesIn06);
-            _images.Add(imagesIn07);
-            _images.Add(imagesIn01);
-            _images.Add(imagesIn02);
-            _images.Add(imagesIn03);
-            _images.Add(imagesIn04);
-            _images.Add(imagesIn05);
+            _pageTransforms.Clear();
+            _pageGroups.Clear();
+            
+            pages.ForEach(page => {
+                _pageTransforms.Add(page.GetComponent<RectTransform>());
+                _pageGroups.Add(page.GetComponent<CanvasGroup>());
+            });
             
             _init = true;
         }
-
-        _closeAction = closeAction;
-
+        
         isActive = isOpen = true;
-
-        currentPage = 0;
-        pageIndicator.text = $"{currentPage + 1}/{tipSize}";
         
         prev.interactable = false;
         next.interactable = true;
 
-        background.color = new Color(0, 0, 0, 0);
+        _closeAction = closeAction;
 
-        foreach (var text in otherTexts) {
-            text.color = new Color(1, 1, 1, 0);
-        }
+        _page = 0;
+        pageIndicator.text = $"{_page + 1}/{_pageSize}";
         
-        foreach (var text in _texts.SelectMany(texts => texts)) {
-            text.color = new Color(1, 1, 1, 0);
-        }
-
-        foreach (var image in _images.SelectMany(images => images)) {
-            image.color = new Color(1, 1, 1, 0);
-        }
-        content.localScale = new Vector3(1.5f, 1.5f, 1);
+        _group.alpha = 0;
+        _content.localScale = new Vector3(1.5f, 1.5f, 1);
 
         gameObject.SetActive(true);
-        tips[0].gameObject.SetActive(true);
-        tips[0].anchoredPosition = new Vector2(0, tips[0].anchoredPosition.y);
+        pages[0].gameObject.SetActive(true);
+        _pageTransforms[0].anchoredPosition = new Vector2(0, _pageTransforms[0].anchoredPosition.y);
         
         StartCoroutine(Interpolators.Linear(0, 1, 0.4f, step => {
-            background.color = new Color(0, 0, 0, step * 0.8f);
+            _group.alpha = step;
             
-            foreach (var text in otherTexts) {
-                text.color = new Color(1, 1, 1, step);
-            }
-
-            foreach (var text in _texts[0]) {
-                text.color = new Color(1, 1, 1, step);
-            }
-
-            foreach (var image in _images[0]) {
-                image.color = new Color(1, 1, 1, step);
-            }
-            content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
+            var localScale = 1.5f - step / 2f;
+            _content.localScale = new Vector3(localScale, localScale, 1);
         }, () => { }));
     }
 
@@ -127,87 +78,75 @@ public class HowToDialog : MonoBehaviour
         isActive = false;
         
         StartCoroutine(Interpolators.Linear(1, 0, 0.25f, step => {
-            background.color = new Color(0, 0, 0, step * 0.8f);
+            _group.alpha = step;
             
-            foreach (var text in otherTexts) {
-                text.color = new Color(1, 1, 1, step);
-            }
-            
-            foreach (var text in _texts[currentPage]) {
-                text.color = new Color(1, 1, 1, step);
-            }
-
-            foreach (var image in _images[currentPage]) {
-                image.color = new Color(1, 1, 1, step);
-            }
-            content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
+            var localScale = 1.5f - step / 2f;
+            _content.localScale = new Vector3(localScale, localScale, 1);
         }, () => {
             gameObject.SetActive(false);
             isOpen = false;
             if (deactivateDialogs)
-                dialogs.SetActive(false);
+                _dialogs.SetActive(false);
             
             _closeAction?.Invoke();
             _closeAction = null;
         }));
     }
 
-    public void NextTip() {
-        if (currentPage >= tipSize - 1) return;
+    public void NextPage() {
+        if (_page >= _pageSize - 1) return;
         
         if (_animating) return;
         _animating = true;
 
-        var beforePage = currentPage;
-        currentPage++;
+        var beforePage = _page;
+        _page++;
 
-        if (currentPage >= tipSize - 1) next.interactable = false;
+        if (_page >= _pageSize - 1) next.interactable = false;
         prev.interactable = true;
 
-        pageIndicator.text = $"{currentPage + 1}/{tipSize}";
+        pageIndicator.text = $"{_page + 1}/{_pageSize}";
         
-        tips[currentPage].gameObject.SetActive(true);
+        pages[_page].gameObject.SetActive(true);
         
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 300, 0, 0.25f, step => {
-            tips[beforePage].anchoredPosition = new Vector2(step - 300, tips[beforePage].anchoredPosition.y);
-            _texts[beforePage].ForEach(text => text.color = new Color(1, 1, 1, step / 300f));
-            _images[beforePage].ForEach(text => text.color = new Color(1, 1, 1, step / 300f));
-            tips[currentPage].anchoredPosition = new Vector2(step, tips[currentPage].anchoredPosition.y);
-            _texts[currentPage].ForEach(text => text.color = new Color(1, 1, 1, (300 - step) / 300f));
-            _images[currentPage].ForEach(text => text.color = new Color(1, 1, 1, (300 - step) / 300f));
+            _pageTransforms[beforePage].anchoredPosition = new Vector2(step - 300, _pageTransforms[beforePage].anchoredPosition.y);
+            _pageGroups[beforePage].alpha = step / 300f;
+            
+            _pageTransforms[_page].anchoredPosition = new Vector2(step, _pageTransforms[_page].anchoredPosition.y);
+            _pageGroups[_page].alpha = (300 - step) / 300f;
         }, () => {
             _animating = false;
-            tips[beforePage].gameObject.SetActive(false);
+            pages[beforePage].gameObject.SetActive(false);
         }));
 
     }
 
-    public void PreviousTip() {
-        if (currentPage <= 0) return;
+    public void PreviousPage() {
+        if (_page <= 0) return;
         
         if (_animating) return;
         _animating = true;
 
-        var beforePage = currentPage;
-        currentPage--;
+        var beforePage = _page;
+        _page--;
         
-        if (currentPage <= 0) prev.interactable = false;
+        if (_page <= 0) prev.interactable = false;
         next.interactable = true;
         
-        pageIndicator.text = $"{currentPage + 1}/{tipSize}";
+        pageIndicator.text = $"{_page + 1}/{_pageSize}";
         
-        tips[currentPage].gameObject.SetActive(true);
+        pages[_page].gameObject.SetActive(true);
 
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 300, 0, 0.25f, step => {
-            tips[beforePage].anchoredPosition = new Vector2(300 - step, tips[beforePage].anchoredPosition.y);
-            _texts[beforePage].ForEach(text => text.color = new Color(1, 1, 1, step / 300f));
-            _images[beforePage].ForEach(text => text.color = new Color(1, 1, 1, step / 300f));
-            tips[currentPage].anchoredPosition = new Vector2(-step, tips[currentPage].anchoredPosition.y);
-            _texts[currentPage].ForEach(text => text.color = new Color(1, 1, 1, (300 - step) / 300f));
-            _images[currentPage].ForEach(text => text.color = new Color(1, 1, 1, (300 - step) / 300f));
+            _pageTransforms[beforePage].anchoredPosition = new Vector2(300 - step, _pageTransforms[beforePage].anchoredPosition.y);
+            _pageGroups[beforePage].alpha = step / 300f;
+            
+            _pageTransforms[_page].anchoredPosition = new Vector2(-step, _pageTransforms[_page].anchoredPosition.y);
+            _pageGroups[_page].alpha = (300 - step) / 300f;
         }, () => {
             _animating = false;
-            tips[beforePage].gameObject.SetActive(false);
+            pages[beforePage].gameObject.SetActive(false);
         }));
     }
     

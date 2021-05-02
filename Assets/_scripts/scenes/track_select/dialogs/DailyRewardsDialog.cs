@@ -1,33 +1,32 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.UI;
 
-internal class RewardObject {
-    public int Index;
-    public Text DayDescription;
-    public Text Rewards;
+[Serializable]
+public class RewardObject {
+    public int index;
+    public CanvasGroup rewardGroup;
 }
 
 public class DailyRewardsDialog : MonoBehaviour {
-    public GameObject dialogs;
-
-    public RectTransform content;
-
-    public Image background;
-    public Text title;
-    public Text closeButton;
     public Text receiveText;
     public Button receiveButton;
-    public Text description;
-
-    public GameObject rewardsParent;
 
     public string forceToday;
 
-    public bool isActive;
+    public List<GameObject> rewards = new List<GameObject>();
 
+    [HideInInspector] public bool isActive;
+    
+    private GameObject _dialogs;
+
+    private RectTransform _content;
+    private CanvasGroup _group;
+    
     private readonly List<RewardObject> _rewards = new List<RewardObject>();
 
     private bool _init;
@@ -37,15 +36,17 @@ public class DailyRewardsDialog : MonoBehaviour {
     private const float FutureAlpha = 0.2f;
 
     private void Init() {
-        for (var i = 0; i < rewardsParent.transform.childCount; i++) {
-            var reward = new RewardObject {
-                Index = i,
-                DayDescription = rewardsParent.transform.GetChild(i).GetChild(0).GetComponent<Text>(),
-                Rewards = rewardsParent.transform.GetChild(i).GetChild(1).GetComponent<Text>()
-            };
-
-            reward.DayDescription.color = reward.Rewards.color = new Color(1, 1, 1, 0);
-            _rewards.Add(reward);
+        _dialogs ??= transform.parent.gameObject;
+        _content ??= transform.GetChild(0).GetComponent<RectTransform>();
+        _group ??= GetComponent<CanvasGroup>();
+        
+        var i = 0;
+        foreach (var created in rewards.Select(reward => new RewardObject {
+            index = i,
+            rewardGroup = reward.GetComponent<CanvasGroup>()
+        })) {
+            _rewards.Add(created);
+            i++;
         }
 
         _init = true;
@@ -55,6 +56,8 @@ public class DailyRewardsDialog : MonoBehaviour {
         if (!_init) Init();
 
         isActive = true;
+        
+        _group.alpha = 0;
         
         gameObject.SetActive(true);
 
@@ -75,63 +78,37 @@ public class DailyRewardsDialog : MonoBehaviour {
                 received = false;
             }
         }
-
-        title.color = closeButton.color = receiveText.color = description.color = new Color(1, 1, 1, 0);
-
-        background.color = new Color(0, 0, 0, 0);
-
-        receiveText.color = new Color(0, 0, 0, 0);
-        content.localScale = new Vector3(1.5f, 1.5f, 1);
+        
+        _content.localScale = new Vector3(1.5f, 1.5f, 1);
 
         receiveButton.interactable = !received;
         receiveText.text = received ? "수령 완료" : "받기";
+        
+        _rewards.ForEach(reward => {
+            reward.rewardGroup.alpha =
+                reward.index == currentReward ? (received ? PresentReceivedAlpha : 1) :
+                reward.index > currentReward ? FutureAlpha : PastAlpha;
+        });
 
         StartCoroutine(Interpolators.Linear(0, 1, 0.4f, step => {
-            _rewards.ForEach(reward => {
-                reward.DayDescription.color = reward.Rewards.color = new Color(
-                    1, 1, 1,
-                    reward.Index == currentReward ? 
-                        (received ? step * PresentReceivedAlpha : step) : 
-                        reward.Index > currentReward ? 
-                            FutureAlpha * step : 
-                            PastAlpha * step
-                );
-            });
-
-            title.color = closeButton.color = receiveText.color = new Color(1, 1, 1, step);
-            description.color = new Color(1, 1, 1, step * 0.45f);
-
-            background.color = new Color(0, 0, 0, step * 0.85f);
-            content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
+            _group.alpha = step;
+            
+            var localScale = 1.5f - step / 2f;
+            _content.localScale = new Vector3(localScale, localScale, 1);
         }, () => { }));
     }
 
     public void Close() {
         isActive = false;
         
-        var currentReward = PlayerPrefs.GetInt(G.Keys.RewardIndex, -1);
-        var received = PlayerPrefs.GetInt(G.Keys.ReceivedPreviousReward, 1) == 1;
-
         StartCoroutine(Interpolators.Linear(1, 0, 0.25f, step => {
-            _rewards.ForEach(reward => {
-                reward.DayDescription.color = reward.Rewards.color = new Color(
-                    1, 1, 1,
-                    reward.Index == currentReward ? 
-                        (received ? step * PresentReceivedAlpha : step) : 
-                        reward.Index > currentReward ? 
-                            FutureAlpha * step : 
-                            PastAlpha * step
-                );
-            });
-
-            title.color = closeButton.color = receiveText.color = new Color(1, 1, 1, step);
-            description.color = new Color(1, 1, 1, step * 0.7f);
-
-            background.color = new Color(0, 0, 0, step * 0.45f);
-            content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
+            _group.alpha = step;
+            
+            var localScale = 1.5f - step / 2f;
+            _content.localScale = new Vector3(localScale, localScale, 1);
         }, () => {
             gameObject.SetActive(false);
-            dialogs.SetActive(false);
+            _dialogs.SetActive(false);
         }));
     }
 
@@ -160,8 +137,6 @@ public class DailyRewardsDialog : MonoBehaviour {
         receiveText.text = "수령 완료";
         receiveButton.interactable = false;
 
-        _rewards[currentReward].DayDescription.color =
-            _rewards[currentReward].Rewards.color =
-                new Color(1, 1, 1, PresentReceivedAlpha);
+        _rewards[currentReward].rewardGroup.alpha = PresentReceivedAlpha;
     }
 }

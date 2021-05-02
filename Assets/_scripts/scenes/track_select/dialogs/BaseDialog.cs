@@ -5,48 +5,40 @@ using UnityEngine.UI;
 
 public class BaseDialog : MonoBehaviour {
 
-    public GameObject dialogs;
-
-    public RectTransform content;
-    public Image background;
     public Text message;
-    public Text positive;
-    public Text negative;
 
-    public bool isOpen;
+    [HideInInspector] public bool isOpen;
+    [HideInInspector] public bool isActive;
+    
+    private GameObject _dialogs;
+    
+    private RectTransform _content;
+    private CanvasGroup _group;
 
-    public bool isActive;
-
-    [HideInInspector]
-    public float backgroundAlpha = 0.6f;
+    private bool _init;
 
     public virtual void Open() {
-        isActive = isOpen = true;
-        
-        background.color = new Color(0, 0, 0, 0);
-        message.color = new Color(1, 1, 1, 0);
-        if (!(positive is null)) {
-            positive.color = new Color(1, 1, 1, 0);
+        if (!_init) {
+            _dialogs ??= transform.parent.gameObject;
+            _content ??= transform.GetChild(0).GetComponent<RectTransform>();
+
+            _group ??= GetComponent<CanvasGroup>();
+            
+            _init = true;
         }
 
-        if (!(negative is null)) {
-            negative.color = new Color(1, 1, 1, 0);
-        }
-        content.localScale = new Vector3(1.5f, 1.5f, 1);
+        isActive = isOpen = true;
+
+        _group.alpha = 0;
+        _content.localScale = new Vector3(1.5f, 1.5f, 1);
         
         gameObject.SetActive(true);
         
         StartCoroutine(Interpolators.Linear(0, 1, 0.4f, step => {
-            background.color = new Color(0, 0, 0, step * backgroundAlpha);
-            message.color = new Color(1, 1, 1, step);
-            if (!(positive is null)) {
-                positive.color = new Color(1, 1, 1, step);
-            }
-
-            if (!(negative is null)) {
-                negative.color = new Color(1, 1, 1, step);
-            }
-            content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
+            _group.alpha = step;
+            
+            var localScale = 1.5f - step / 2f;
+            _content.localScale = new Vector3(localScale, localScale, 1);
         }, () => { }));
     }
 
@@ -54,21 +46,15 @@ public class BaseDialog : MonoBehaviour {
         isActive = false;
         
         StartCoroutine(Interpolators.Linear(1, 0, 0.25f, step => {
-            background.color = new Color(0, 0, 0, step * backgroundAlpha);
-            message.color = new Color(1, 1, 1, step);
-            if (!(positive is null)) {
-                positive.color = new Color(1, 1, 1, step);
-            }
-
-            if (!(negative is null)) {
-                negative.color = new Color(1, 1, 1, step);
-            }
-            content.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
+            _group.alpha = step;
+            
+            var localScale = 1.5f - step / 2f;
+            _content.localScale = new Vector3(localScale, localScale, 1);
         }, () => {
             gameObject.SetActive(false);
             isOpen = false;
             if (deactivateDialogs)
-                dialogs.SetActive(false);
+                _dialogs.SetActive(false);
         }));
     }
     
