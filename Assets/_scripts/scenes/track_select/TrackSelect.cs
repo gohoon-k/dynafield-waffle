@@ -176,7 +176,6 @@ public class TrackSelect : MonoBehaviour {
         UpdateKeyUI(0);
         
         var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0);
-        uiElements.records.playType.text = G.InternalSettings.PlayTypeNames[playType];
         StartCoroutine(CheckPlayTypeReward(playType));
     }
 
@@ -355,6 +354,9 @@ public class TrackSelect : MonoBehaviour {
         var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
         uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
         uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
+        
+        var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0);
+        uiElements.records.playType.text = G.InternalSettings.PlayTypeNames[playType];
     }
 
     private IEnumerator CheckPlayTypeReward(int playType) {
