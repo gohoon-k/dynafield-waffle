@@ -225,15 +225,20 @@ public class ChartPlayer : MonoBehaviour {
 
             if (constants.debugMode || !G.PlaySettings.AutoPlay) {
                 if (Math.Abs(G.InGame.Accuracy - 100f) < 0.001f) {
-                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 3);
+                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 
+                        Math.Max(PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0), 3));
                 } else if ((int) Math.Ceiling(G.InGame.TotalScore) == 1000000) {
-                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 2);
+                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 
+                        Math.Max(PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0), 2));
                 } else if (G.InGame.MaxCombo == G.InGame.CountOfNotes) {
-                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 1);
+                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 
+                        Math.Max(PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0), 1));
                 }
-
-                PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.BestScore), (int) Math.Ceiling(G.InGame.TotalScore));
-                PlayerPrefs.SetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), G.InGame.Accuracy);
+                
+                PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.BestScore), 
+                    (int) Math.Max(Math.Ceiling(G.InGame.TotalScore), PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0)));
+                PlayerPrefs.SetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 
+                    Math.Max(G.InGame.Accuracy, PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0)));
             }
 
             StartCoroutine(Outro());
