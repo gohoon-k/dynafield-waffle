@@ -524,6 +524,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 59748736}
   m_CullTransparentMesh: 1
+--- !u!1 &71625040
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 71625041}
+  - component: {fileID: 71625043}
+  - component: {fileID: 71625042}
+  m_Layer: 5
+  m_Name: background_blur
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &71625041
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 71625040}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 643407279}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 2882, y: 2160}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &71625042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 71625040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 16aee176828ff864aba056aa306f653e, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &71625043
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 71625040}
+  m_CullTransparentMesh: 1
 --- !u!1 &82795186
 GameObject:
   m_ObjectHideFlags: 0
@@ -2734,7 +2809,7 @@ RectTransform:
   - {fileID: 438881094}
   - {fileID: 1729518191}
   m_Father: {fileID: 643407279}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2812,7 +2887,7 @@ RectTransform:
   - {fileID: 381999514}
   - {fileID: 112852967}
   m_Father: {fileID: 643407279}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -5131,6 +5206,7 @@ RectTransform:
   - {fileID: 2014579933}
   - {fileID: 1749477987}
   - {fileID: 533701326}
+  - {fileID: 71625041}
   - {fileID: 1631161405}
   - {fileID: 382425699}
   - {fileID: 375399565}
@@ -9644,33 +9720,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5fa3700b1c77d94e88193751e2c21dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trackBackground: {fileID: 1749477988}
-  trackBackgroundBright: {fileID: 533701327}
-  trackBackgroundBrightAnimator: {fileID: 533701329}
-  virtualBackground: {fileID: 1482483635}
-  virtualBackgroundBright: {fileID: 2014579935}
-  trackInfo: {fileID: 1415858134}
-  bastScore: {fileID: 1305040619}
-  bestAccuracyInteger: {fileID: 942396693}
-  bestAccuracyFloat: {fileID: 118012390}
-  remainingEnergy: {fileID: 1382251679}
-  maxEnergy: {fileID: 349856666}
-  energyTimer: {fileID: 1150387459}
-  difficulty: {fileID: 7482132}
-  difficultyDescriptions:
-  - {fileID: 1978903302}
-  - {fileID: 997145976}
-  speed: {fileID: 1926046016}
-  speedIncrease: {fileID: 1194310093}
-  speedIncreaseText: {fileID: 1837907415}
-  speedDecrease: {fileID: 1493703885}
-  speedDecreaseText: {fileID: 482742066}
-  keysUI: {fileID: 1521161338}
-  scalableArea: {fileID: 1631161405}
-  scalableAreaPrepare: {fileID: 381999514}
-  prepareBack: {fileID: 2145211023}
-  preparePlay: {fileID: 382425700}
-  barrier: {fileID: 1056771693}
+  uiElements:
+    scalable:
+      main: {fileID: 1631161405}
+      prepare: {fileID: 381999514}
+    backgrounds:
+      main:
+        normal: {fileID: 1749477988}
+        bright: {fileID: 533701327}
+        blur: {fileID: 71625042}
+      virtual_:
+        normal: {fileID: 1482483635}
+        bright: {fileID: 2014579935}
+    trackInformation:
+      text: {fileID: 1415858134}
+    records:
+      score: {fileID: 1305040619}
+      accuracyInt: {fileID: 942396693}
+      accuracyFloat: {fileID: 118012390}
+    playSettings:
+      energy:
+        remaining: {fileID: 1382251679}
+        max: {fileID: 349856666}
+        timer: {fileID: 1150387459}
+      difficulty:
+        value: {fileID: 7482132}
+        names:
+        - {fileID: 1978903302}
+        - {fileID: 997145976}
+      speed:
+        value: {fileID: 1926046016}
+        increase: {fileID: 1194310093}
+        decrease: {fileID: 1493703885}
+    keys:
+      text: {fileID: 1521161338}
+  others:
+    bgBrightAnimator: {fileID: 533701329}
+    prepareBack: {fileID: 2145211023}
+    preparePlay: {fileID: 382425700}
+    barrier: {fileID: 1056771693}
 --- !u!82 &1290131456
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10110,7 +10198,7 @@ GameObject:
   - component: {fileID: 1382251680}
   - component: {fileID: 1382251679}
   m_Layer: 5
-  m_Name: energy_left
+  m_Name: energy_remaining
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12402,7 +12490,7 @@ RectTransform:
   - {fileID: 1194310092}
   - {fileID: 1493703884}
   m_Father: {fileID: 643407279}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -12924,7 +13012,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   receiveText: {fileID: 470073902}
   receiveButton: {fileID: 470073904}
-  forceToday: 2022-01-01
+  forceToday: -1
   rewards:
   - {fileID: 1910416578}
   - {fileID: 998266352}

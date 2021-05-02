@@ -1,45 +1,105 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class TrackSelect : MonoBehaviour {
-    #region UIObj
+[Serializable]
+public class UIElements {
+    public Scalable scalable;
 
-    public Image trackBackground;
-    public Image trackBackgroundBright;
-    public Animator trackBackgroundBrightAnimator;
-    public Image virtualBackground;
-    public Image virtualBackgroundBright;
+    public Backgrounds backgrounds;
+    public TrackInformation trackInformation;
+    public Records records;
+    public PlaySettings playSettings;
+    public Keys keys;
 
-    public Text trackInfo; //곡 정보
-    public Text bastScore; //최고 스코어
-    public Text bestAccuracyInteger; //최고 정확도
-    public Text bestAccuracyFloat; //최고 정확도
-    public Text remainingEnergy; //현재 에너지
-    public Text maxEnergy; //최대 에너지
-    public Text energyTimer; //에너지 충전 대기시간
-    public Text difficulty; //난이도 숫자
-    public Text[] difficultyDescriptions; //난이도 easy
-    public Text speed; //채보속도 숫자
-    public Button speedIncrease;
-    public Text speedIncreaseText;
-    public Button speedDecrease;
-    public Text speedDecreaseText;
+    [Serializable]
+    public class Scalable {
+        public RectTransform main;
+        public RectTransform prepare;
+    }
+    
+    [Serializable]
+    public class Backgrounds {
 
-    public Text keysUI;
+        public Main main;
+        public Virtual virtual_;
+        
+        [Serializable]
+        public class Main {
+            public Image normal;
+            public Image bright;
+            public Image blur;
+        }
+        
+        [Serializable]
+        public class Virtual {
+            public Image normal;
+            public Image bright;
+        }
+    }
 
-    #endregion
+    [Serializable]
+    public class TrackInformation {
+        public Text text;
+    }
 
-    public RectTransform scalableArea;
-    public RectTransform scalableAreaPrepare;
+    [Serializable]
+    public class Records {
+        public Text score;
+        public Text accuracyInt;
+        public Text accuracyFloat;
+    }
+
+    [Serializable]
+    public class PlaySettings {
+
+        public Energy energy;
+        public Difficulty difficulty;
+        public Speed speed;
+        
+        [Serializable]
+        public class Energy {
+            public Text remaining;
+            public Text max;
+            public Text timer;
+        }
+
+        [Serializable]
+        public class Difficulty {
+            public Text value;
+            public Text[] names;
+        }
+
+        [Serializable]
+        public class Speed {
+            public Text value;
+            public Button increase;
+            public Button decrease;
+        }
+    }
+
+    [Serializable]
+    public class Keys {
+        public Text text;
+    }
+
+}
+
+[Serializable]
+public class Others {
+    public Animator bgBrightAnimator;
     public Animator prepareBack;
     public Animator preparePlay;
-
-    public LockedBarrier barrier;
     
+    public LockedBarrier barrier;
+}
+
+public class TrackSelect : MonoBehaviour {
+    public UIElements uiElements;
+    public Others others;
+
     private Image _startGameEffectImage;
 
     private AudioSource _previewPlayer;
@@ -48,7 +108,7 @@ public class TrackSelect : MonoBehaviour {
     private Sprite[] _backgrounds;
     private Sprite[] _brightBackgrounds;
 
-    private bool _canPrepare = false;
+    private bool _canPrepare;
     private bool _trackSelectable = true;
     private bool _canStartGame;
     private bool _prepareAnimating;
@@ -79,9 +139,9 @@ public class TrackSelect : MonoBehaviour {
         _brightBackgrounds = Resources.LoadAll<Sprite>("textures/tracks/bright");
         Array.Sort(_brightBackgrounds, (a, b) => int.Parse(a.name) - int.Parse(b.name));
 
-        speed.text = G.PlaySettings.DisplaySpeed.ToString();
+        uiElements.playSettings.speed.value.text = $"{G.PlaySettings.DisplaySpeed}";
 
-        _startGameEffectImage = preparePlay.gameObject.transform.GetChild(0).gameObject.GetComponent<Image>();
+        _startGameEffectImage = others.preparePlay.gameObject.transform.GetChild(0).gameObject.GetComponent<Image>();
 
         #endregion
 
@@ -94,8 +154,8 @@ public class TrackSelect : MonoBehaviour {
         UpdateEnergyUI(G.Items.Energy);
 
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 2, 1, 1f, step => {
-            scalableArea.localScale = new Vector3(step, step, 1);
-            scalableAreaPrepare.localScale = new Vector3(step, step, 1);
+            uiElements.scalable.main.localScale = new Vector3(step, step, 1);
+            uiElements.scalable.prepare.localScale = new Vector3(step, step, 1);
         }, () => {
             _canPrepare = true;
         }));
@@ -116,25 +176,22 @@ public class TrackSelect : MonoBehaviour {
     public void UpdateEnergyUI(int delta, bool energyChanged = true) {
         if (G.Items.CoolDown != -1) {
             var difference = new DateTime(G.Items.CoolDown - DateTime.Now.ToBinary());
-            energyTimer.text = difference.ToString("m:ss");
+            uiElements.playSettings.energy.timer.text = difference.ToString("m:ss");
         }
 
         if (energyChanged)
             StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, G.Items.Energy - delta, G.Items.Energy,
                 0.35f,
-                step => { remainingEnergy.text = $"{(int) step}"; }, () => { })
+                step => { uiElements.playSettings.energy.remaining.text = $"{(int) step}"; }, () => { })
             );
 
-        remainingEnergy.color = new Color(remainingEnergy.color.r, remainingEnergy.color.g,
-            remainingEnergy.color.b, G.Items.CoolDown == -1 ? 1.0f : 0.15f);
+        uiElements.playSettings.energy.remaining.color = uiElements.playSettings.energy.max.color = 
+            new Color(1, 1, 1, G.Items.CoolDown == -1 ? 1.0f : 0.15f);
 
-        maxEnergy.color = new Color(maxEnergy.color.r, maxEnergy.color.g,
-            maxEnergy.color.b, G.Items.CoolDown == -1 ? 1.0f : 0.15f);
+        uiElements.playSettings.energy.max.text = $"/{G.Items.MaxEnergy[G.Items.MaxEnergyStep]}";
 
-        maxEnergy.text = $"/{G.Items.MaxEnergy[G.Items.MaxEnergyStep]}";
-
-        energyTimer.color = new Color(energyTimer.color.r, energyTimer.color.g,
-            energyTimer.color.b, G.Items.CoolDown == -1 ? 0.0f : 1.0f);
+        uiElements.playSettings.energy.timer.color = 
+            new Color(1, 1, 1, G.Items.CoolDown == -1 ? 0.0f : 1.0f);
     }
 
     private void CheckCooldownFinished() {
@@ -150,7 +207,7 @@ public class TrackSelect : MonoBehaviour {
 
     public void UpdateKeyUI(int before) {
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, before, G.Items.Key, 0.5f,
-            step => { keysUI.text = $"<size=50>you have</size>\n{(int) step} key(s)"; }, () => { }));
+            step => { uiElements.keys.text.text = $"<size=50>you have</size>\n{(int) step} key(s)"; }, () => { }));
     }
 
     public void PreparePlay() {
@@ -158,20 +215,20 @@ public class TrackSelect : MonoBehaviour {
 
         _prepareAnimating = true;
 
-        prepareBack.gameObject.SetActive(true);
-        preparePlay.gameObject.SetActive(true);
+        others.prepareBack.gameObject.SetActive(true);
+        others.preparePlay.gameObject.SetActive(true);
 
-        preparePlay.transform.GetChild(0).gameObject.SetActive(G.Items.Energy != 0);
-        preparePlay.transform.GetChild(1).gameObject.SetActive(G.Items.Energy != 0);
-        preparePlay.transform.GetChild(2).gameObject.SetActive(G.Items.Energy != 0);
-        preparePlay.transform.GetChild(3).gameObject.SetActive(G.Items.Energy != 0);
+        others.preparePlay.transform.GetChild(0).gameObject.SetActive(G.Items.Energy != 0);
+        others.preparePlay.transform.GetChild(1).gameObject.SetActive(G.Items.Energy != 0);
+        others.preparePlay.transform.GetChild(2).gameObject.SetActive(G.Items.Energy != 0);
+        others.preparePlay.transform.GetChild(3).gameObject.SetActive(G.Items.Energy != 0);
 
-        preparePlay.transform.GetChild(4).gameObject.SetActive(G.Items.Energy == 0);
+        others.preparePlay.transform.GetChild(4).gameObject.SetActive(G.Items.Energy == 0);
 
-        prepareBack.SetFloat("speed", 3f);
-        preparePlay.SetFloat("speed", 3f);
-        prepareBack.Play("track_select_prepare_back", -1, 0);
-        preparePlay.Play("track_select_prepare_play", -1, 0);
+        others.prepareBack.SetFloat("speed", 3f);
+        others.preparePlay.SetFloat("speed", 3f);
+        others.prepareBack.Play("track_select_prepare_back", -1, 0);
+        others.preparePlay.Play("track_select_prepare_play", -1, 0);
         StartCoroutine(SetGameCanStart(0.2f));
     }
 
@@ -182,10 +239,10 @@ public class TrackSelect : MonoBehaviour {
 
         _canStartGame = false;
 
-        prepareBack.Play("track_select_prepare_back", -1, 1);
-        preparePlay.Play("track_select_prepare_play", -1, 1);
-        prepareBack.SetFloat("speed", slow ? -0.75f : -2f);
-        preparePlay.SetFloat("speed", slow ? -0.75f : -2f);
+        others.prepareBack.Play("track_select_prepare_back", -1, 1);
+        others.preparePlay.Play("track_select_prepare_play", -1, 1);
+        others.prepareBack.SetFloat("speed", slow ? -0.75f : -2f);
+        others.preparePlay.SetFloat("speed", slow ? -0.75f : -2f);
         StartCoroutine(DeactivatePrepare(slow ? 0.6f : 0.2f));
     }
 
@@ -198,15 +255,15 @@ public class TrackSelect : MonoBehaviour {
     private IEnumerator DeactivatePrepare(float length) {
         yield return new WaitForSeconds(length);
 
-        preparePlay.transform.GetChild(0).gameObject.SetActive(false);
-        preparePlay.transform.GetChild(1).gameObject.SetActive(false);
-        preparePlay.transform.GetChild(2).gameObject.SetActive(false);
-        preparePlay.transform.GetChild(3).gameObject.SetActive(false);
+        others.preparePlay.transform.GetChild(0).gameObject.SetActive(false);
+        others.preparePlay.transform.GetChild(1).gameObject.SetActive(false);
+        others.preparePlay.transform.GetChild(2).gameObject.SetActive(false);
+        others.preparePlay.transform.GetChild(3).gameObject.SetActive(false);
 
-        preparePlay.transform.GetChild(4).gameObject.SetActive(false);
+        others.preparePlay.transform.GetChild(4).gameObject.SetActive(false);
 
-        prepareBack.gameObject.SetActive(false);
-        preparePlay.gameObject.SetActive(false);
+        others.prepareBack.gameObject.SetActive(false);
+        others.preparePlay.gameObject.SetActive(false);
         _prepareAnimating = false;
     }
 
@@ -218,19 +275,21 @@ public class TrackSelect : MonoBehaviour {
     }
 
     private IEnumerator Enter() {
-        var backgroundBrightAnimator = trackBackgroundBright.GetComponent<Animator>();
+        var backgroundBrightAnimator = uiElements.backgrounds.main.bright.GetComponent<Animator>();
         backgroundBrightAnimator.enabled = false;
 
-        trackBackgroundBrightAnimator.enabled = false;
+        others.bgBrightAnimator.enabled = false;
+
+        var beforeAlpha = uiElements.backgrounds.main.bright.color.a;
 
         StartCoroutine(Interpolators.Linear(1, 0, 0.15f, step => {
             _startGameEffectImage.color = new Color(1, 1, 1, step);
-            trackBackgroundBright.color = new Color(1, 1, 1, step * trackBackgroundBright.color.a);
+            uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, step * beforeAlpha);
         }, () => { }));
 
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 1, 2f, 1f, step => {
-            scalableArea.localScale = new Vector3(step, step, 1);
-            scalableAreaPrepare.localScale = new Vector3(step, step, 1);
+            uiElements.scalable.main.localScale = new Vector3(step, step, 1);
+            uiElements.scalable.prepare.localScale = new Vector3(step, step, 1);
 
             _previewPlayer.volume = 2 - step;
         }, () => { }));
@@ -256,31 +315,32 @@ public class TrackSelect : MonoBehaviour {
 
     private void SelectTrack() {
         if (!G.PlaySettings.FromTrackPlay) {
-            trackBackground.color = new Color(1, 1, 1, 0);
-            trackBackgroundBright.color = new Color(1, 1, 1, 0);
+            uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, 0);
+            uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, 0);
+            uiElements.backgrounds.main.blur.color = new Color(1, 1, 1, 0);
 
             StartCoroutine(Interpolators.Linear(0, 1, 1f, step => {
-                trackBackground.color = new Color(1, 1, 1, step);
-                trackBackgroundBright.color = new Color(1, 1, 1, step);
+                uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, step);
+                uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, step);
             }, () => { }));
         }
         
         if (!G.TrackUnlockData[G.PlaySettings.TrackId])
-            barrier.Show();
+            others.barrier.Show();
 
-        trackBackground.sprite = _backgrounds[G.PlaySettings.TrackId];
-        trackBackgroundBright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.main.normal.sprite = _backgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.main.bright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
 
-        trackInfo.GetComponent<Text>().text =
+        uiElements.trackInformation.text.text =
             $"{G.Tracks[G.PlaySettings.TrackId].title}   <size=40>{G.Tracks[G.PlaySettings.TrackId].artist}</size>";
-        difficulty.text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
+        uiElements.playSettings.difficulty.value.text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
 
-        bastScore.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
+        uiElements.records.score.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
         var bestAc = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0);
         var bestAcInt = Math.Floor(bestAc);
         var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
-        bestAccuracyInteger.text = $"{bestAcInt:00}";
-        bestAccuracyFloat.text = $"{bestAcFloat:00}";
+        uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
+        uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
 
         _previewPlayer.clip = _previewClips[G.PlaySettings.TrackId];
         _previewPlayer.PlayDelayed(1.0f);
@@ -290,47 +350,47 @@ public class TrackSelect : MonoBehaviour {
     {
         if (!_trackSelectable) return;
 
-        trackBackground.sprite = _backgrounds[G.PlaySettings.TrackId];
-        trackBackgroundBright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.main.normal.sprite = _backgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.main.bright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
 
         G.PlaySettings.TrackId += dir;
         if (G.PlaySettings.TrackId == -1) G.PlaySettings.TrackId = G.Tracks.Length - 1;
         if (G.PlaySettings.TrackId == G.Tracks.Length) G.PlaySettings.TrackId = 0;
         
-        if (!G.TrackUnlockData[G.PlaySettings.TrackId] && !barrier.showing)
-            barrier.Show();
-        else if(G.TrackUnlockData[G.PlaySettings.TrackId] && barrier.showing)
-            barrier.Hide();
+        if (!G.TrackUnlockData[G.PlaySettings.TrackId] && !others.barrier.showing)
+            others.barrier.Show();
+        else if(G.TrackUnlockData[G.PlaySettings.TrackId] && others.barrier.showing)
+            others.barrier.Hide();
 
-        virtualBackground.sprite = _backgrounds[G.PlaySettings.TrackId];
-        virtualBackgroundBright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.virtual_.normal.sprite = _backgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.virtual_.bright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
 
-        trackInfo.GetComponent<Text>().text =
+        uiElements.trackInformation.text.text =
             $"{G.Tracks[G.PlaySettings.TrackId].title}   <size=40>{G.Tracks[G.PlaySettings.TrackId].artist}</size>";
-        difficulty.text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
+        uiElements.playSettings.difficulty.value.text = $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
 
-        bastScore.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
+        uiElements.records.score.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
         var bestAc = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0);
         var bestAcInt = Math.Floor(bestAc);
         var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
-        bestAccuracyInteger.text = $"{bestAcInt:00}";
-        bestAccuracyFloat.text = $"{bestAcFloat:00}";
+        uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
+        uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
         
         _trackSelectable = false;
 
         StartCoroutine(Interpolators.Linear(0, 1, 0.15f, step => {
-            trackBackground.color = new Color(1, 1, 1, 1 - step);
-            trackBackgroundBright.color = new Color(1, 1, 1, 1 - step);
-            virtualBackground.color = new Color(1, 1, 1, step);
-            virtualBackgroundBright.color = new Color(1, 1, 1, step);
+            uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, 1 - step);
+            uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, 1 - step);
+            uiElements.backgrounds.virtual_.normal.color = new Color(1, 1, 1, step);
+            uiElements.backgrounds.virtual_.bright.color = new Color(1, 1, 1, step);
         }, () => {
-            trackBackground.sprite = virtualBackground.sprite;
-            trackBackgroundBright.sprite = virtualBackgroundBright.sprite;
+            uiElements.backgrounds.main.normal.sprite = uiElements.backgrounds.virtual_.normal.sprite;
+            uiElements.backgrounds.main.bright.sprite = uiElements.backgrounds.virtual_.bright.sprite;
 
-            trackBackground.color = new Color(1, 1, 1, 1);
-            trackBackgroundBright.color = new Color(1, 1, 1, 1);
-            virtualBackground.color = new Color(1, 1, 1, 0);
-            virtualBackgroundBright.color = new Color(1, 1, 1, 0);
+            uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, 1);
+            uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, 1);
+            uiElements.backgrounds.virtual_.normal.color = new Color(1, 1, 1, 0);
+            uiElements.backgrounds.virtual_.bright.color = new Color(1, 1, 1, 0);
 
             _trackSelectable = true;
         }));
@@ -344,30 +404,27 @@ public class TrackSelect : MonoBehaviour {
 
     public void ToggleDifficulty() //난이도 변경
     {
-        var previousDifficulty = difficultyDescriptions[G.PlaySettings.Difficulty];
+        var previousDifficulty = uiElements.playSettings.difficulty.names[G.PlaySettings.Difficulty];
         previousDifficulty.color = new Color(
             previousDifficulty.color.r, previousDifficulty.color.g, previousDifficulty.color.b, 0.4f
         );
         G.PlaySettings.Difficulty = G.PlaySettings.Difficulty == 0 ? 1 : 0;
-        var currentDifficulty = difficultyDescriptions[G.PlaySettings.Difficulty];
+        var currentDifficulty = uiElements.playSettings.difficulty.names[G.PlaySettings.Difficulty];
         currentDifficulty.color = new Color(
             currentDifficulty.color.r, currentDifficulty.color.g, currentDifficulty.color.b, 1f
         );
 
-        difficulty.GetComponent<Text>().text =
+        uiElements.playSettings.difficulty.value.text =
             $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
     }
 
     public void SetDisplaySpeed(int delta) //DisplaySpeed 변경   
     {
         G.PlaySettings.DisplaySpeed += delta;
-        speed.text = $"{G.PlaySettings.DisplaySpeed}";
+        uiElements.playSettings.speed.value.text = $"{G.PlaySettings.DisplaySpeed}";
 
-        speedIncrease.interactable = G.PlaySettings.DisplaySpeed != 9;
-        speedDecrease.interactable = G.PlaySettings.DisplaySpeed != 1;
-
-        speedIncreaseText.color = new Color(1, 1, 1, speedIncrease.interactable ? 1f : 0.5f);
-        speedDecreaseText.color = new Color(1, 1, 1, speedDecrease.interactable ? 1f : 0.5f);
+        uiElements.playSettings.speed.increase.interactable = G.PlaySettings.DisplaySpeed < 9;
+        uiElements.playSettings.speed.decrease.interactable = G.PlaySettings.DisplaySpeed > 1;
     }
 
     public void RefillEnergy() {
