@@ -468,7 +468,7 @@ public class TrackSelect : MonoBehaviour {
     private IEnumerator AnimateBack() {
         var beforeColor = uiElements.backgrounds.main.bright.color.a;
 
-        yield return StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 0, 1, 0.4f,
+        yield return StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 0, 1, 1f,
                 step => {
                     var newScale = 1 + step / 2f;
                     uiElements.scalable.main.localScale = new Vector3(newScale, newScale, 1);

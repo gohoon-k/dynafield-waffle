@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InputDetector : MonoBehaviour {
-    public Animator backgroundEffect;
+    public Image backgroundEffect;
+    public Animator backgroundAnimator;
     public ScreenTranslator translator;
 
     public RectTransform trackSource;
@@ -33,7 +34,14 @@ public class InputDetector : MonoBehaviour {
     }
 
     private IEnumerator TranslateToSelect() {
-        backgroundEffect.Play("intro_effect_clicked", -1, 0);
+        backgroundAnimator.enabled = false;
+        yield return StartCoroutine(Interpolators.Curve(Interpolators.EaseInCurve, backgroundEffect.color.a, 1, 0.1f, step => {
+            backgroundEffect.color = new Color(1, 1, 1, step);
+        }, () => {}));
+        StartCoroutine(Interpolators.Curve(Interpolators.EaseInCurve, 1, 0, 0.4f, step => {
+            backgroundEffect.color = new Color(1, 1, 1, step);
+        }, () => {}));
+        
         yield return new WaitForSeconds(0.15f);
         StartCoroutine(Interpolators.Linear(1, 0, 0.65f, step => {
             introAudioPlayer.volume = step;

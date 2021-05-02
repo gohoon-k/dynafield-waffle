@@ -27,7 +27,7 @@ public class TextLoader : MonoBehaviour {
         text.color = new Color(text.color.r, text.color.g, text.color.b, 1f);
         yield return new WaitForSeconds(5f);
         text.color = new Color(text.color.r, text.color.g, text.color.b, 0f);
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2f);
         SceneManager.LoadScene("Intro");
     }
 

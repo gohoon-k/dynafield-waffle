@@ -1854,7 +1854,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac4feec8d47aeab448de5e1c3e5b4124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backgroundEffect: {fileID: 1748213121}
+  backgroundEffect: {fileID: 1748213119}
+  backgroundAnimator: {fileID: 1748213121}
   translator: {fileID: 4310911}
   trackSource: {fileID: 297543391}
   trackSourceText: {fileID: 661834698}
@@ -2007,6 +2008,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 92.350006, y: -70.07}
-  m_SizeDelta: {x: 364.84, y: 87.03}
+  m_AnchoredPosition: {x: 88.74, y: -70.07}
+  m_SizeDelta: {x: 372.05, y: 87.03}
   m_Pivot: {x: 0.5, y: 0.5}
