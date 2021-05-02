@@ -2978,7 +2978,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   message: {fileID: 1554915736}
-  positive: {fileID: 0}
   isOpen: 0
   isActive: 0
 --- !u!114 &409705860
@@ -5334,7 +5333,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   message: {fileID: 752951093}
-  positive: {fileID: 0}
   isOpen: 0
   isActive: 0
 --- !u!114 &653337535
@@ -5793,7 +5791,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   message: {fileID: 1903782934}
-  positive: {fileID: 0}
   isOpen: 0
   isActive: 0
   positiveButton: {fileID: 82795188}
@@ -6097,7 +6094,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   message: {fileID: 1927912675}
-  positive: {fileID: 0}
   isOpen: 0
   isActive: 0
 --- !u!225 &757213762
@@ -6542,9 +6538,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 811455486}
+  - component: {fileID: 811455488}
   - component: {fileID: 811455490}
   - component: {fileID: 811455489}
-  - component: {fileID: 811455488}
   - component: {fileID: 811455487}
   m_Layer: 5
   m_Name: play_type_reward
@@ -6594,13 +6590,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 811455485}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6df8c84091a39f84db6080e5b00d1c07, type: 3}
+  m_Script: {fileID: 11500000, guid: a5f0c7ea688d48f4861e9a7ef109adcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  message: {fileID: 793773568}
-  positive: {fileID: 1109047977}
+  message: {fileID: 0}
   isOpen: 0
   isActive: 0
+  title: {fileID: 0}
+  reward: {fileID: 0}
+  positive: {fileID: 0}
 --- !u!114 &811455489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7452,7 +7450,7 @@ MonoBehaviour:
   fakePurchasingDialog: {fileID: 409705859}
   fakePurchaseSuccessDialog: {fileID: 653337534}
   adDialog: {fileID: 1940476418}
-  playTypeRewardDialog: {fileID: 0}
+  playTypeRewardDialog: {fileID: 811455488}
   storeDialog: {fileID: 1946096452}
   calibrationDialog: {fileID: 264523188}
   howToDialog: {fileID: 438881096}
@@ -10116,7 +10114,7 @@ MonoBehaviour:
       score: {fileID: 1305040619}
       accuracyInt: {fileID: 942396693}
       accuracyFloat: {fileID: 118012390}
-      playType: {fileID: 0}
+      playType: {fileID: 1489671542}
     playSettings:
       energy:
         remaining: {fileID: 1382251679}
@@ -11034,7 +11032,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   message: {fileID: 1393517624}
-  positive: {fileID: 0}
   isOpen: 0
   isActive: 0
 --- !u!225 &1415839796
@@ -15282,7 +15279,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   message: {fileID: 1865830678}
-  positive: {fileID: 0}
   isOpen: 0
   isActive: 0
 --- !u!114 &1940476419
