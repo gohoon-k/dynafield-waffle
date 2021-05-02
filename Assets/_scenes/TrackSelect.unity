@@ -4134,7 +4134,7 @@ GameObject:
   - component: {fileID: 533701327}
   - component: {fileID: 533701329}
   m_Layer: 5
-  m_Name: background_bright
+  m_Name: main_background_bright
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9778,7 +9778,7 @@ MonoBehaviour:
         normal: {fileID: 1749477988}
         bright: {fileID: 533701327}
         blur: {fileID: 71625042}
-      virtual_:
+      transition:
         normal: {fileID: 1482483635}
         bright: {fileID: 2014579935}
     trackInformation:
@@ -11359,7 +11359,7 @@ GameObject:
   - component: {fileID: 1482483634}
   - component: {fileID: 1482483635}
   m_Layer: 5
-  m_Name: background_virtual
+  m_Name: transition_background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13356,7 +13356,7 @@ GameObject:
   - component: {fileID: 1749477989}
   - component: {fileID: 1749477988}
   m_Layer: 5
-  m_Name: background
+  m_Name: main_background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15170,7 +15170,7 @@ GameObject:
   - component: {fileID: 2014579935}
   - component: {fileID: 2014579936}
   m_Layer: 5
-  m_Name: background_bright_virtual
+  m_Name: transition_background_bright
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

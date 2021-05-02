@@ -25,7 +25,7 @@ public class UIElements {
     [Serializable]
     public class Backgrounds {
         public Main main;
-        public Virtual virtual_;
+        public Transition transition;
 
         [Serializable]
         public class Main {
@@ -35,7 +35,7 @@ public class UIElements {
         }
 
         [Serializable]
-        public class Virtual {
+        public class Transition {
             public Image normal;
             public Image bright;
         }
@@ -230,8 +230,8 @@ public class TrackSelect : MonoBehaviour {
         
         others.preparePlay.transform.GetChild(3).gameObject.SetActive(G.Items.Energy == 0);
 
-        others.prepareBack.SetFloat("speed", 3f);
-        others.preparePlay.SetFloat("speed", 3f);
+        others.prepareBack.SetFloat(others.prepareBack.GetParameter(0).name, 3f);
+        others.preparePlay.SetFloat(others.preparePlay.GetParameter(0).name, 3f);
         others.prepareBack.Play("track_select_prepare_back", -1, 0);
         others.preparePlay.Play("track_select_prepare_play", -1, 0);
 
@@ -255,8 +255,8 @@ public class TrackSelect : MonoBehaviour {
 
         others.prepareBack.Play("track_select_prepare_back", -1, 1);
         others.preparePlay.Play("track_select_prepare_play", -1, 1);
-        others.prepareBack.SetFloat("speed", slow ? -0.75f : -2f);
-        others.preparePlay.SetFloat("speed", slow ? -0.75f : -2f);
+        others.prepareBack.SetFloat(others.prepareBack.GetParameter(0).name, slow ? -0.75f : -2f);
+        others.preparePlay.SetFloat(others.preparePlay.GetParameter(0).name, slow ? -0.75f : -2f);
         
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 1f, 0f, 0.5f, step => {
                     uiElements.preparePlay.startGroup.alpha = step;
@@ -382,8 +382,8 @@ public class TrackSelect : MonoBehaviour {
         else if (G.TrackUnlockData[G.PlaySettings.TrackId] && others.barrier.showing)
             others.barrier.Hide();
 
-        uiElements.backgrounds.virtual_.normal.sprite = _backgrounds[G.PlaySettings.TrackId];
-        uiElements.backgrounds.virtual_.bright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.transition.normal.sprite = _backgrounds[G.PlaySettings.TrackId];
+        uiElements.backgrounds.transition.bright.sprite = _brightBackgrounds[G.PlaySettings.TrackId];
 
         uiElements.trackInformation.text.text =
             $"{G.Tracks[G.PlaySettings.TrackId].title}   <size=40>{G.Tracks[G.PlaySettings.TrackId].artist}</size>";
@@ -402,17 +402,17 @@ public class TrackSelect : MonoBehaviour {
         StartCoroutine(Interpolators.Linear(0, 1, 0.15f, step => {
             uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, 1 - step);
             uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, 1 - step);
-            uiElements.backgrounds.virtual_.normal.color = new Color(1, 1, 1, step);
-            uiElements.backgrounds.virtual_.bright.color = new Color(1, 1, 1, step);
+            uiElements.backgrounds.transition.normal.color = new Color(1, 1, 1, step);
+            uiElements.backgrounds.transition.bright.color = new Color(1, 1, 1, step);
         }, () => {
-            uiElements.backgrounds.main.normal.sprite = uiElements.backgrounds.virtual_.normal.sprite;
-            uiElements.backgrounds.main.bright.sprite = uiElements.backgrounds.virtual_.bright.sprite;
+            uiElements.backgrounds.main.normal.sprite = uiElements.backgrounds.transition.normal.sprite;
+            uiElements.backgrounds.main.bright.sprite = uiElements.backgrounds.transition.bright.sprite;
             uiElements.backgrounds.main.blur.sprite = _blurBackgrounds[G.PlaySettings.TrackId];
 
             uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, 1);
             uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, 1);
-            uiElements.backgrounds.virtual_.normal.color = new Color(1, 1, 1, 0);
-            uiElements.backgrounds.virtual_.bright.color = new Color(1, 1, 1, 0);
+            uiElements.backgrounds.transition.normal.color = new Color(1, 1, 1, 0);
+            uiElements.backgrounds.transition.bright.color = new Color(1, 1, 1, 0);
 
             _trackSelectable = true;
         }));
