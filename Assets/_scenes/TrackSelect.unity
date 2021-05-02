@@ -9807,6 +9807,7 @@ MonoBehaviour:
     keys:
       text: {fileID: 1521161338}
   others:
+    dialogManager: {fileID: 937434921}
     bgBrightAnimator: {fileID: 533701329}
     prepareBack: {fileID: 2145211023}
     preparePlay: {fileID: 382425700}
@@ -13087,6 +13088,7 @@ MonoBehaviour:
   - {fileID: 127489887}
   - {fileID: 970465026}
   isActive: 0
+  isOpen: 0
 --- !u!225 &1729518195
 CanvasGroup:
   m_ObjectHideFlags: 0

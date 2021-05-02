@@ -56,6 +56,16 @@ public class DialogManager : MonoBehaviour {
         }
     }
 
+    public void CloseAllDialogs() {
+        if (energyRefillDialog.isActive) energyRefillDialog.Close(true);
+        if (startCooldownNowDialog.isActive) startCooldownNowDialog.Close(true);
+        if (trackUnlockDialog.isActive) trackUnlockDialog.Close(true);
+        if (storeDialog.isActive) storeDialog.Close(true);
+        if (calibrationDialog.isActive) calibrationDialog.Close(true);
+        if (howToDialog.isActive) howToDialog.Close(true);
+        if (dailyRewardsDialog.isActive) dailyRewardsDialog.Close();
+    }
+
     private IEnumerator ShowHowToWithDelay() {
         yield return new WaitForSeconds(1.25f);
 

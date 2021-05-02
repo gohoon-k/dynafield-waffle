@@ -94,6 +94,8 @@ public class UIElements {
 
 [Serializable]
 public class Others {
+    public DialogManager dialogManager;
+    
     public Animator bgBrightAnimator;
     public Animator prepareBack;
     public Animator preparePlay;
@@ -176,6 +178,16 @@ public class TrackSelect : MonoBehaviour {
         if (G.Items.CoolDown != -1) {
             CheckCooldownFinished();
             UpdateEnergyUI(0, false);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            if (_canStartGame) {
+                CancelPrepare();
+            } else if (others.dialogManager.DialogShowing) {
+                others.dialogManager.CloseAllDialogs();
+            } else {
+                Back();
+            }
         }
     }
 

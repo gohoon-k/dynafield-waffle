@@ -21,6 +21,7 @@ public class DailyRewardsDialog : MonoBehaviour {
     public List<GameObject> rewards = new List<GameObject>();
 
     [HideInInspector] public bool isActive;
+    [HideInInspector] public bool isOpen;
     
     private GameObject _dialogs;
 
@@ -55,7 +56,7 @@ public class DailyRewardsDialog : MonoBehaviour {
     public void Open() {
         if (!_init) Init();
 
-        isActive = true;
+        isOpen = isActive = true;
         
         _group.alpha = 0;
         
@@ -107,6 +108,7 @@ public class DailyRewardsDialog : MonoBehaviour {
             var localScale = 1.5f - step / 2f;
             _content.localScale = new Vector3(localScale, localScale, 1);
         }, () => {
+            isOpen = false;
             gameObject.SetActive(false);
             _dialogs.SetActive(false);
         }));
