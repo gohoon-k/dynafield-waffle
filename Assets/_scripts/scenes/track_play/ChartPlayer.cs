@@ -223,19 +223,6 @@ public class ChartPlayer : MonoBehaviour {
                 }
             }
 
-            if (constants.debugMode || !G.PlaySettings.AutoPlay) {
-                if (Math.Abs(G.InGame.Accuracy - 100f) < 0.001f) {
-                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 3);
-                } else if ((int) Math.Ceiling(G.InGame.TotalScore) == 1000000) {
-                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 2);
-                } else if (G.InGame.MaxCombo == G.InGame.CountOfNotes) {
-                    PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayType), 1);
-                }
-
-                PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.BestScore), (int) Math.Ceiling(G.InGame.TotalScore));
-                PlayerPrefs.SetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), G.InGame.Accuracy);
-            }
-
             StartCoroutine(Outro());
         }
     }
@@ -718,11 +705,7 @@ public class ChartPlayer : MonoBehaviour {
 
         // animators.foreground.Play("ingame_foreground_fade_out", -1, 0);
 
-        PlayerPrefs.Save();
-        
         yield return new WaitForSeconds(2f);
-
-        SceneManager.LoadScene("TrackSelect");
     }
 
     private IEnumerator Ready() {

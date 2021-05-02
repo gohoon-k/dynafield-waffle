@@ -174,10 +174,6 @@ public class TrackSelect : MonoBehaviour {
             G.Items.CoolDown = DateTime.Now.AddMinutes(5).ToBinary();
 
         UpdateKeyUI(0);
-        
-        var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0);
-        uiElements.records.playType.text = G.InternalSettings.PlayTypeNames[playType];
-        StartCoroutine(CheckPlayTypeReward(playType));
     }
 
     void Update() {
@@ -355,12 +351,15 @@ public class TrackSelect : MonoBehaviour {
         var bestAcFloat = Math.Floor((bestAc - bestAcInt) * 100);
         uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
         uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
+
+        var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType));
+        uiElements.records.playType.text = G.InternalSettings.PlayTypeNames[playType];
+        
+        CheckPlayTypeReward(playType);
     }
 
-    private IEnumerator CheckPlayTypeReward(int playType) {
-        yield return new WaitForSeconds(1f);
-        
-        if (playType < 1 || playType > 3) yield break;
+    private void CheckPlayTypeReward(int playType) {
+        if (playType < 1 || playType > 3) return;
 
         var types = new List<int>();
         var rewards = new List<int>();

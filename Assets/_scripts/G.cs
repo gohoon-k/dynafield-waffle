@@ -8,7 +8,7 @@ public static class G {
     public static void InitTracks() {
         if (Tracks != null) return;
         Tracks = JsonUtility.FromJson<TrackList>(Resources.Load("data/tracks", typeof(TextAsset)).ToString()).tracks;
-        if (PlayerPrefs.GetString(Keys.UnlockedTracks, "") == string.Empty) {
+        if (PlayerPrefs.GetString(Keys.TrackUnlockData, "") == string.Empty) {
             TrackUnlockData = new bool[Tracks.Length];
             for (var i = 0; i < 2; i++) {
                 TrackUnlockData[i] = true;
@@ -16,14 +16,14 @@ public static class G {
 
             SaveTrackUnlockData();
         } else {
-            TrackUnlockData = JsonUtility.FromJson<TrackUnlockDataRaw>(PlayerPrefs.GetString(Keys.UnlockedTracks, ""))
+            TrackUnlockData = JsonUtility.FromJson<TrackUnlockDataRaw>(PlayerPrefs.GetString(Keys.TrackUnlockData, ""))
                 .data;
         }
     }
 
     public static void SaveTrackUnlockData() {
         var dat = new TrackUnlockDataRaw {data = TrackUnlockData};
-        PlayerPrefs.SetString(Keys.UnlockedTracks, JsonUtility.ToJson(dat));
+        PlayerPrefs.SetString(Keys.TrackUnlockData, JsonUtility.ToJson(dat));
         PlayerPrefs.Save();
     }
 
@@ -48,12 +48,12 @@ public static class G {
         public const string CheckedDate = "checked_date";
         public const string RewardIndex = "reward_index";
 
-        public const string UnlockedTracks = "track_unlock_data";
+        public const string TrackUnlockData = "track_unlock_data";
 
         public const string BestScore = "score_{0}_{1}";
         public const string BestAccuracy = "accuracy_{0}_{1}";
         public const string PlayType = "super_play_{0}_{1}";
-        private const string PlayTypeRewards = "super_play_reward_{0}_{1}_{2}";
+        public const string PlayTypeRewards = "super_play_reward_{0}_{1}_{2}";
         public const string PlayTimes = "play_time_{0}_{1}";
 
         public static string FormatKey(string key) {
@@ -176,7 +176,7 @@ public static class G {
 
         public static readonly string[] PlayTypeNames = { "", "FC", "P", "K" };
         public static readonly int[][] PlayTypeRewards = {
-            new [] { 0, 1, 2, 3 }, new [] { 0, 2, 5, 10 }
+            new [] { 1, 2, 3 }, new [] { 2, 5, 10 }
         };
     }
 
