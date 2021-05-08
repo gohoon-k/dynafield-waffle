@@ -129,7 +129,7 @@ public static class G {
             }
         }
 
-        private static int _difficulty = 1;
+        private static int _difficulty = 0;
 
         public static int DisplaySync {
             get => _displaySync;
