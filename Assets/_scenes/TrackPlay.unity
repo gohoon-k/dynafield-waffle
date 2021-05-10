@@ -2971,9 +2971,9 @@ MonoBehaviour:
     scaler: {fileID: 277181710}
   constants:
     placingPrecision: 600
-    viewMode: 0
-    autoPlay: 0
-    debugMode: 0
+    viewMode: 1
+    autoPlay: 1
+    debugMode: 1
   notePrefabs:
     click: {fileID: 4191954091923668995, guid: c10a19e4a1a23504382f17f7fa6bbf06, type: 3}
     slide: {fileID: 3189764165758293691, guid: 42c59fe0bf6a4cc44af6c8ad2a7fcc78, type: 3}
