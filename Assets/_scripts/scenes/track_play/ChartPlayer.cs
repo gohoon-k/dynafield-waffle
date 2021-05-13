@@ -46,9 +46,11 @@ public class Effects {
 [Serializable]
 public class Constants {
     public float placingPrecision;
+    public bool debugMode;
     public bool viewMode;
     public bool autoPlay;
-    public bool debugMode;
+    public int difficulty;
+    public int trackId;
 }
 
 public class ChartPlayer : MonoBehaviour {
@@ -113,6 +115,19 @@ public class ChartPlayer : MonoBehaviour {
     
     void Start() {
         G.InitTracks();
+        
+        if (constants.debugMode) {
+            G.PlaySettings.AutoPlay = constants.autoPlay;
+            G.PlaySettings.TrackId = constants.trackId;
+            G.PlaySettings.Difficulty = constants.difficulty;
+        }
+        
+        if (!constants.debugMode) {
+            G.Items.Energy = PlayerPrefs.GetInt(G.Keys.Energy, 15);
+
+            G.Items.Energy--;
+            PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
+        }
 
         G.PlaySettings.FromTrackPlay = true;
         
@@ -123,17 +138,6 @@ public class ChartPlayer : MonoBehaviour {
         G.InGame.CountOfNotes = _chart.chart.Length;
         G.InGame.CanBePaused = false;
 
-        if (constants.debugMode) {
-            G.PlaySettings.AutoPlay = constants.autoPlay;
-        }
-        
-        if (!constants.debugMode) {
-            G.Items.Energy = PlayerPrefs.GetInt(G.Keys.Energy, 15);
-
-            G.Items.Energy--;
-            PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
-        }
-        
         PlayerPrefs.SetInt(G.Keys.FormatKey(G.Keys.PlayTimes),
             PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayTimes), 0) + 1);
         
