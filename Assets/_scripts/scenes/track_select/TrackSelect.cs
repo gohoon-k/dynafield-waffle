@@ -171,7 +171,7 @@ public class TrackSelect : MonoBehaviour {
         }, () => { _canPrepare = true; }));
 
         if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
-            G.Items.CoolDown = DateTime.Now.AddMinutes(5).ToBinary();
+            G.Items.CoolDown = DateTime.Now.AddMinutes(G.InternalSettings.CooldownInMinute).ToBinary();
 
         UpdateKeyUI(0);
         
@@ -496,7 +496,7 @@ public class TrackSelect : MonoBehaviour {
 
     public void StartCooldownNow() {
         G.Items.Energy = 0;
-        G.Items.CoolDown = DateTime.Now.AddMinutes(5).ToBinary();
+        G.Items.CoolDown = DateTime.Now.AddMinutes(G.InternalSettings.CooldownInMinute).ToBinary();
     }
 
     public void Back() //뒤로가기 버튼

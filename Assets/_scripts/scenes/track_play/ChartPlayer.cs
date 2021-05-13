@@ -251,7 +251,7 @@ public class ChartPlayer : MonoBehaviour {
 
     private void OnApplicationQuit() {
         if (G.Items.Energy == 0)
-            G.Items.CoolDown = DateTime.Now.AddMinutes(10).ToBinary();
+            G.Items.CoolDown = DateTime.Now.AddMinutes(G.InternalSettings.CooldownInMinute).ToBinary();
     }
 
     private void MoveNotes() {

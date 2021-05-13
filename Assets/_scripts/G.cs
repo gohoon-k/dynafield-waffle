@@ -178,6 +178,8 @@ public static class G {
         public static readonly int[][] PlayTypeRewards = {
             new [] { 0, 1, 2, 3 }, new [] { 0, 2, 5, 10 }
         };
+
+        public const int CooldownInMinute = 10;
     }
 
     public static class InGame {
