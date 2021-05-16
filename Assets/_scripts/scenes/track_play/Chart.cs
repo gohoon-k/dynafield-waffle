@@ -17,6 +17,9 @@ class Chart {
         public byte ty;
         public sbyte d;
         
+        /* Swipe only */
+        public sbyte ad;
+        
         /* Hold only */
         public float dur;
         
