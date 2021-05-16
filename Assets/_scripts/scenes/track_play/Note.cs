@@ -170,14 +170,16 @@ public abstract class Note : MonoBehaviour {
         );
     }
 
-    protected void AlphaAnim(SpriteRenderer target) {
+    protected void AlphaAnim(SpriteRenderer target, bool callback = true) {
         StartCoroutine(
             Interpolators.Linear(
                 target.color.a, 0, 0.25f,
                 step => { target.color = new Color(1f, 1f, 1f, step); },
                 () => {
-                    parent.RemoveNote(this);
-                    Destroy(gameObject);
+                    if (callback) {
+                        parent.RemoveNote(this);
+                        Destroy(gameObject);
+                    }
                 }
             )
         );
