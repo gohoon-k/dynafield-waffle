@@ -195,7 +195,7 @@ public class NoteCounter : Note {
 
     protected override void PlayDestroyAnim() {
         ScaleAnim();
-        AlphaAnim(mainRenderer);
+        AlphaAnim(mainRenderer, false);
         AlphaAnim(timeoutEffect);
     }
 

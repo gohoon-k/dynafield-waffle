@@ -98,14 +98,14 @@ public class NoteHold : Note {
 
     protected override void PlayDestroyAnim() {
         ScaleAnim();
-        AlphaAnim(startRenderer);
-        AlphaAnim(holdRenderer);
+        AlphaAnim(startRenderer, false);
+        AlphaAnim(holdRenderer, false);
         AlphaAnim(endRenderer);
     }
 
     private void PlayRemoveAnim() {
-        AlphaAnim(startRenderer);
-        AlphaAnim(holdRenderer);
+        AlphaAnim(startRenderer, false);
+        AlphaAnim(holdRenderer, false);
         AlphaAnim(endRenderer);
     }
 
