@@ -295,6 +295,19 @@ public class ChartPlayer : MonoBehaviour {
         script.hasAnotherNote = _sHitData[id];
 
         switch (script) {
+            case NoteSwipe swipeScript: {
+                var spriteRenderer = note.GetComponent<SpriteRenderer>();
+                spriteRenderer.size = new Vector2(script.size / 10f, spriteRenderer.size.y);
+
+                swipeScript.ad = _chart.chart[id].ad == 0 ? _chart.chart[id].d : _chart.chart[id].ad;
+                if (swipeScript.ad == 1 && swipeScript.direction == 1 || swipeScript.ad == -1 && swipeScript.direction == -1) {
+                    swipeScript.arrowRotation = 0;
+                } else {
+                    swipeScript.arrowRotation = 180;
+                }
+                script.SetRenderer(spriteRenderer);
+                break;
+            }
             case NoteHold holdScript: {
                 holdScript.duration = _chart.chart[id].dur;
 
