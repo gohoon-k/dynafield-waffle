@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 [Serializable]
 public class Field {
@@ -129,7 +130,8 @@ public class ChartPlayer : MonoBehaviour {
             PlayerPrefs.SetInt(G.Keys.Energy, G.Items.Energy);
         }
 
-        G.PlaySettings.FromTrackPlay = true;
+        G.InGame.BestScore = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0);
+        G.InGame.BestAccuracy = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0f);
         
         _chart = JsonUtility.FromJson<Chart>(((TextAsset) Resources.Load(
             $"data/charts/{G.Tracks[G.PlaySettings.TrackId].internal_name}.{G.PlaySettings.Difficulty}", typeof(TextAsset)
@@ -169,7 +171,16 @@ public class ChartPlayer : MonoBehaviour {
         _audio = GetComponent<AudioSource>();
         _audio.clip = (AudioClip) Resources.Load($"tracks/{G.Tracks[G.PlaySettings.TrackId].id}", typeof(AudioClip));
 
-        animators.foreground.Play("ingame_foreground_fade_in", -1, 0);
+        if (G.PlaySettings.FromTrackResult) {
+            animators.foreground.enabled = false;
+            animators.foreground.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 0.705f);
+        } else {
+            animators.foreground.Play("ingame_foreground_fade_in", -1, 0);
+        }
+        
+        G.PlaySettings.FromTrackPlay = true;
+        G.PlaySettings.FromTrackResult = false;
+
         StartCoroutine(Intro());
     }
     
@@ -646,6 +657,7 @@ public class ChartPlayer : MonoBehaviour {
     public void Stop() {
         G.InGame.CanBePaused = false;
         G.InGame.Init();
+        scripts.scoreCalculator.Init();
         G.InGame.ReadyAnimated = false;
         G.InGame.Paused = false;
         Interpolators.paused = false;
@@ -659,6 +671,7 @@ public class ChartPlayer : MonoBehaviour {
         _notifyFieldUp.Play("notify_field_move_outro", -1, 0);
         _notifyFieldDown.Play("notify_field_move_outro", -1, 0);
 
+        animators.foreground.enabled = true;
         animators.foreground.Play("ingame_foreground_fade_out", -1, 0);
         animators.ui.Play("ingame_ui_fade_out", -1, 0);
 
@@ -679,6 +692,8 @@ public class ChartPlayer : MonoBehaviour {
         ));
 
         StartCoroutine(Exit());
+
+        G.InGame.Reset();
     }
 
     private IEnumerator Exit() {
@@ -744,7 +759,7 @@ public class ChartPlayer : MonoBehaviour {
         
         yield return new WaitForSeconds(2f);
 
-        SceneManager.LoadScene("TrackSelect");
+        SceneManager.LoadScene("TrackResult");
     }
 
     private IEnumerator Ready() {
