@@ -143,6 +143,8 @@ public class NoteHold : Note {
     protected override void HandleInput(Touch touch) {
         if (judged) return;
 
+        if (_handling && touch.fingerId != _fingerId) return;
+        
         var inputPosition = GetInputPosition(touch);
 
         if (_handling && touch.fingerId == _fingerId && !IsTargeted(inputPosition)) {
