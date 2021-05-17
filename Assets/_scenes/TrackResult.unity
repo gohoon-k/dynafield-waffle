@@ -2267,7 +2267,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'you dont have
+  m_Text: 'you don''t have
 
     energy'
 --- !u!222 &1363697171
@@ -2704,7 +2704,7 @@ MonoBehaviour:
   rank: {fileID: 625241897}
   difficulty: {fileID: 1941325169}
   retry: {fileID: 1693136343}
-  energyDes: {fileID: 0}
+  energyDes: {fileID: 1363697168}
   ranks:
   - {fileID: 21300000, guid: 071eca1aa10dace43a030f89f74db49f, type: 3}
   - {fileID: 21300000, guid: 0befd5199872b9e479e8eb1b7ba94e22, type: 3}
