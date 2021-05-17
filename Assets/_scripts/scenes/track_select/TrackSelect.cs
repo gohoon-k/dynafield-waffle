@@ -174,9 +174,6 @@ public class TrackSelect : MonoBehaviour {
             G.Items.CoolDown = DateTime.Now.AddMinutes(G.InternalSettings.CooldownInMinute).ToBinary();
 
         UpdateKeyUI(0);
-        
-        var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0);
-        StartCoroutine(CheckPlayTypeReward(playType));
 
         G.PlaySettings.FromTrackPlay = false;
         G.PlaySettings.FromTrackResult = false;
@@ -360,24 +357,6 @@ public class TrackSelect : MonoBehaviour {
         
         var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0);
         uiElements.records.playType.text = G.InternalSettings.PlayTypeNames[playType];
-    }
-
-    private IEnumerator CheckPlayTypeReward(int playType) {
-        yield return new WaitForSeconds(1f);
-        
-        if (playType < 1 || playType > 3) yield break;
-
-        var types = new List<int>();
-        var rewards = new List<int>();
-        for (var i = 1; i <= playType; i++) {
-            if (PlayerPrefs.GetInt(G.Keys.FormatPlayTypeRewards(i), 0) == 0) {
-                types.Add(i);
-                rewards.Add(G.InternalSettings.PlayTypeRewards[G.PlaySettings.Difficulty][i]);
-            }
-        }
-        
-        if (types.Count > 0 && rewards.Count > 0)
-            others.dialogManager.OpenPlayTypeRewardDialog(rewards, types);
     }
 
     private void SelectTrack() {

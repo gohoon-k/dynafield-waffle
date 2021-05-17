@@ -36,6 +36,8 @@ public class DailyRewardsDialog : MonoBehaviour {
     private const float PastAlpha = 0.45f;
     private const float FutureAlpha = 0.2f;
 
+    private Action _closeAction;
+
     private void Init() {
         _dialogs ??= transform.parent.gameObject;
         _content ??= transform.GetChild(0).GetComponent<RectTransform>();
@@ -53,8 +55,10 @@ public class DailyRewardsDialog : MonoBehaviour {
         _init = true;
     }
 
-    public void Open() {
+    public void Open(Action closeAction = null) {
         if (!_init) Init();
+
+        _closeAction = closeAction;
 
         isOpen = isActive = true;
         
@@ -109,6 +113,7 @@ public class DailyRewardsDialog : MonoBehaviour {
             _content.localScale = new Vector3(localScale, localScale, 1);
         }, () => {
             isOpen = false;
+            _closeAction?.Invoke();
             gameObject.SetActive(false);
             _dialogs.SetActive(false);
         }));

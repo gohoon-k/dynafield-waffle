@@ -38,7 +38,14 @@ public class DialogManager : MonoBehaviour {
         if (PlayerPrefs.GetInt(G.Keys.FirstExecution, 0) == 0) {
             StartCoroutine(ShowHowToWithDelay());
         } else if (PlayerPrefs.GetString(G.Keys.CheckedDate, "1990-01-01") != DateTime.Now.ToString("yyyy-MM-dd")) {
-            StartCoroutine(ShowDailyRewardWithDelay());
+            var rewards = CheckPlayTypeReward(PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0));
+            if (rewards.valid) {
+                StartCoroutine(ShowDailyRewardWithDelay(() => {
+                    StartCoroutine(OpenPlayTypeRewardWithDelay(rewards)); 
+                }));
+            } else {
+                StartCoroutine(ShowDailyRewardWithDelay());
+            }
         }
     }
 
@@ -68,6 +75,30 @@ public class DialogManager : MonoBehaviour {
         if (howToDialog.isActive) howToDialog.Close(true);
         if (dailyRewardsDialog.isActive) dailyRewardsDialog.Close();
     }
+    
+    private PlayTypeReward CheckPlayTypeReward(int playType) {
+        if (playType < 1 || playType > 3) 
+            return new PlayTypeReward {
+                valid = false,
+                types = null,
+                rewards = null
+            };
+
+        var types = new List<int>();
+        var rewards = new List<int>();
+        for (var i = 1; i <= playType; i++) {
+            if (PlayerPrefs.GetInt(G.Keys.FormatPlayTypeRewards(i), 0) == 0) {
+                types.Add(i);
+                rewards.Add(G.InternalSettings.PlayTypeRewards[G.PlaySettings.Difficulty][i]);
+            }
+        }
+        
+        return new PlayTypeReward {
+            valid = types.Count > 0 && rewards.Count > 0,
+            types = types,
+            rewards = rewards
+        };
+    }
 
     private IEnumerator ShowHowToWithDelay() {
         yield return new WaitForSeconds(1.25f);
@@ -76,10 +107,16 @@ public class DialogManager : MonoBehaviour {
         PlayerPrefs.SetInt(G.Keys.FirstExecution, 1);
     }
 
-    private IEnumerator ShowDailyRewardWithDelay() {
+    private IEnumerator ShowDailyRewardWithDelay(Action closeAction = null) {
         yield return new WaitForSeconds(1.25f);
 
-        OpenDailyRewardsDialog();
+        OpenDailyRewardsDialog(closeAction);
+    }
+
+    private IEnumerator OpenPlayTypeRewardWithDelay(PlayTypeReward reward) {
+        yield return new WaitForSeconds(1.25f);
+        
+        OpenPlayTypeRewardDialog(reward.rewards, reward.types);
     }
 
     public void EnergyButtonAction() {
@@ -132,9 +169,9 @@ public class DialogManager : MonoBehaviour {
         });
     }
 
-    public void OpenDailyRewardsDialog() {
+    private void OpenDailyRewardsDialog(Action closeAction = null) {
         dialogs.SetActive(true);
-        dailyRewardsDialog.Open();
+        dailyRewardsDialog.Open(closeAction);
     }
 
     public void OpenUnlockTrackDialog() {
@@ -142,7 +179,7 @@ public class DialogManager : MonoBehaviour {
         trackUnlockDialog.Open();
     }
 
-    public void OpenPlayTypeRewardDialog(List<int> rewards, List<int> types) {
+    private void OpenPlayTypeRewardDialog(List<int> rewards, List<int> types) {
         dialogs.SetActive(true);
 
         var typeString = string.Join(" / ", types.Select(type => G.InternalSettings.PlayTypeNames[type]));
@@ -169,5 +206,12 @@ public class DialogManager : MonoBehaviour {
             playTypeRewardDialog.RemoveAllPositiveCallbacks();
         });
         playTypeRewardDialog.Open();
+    }
+
+    [Serializable]
+    class PlayTypeReward {
+        public bool valid;
+        public List<int> rewards;
+        public List<int> types;
     }
 }
