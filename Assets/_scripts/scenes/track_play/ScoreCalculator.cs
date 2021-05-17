@@ -13,7 +13,6 @@ public class ScoreCalculator : MonoBehaviour {
     void Start() { }
     
     void Update() {
-
         G.InGame.ScoreByJudge =
             (G.InternalSettings.ScoreRatioByJudges[0] * G.InGame.CountOfAccuracyPerfect + 
              G.InternalSettings.ScoreRatioByJudges[1] * G.InGame.CountOfPerfect +
