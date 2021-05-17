@@ -177,6 +177,9 @@ public class TrackSelect : MonoBehaviour {
         
         var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0);
         StartCoroutine(CheckPlayTypeReward(playType));
+
+        G.PlaySettings.FromTrackPlay = false;
+        G.PlaySettings.FromTrackResult = false;
     }
 
     void Update() {
@@ -378,7 +381,7 @@ public class TrackSelect : MonoBehaviour {
     }
 
     private void SelectTrack() {
-        if (!G.PlaySettings.FromTrackPlay) {
+        if (!(G.PlaySettings.FromTrackPlay || G.PlaySettings.FromTrackResult)) {
             uiElements.backgrounds.main.normal.color = new Color(1, 1, 1, 0);
             uiElements.backgrounds.main.bright.color = new Color(1, 1, 1, 0);
             uiElements.backgrounds.main.blur.color = new Color(1, 1, 1, 0);
