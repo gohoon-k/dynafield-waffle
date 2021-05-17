@@ -114,7 +114,7 @@ public class DialogManager : MonoBehaviour {
     }
 
     private IEnumerator OpenPlayTypeRewardWithDelay(PlayTypeReward reward) {
-        yield return new WaitForSeconds(1.25f);
+        yield return new WaitForSeconds(0.35f);
         
         OpenPlayTypeRewardDialog(reward.rewards, reward.types);
     }
