@@ -48,7 +48,7 @@ public class LockedBarrier : MonoBehaviour {
             background.color = new Color(0, 0, 0, step * 0.7f);
             locker.color = description.color = unlockText.color = new Color(1, 1, 1, step * 0.8f);
 
-            _rect.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
+            _rect.localScale = new Vector3(1.75f - step / 2f, 1.75f - step / 2f, 1);
         }, () => { }));
     }
 
@@ -73,7 +73,7 @@ public class LockedBarrier : MonoBehaviour {
             background.color = new Color(0, 0, 0, step * 0.7f);
             locker.color = description.color = unlockText.color = new Color(1, 1, 1, step * 0.8f);
             
-            _rect.localScale = new Vector3(1.5f - step / 2f, 1.5f - step / 2f, 1);
+            _rect.localScale = new Vector3(1.75f - step / 2f, 1.75f - step / 2f, 1);
         }, () => {
             gameObject.SetActive(false);
             showing = false;
