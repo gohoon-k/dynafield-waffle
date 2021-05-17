@@ -159,6 +159,7 @@ public static class G {
 
 
         public static bool FromTrackPlay = false;
+        public static bool FromTrackResult = false;
     }
 
     public static class InternalSettings {
@@ -210,6 +211,9 @@ public static class G {
         public static int CountOfBad;
         public static int CountOfError;
 
+        public static int BestScore;
+        public static float BestAccuracy;
+
         public static void Init() {
             Time = 0;
             ScoreByJudge = 0;
@@ -222,6 +226,17 @@ public static class G {
             CountOfGreat = 0;
             CountOfBad = 0;
             CountOfError = 0;
+        }
+
+        public static void Reset() {
+            Init();
+            BestScore = 0;
+            BestAccuracy = 0;
+            PreparePause = false;
+            Paused = false;
+            CanBePaused = true;
+            CanBeResumed = false;
+            ReadyAnimated = false;
         }
     }
 
