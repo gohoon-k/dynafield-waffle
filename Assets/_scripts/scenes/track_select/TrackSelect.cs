@@ -123,6 +123,7 @@ public class TrackSelect : MonoBehaviour {
     private bool _canStartGame;
     private bool _prepareAnimating;
     private bool _starting;
+    private bool _backAnimating = false;
 
     void Start() {
         #region Initialization
@@ -483,6 +484,9 @@ public class TrackSelect : MonoBehaviour {
 
     public void Back() //뒤로가기 버튼
     {
+        if (_backAnimating) return;
+        _backAnimating = true;
+        
         StartCoroutine(AnimateBack());
     }
 
