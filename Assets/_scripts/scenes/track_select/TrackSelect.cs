@@ -338,7 +338,7 @@ public class TrackSelect : MonoBehaviour {
     }
 
     private void InitializePlayerPrefs() {
-        G.PlaySettings.DisplaySpeed = 4;
+        G.PlaySettings.DisplaySpeed = 6;
         G.PlaySettings.DisplaySync = 0;
         G.Items.MaxEnergyStep = 0;
         G.Items.Energy = G.Items.MaxEnergy[G.Items.MaxEnergyStep];

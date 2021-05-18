@@ -149,11 +149,11 @@ public static class G {
             }
         }
 
-        private static int _displaySpeed = 3;
+        private static int _displaySpeed = 6;
 
         public static bool AutoPlay = false;
 
-        public static float Speed => DisplaySpeed / 200f;
+        public static float Speed => DisplaySpeed / 400f;
 
         public static int Sync => (int) ((DisplaySync / 165f + 1) * 165f);
 
