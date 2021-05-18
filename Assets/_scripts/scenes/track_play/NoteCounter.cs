@@ -15,12 +15,14 @@ public class NoteCounter : Note {
     public float timeout;
 
     private GameObject _handlingEffectInstantiated;
-    
+
     public SpriteRenderer mainRenderer;
-    public SpriteRenderer effectRenderer; 
+    public SpriteRenderer effectRenderer;
 
     private TextMesh _countText;
     private TextMesh[] _countEffects;
+    public TextMesh countTextInNote;
+    public MeshRenderer countTextInNoteRenderer;
 
     private bool _handling;
     private int _handledCount;
@@ -35,12 +37,17 @@ public class NoteCounter : Note {
 
         _handlingEffectInstantiated = Instantiate(handlingEffect, effectGroup.transform, true);
         _countText = _handlingEffectInstantiated.GetComponent<TextMesh>();
+        
+        countTextInNote.text = $"> {count} <";
+        countTextInNoteRenderer.sortingOrder = 200;
+        
+        countTextInNote.transform.parent.localRotation = Quaternion.Euler(0, 0, direction == 1 ? 0 : 180);
 
         for (var i = 0; i < count; i++) {
-            _countEffects[i] = Instantiate(countEffect, _handlingEffectInstantiated.transform, true).GetComponent<TextMesh>();
+            _countEffects[i] = Instantiate(countEffect, _handlingEffectInstantiated.transform, true)
+                .GetComponent<TextMesh>();
             _countEffects[i].color = new Color(1, 1, 1, 0);
         }
-        
     }
 
     new void Update() {
@@ -55,7 +62,7 @@ public class NoteCounter : Note {
 
             _interval = timeout / (count + 1);
         }
-        
+
         if (G.PlaySettings.AutoPlay && _handling && _handledCount == count) EndHandle();
 
         if (G.PlaySettings.AutoPlay && _handling && G.InGame.Time >= time + _interval * (_handledCount + 1) && !judged)
@@ -74,7 +81,7 @@ public class NoteCounter : Note {
         var inputPosition = GetInputPosition(touch);
 
         if (_handledCount == count) EndHandle();
-        
+
         if (_handling) Handle(inputPosition);
 
         if (_handling) return;
@@ -91,6 +98,10 @@ public class NoteCounter : Note {
     }
 
     private void StartHandle() {
+        StartCoroutine(Interpolators.Linear(1, 0, 0.25f,
+            step => { countTextInNote.color = new Color(1, 1, 1, step); }, () => { }
+        ));
+
         var before = effectRenderer.size;
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, before, before * 1.75f, 0.35f,
                 step => { effectRenderer.size = step; },
@@ -102,7 +113,7 @@ public class NoteCounter : Note {
                 () => { }
             )
         );
-        
+
         _countText.text = $"{count}";
 
         StartCoroutine(Interpolators.Linear(0, 0.45f, 0.1f,
@@ -128,7 +139,7 @@ public class NoteCounter : Note {
     private void Handle(Vector3 pos) {
         var clickEffectInstantiated = Instantiate(clickEffect, effectGroup.transform, true);
         clickEffectInstantiated.transform.position = pos;
-        
+
         var clickEffectBeamInstantiated = Instantiate(clickEffectBeam, effectGroup.transform, true);
         clickEffectBeamInstantiated.transform.position = pos;
 
@@ -147,7 +158,7 @@ public class NoteCounter : Note {
                 () => { }
             )
         );
-        
+
         _countText.text = $"{count - _handledCount - 1}";
         _handledCount++;
     }
@@ -162,9 +173,7 @@ public class NoteCounter : Note {
         );
         StartCoroutine(Interpolators.Linear(0.45f, 0, 0.25f,
                 step => { _countText.color = new Color(1, 1, 1, step); },
-                () => {
-                    Destroy(_handlingEffectInstantiated);
-                }
+                () => { Destroy(_handlingEffectInstantiated); }
             )
         );
     }
@@ -180,7 +189,7 @@ public class NoteCounter : Note {
         yield return new WaitForEndOfFrame();
         _handling = true;
     }
-    
+
     protected override float GetTimeDifference() {
         return (float) _handledCount / count;
     }
