@@ -350,7 +350,7 @@ public class TrackSelect : MonoBehaviour {
     private void UpdateScoreUI() {
         uiElements.records.score.text = $"{PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.BestScore), 0):000000}";
         var bestAc = PlayerPrefs.GetFloat(G.Keys.FormatKey(G.Keys.BestAccuracy), 0);
-        var bestAcInt = Math.Round(bestAc);
+        var bestAcInt = Math.Floor(bestAc);
         var bestAcFloat = Math.Round((bestAc - bestAcInt) * 100);
         uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
         uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
