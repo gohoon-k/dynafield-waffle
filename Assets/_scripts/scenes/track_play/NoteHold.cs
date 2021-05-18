@@ -201,7 +201,7 @@ public class NoteHold : Note {
         // It's not error, but animation name is same with error animation.
         PlayErrorAnim();
 
-        CreateJudgeEffect(result);
+        CreateJudgeEffect(result, result == 2 ? "inaccurate" : "");
 
         CreateDestroyEffect(result);
 

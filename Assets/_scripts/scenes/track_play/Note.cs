@@ -121,10 +121,10 @@ public abstract class Note : MonoBehaviour {
         destroyEffectObject.transform.localPosition = new Vector2(xPos / 100f, 0);
     }
 
-    protected void CreateJudgeEffect(int judgeTypeInt) {
+    protected void CreateJudgeEffect(int judgeTypeInt, string forceText = "") {
         var judgeEffectObject = Instantiate(judgeEffect, parent.GetJudgeEffectsHolder().transform, false);
         var judgeEffectScript = judgeEffectObject.GetComponent<JudgeEffect>();
-        judgeEffectScript.Set(judgeTypeInt, direction, G.InGame.Time - time < 0f);
+        judgeEffectScript.Set(judgeTypeInt, direction, G.InGame.Time - time < 0f, forceText);
         judgeEffectObject.transform.localPosition = new Vector3(xPos / 100f, direction * 1.1f, 0);
     }
 

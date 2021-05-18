@@ -55,15 +55,20 @@ public class JudgeEffect : MonoBehaviour {
         _startFadeOut = true;
     }
 
-    public void Set(int type, sbyte direction, bool early) {
+    public void Set(int type, sbyte direction, bool early, string forceText = "") {
         d = direction;
         _mainRenderer = GetComponent<SpriteRenderer>();
         _earlyLateMesh = transform.GetChild(0).GetComponent<TextMesh>();
         _mainRenderer.sprite = judgeSprites[type];
-        if (type == 2 && early) {
-            _earlyLateMesh.text = "early";
-        }else if (type == 2 && !early) {
-            _earlyLateMesh.text = "late";
+
+        if (forceText.Equals("")) {
+            if (type == 2 && early) {
+                _earlyLateMesh.text = "early";
+            } else if (type == 2 && !early) {
+                _earlyLateMesh.text = "late";
+            }
+        } else {
+            _earlyLateMesh.text = forceText;
         }
     }
 
