@@ -33,8 +33,6 @@ public static class G {
         public const string SelectedTrack = "selected_track";
 
         public const string Difficulty = "difficulty";
-        public const string NotifyLineMove = "notify_line_move";
-        public const string ShowEarlyLate = "show_early_late";
 
         public const string Sync = "sync";
         public const string Speed = "speed";

@@ -77,7 +77,8 @@ public class UserInterfaceUpdater : MonoBehaviour {
 
         trackInformationArea.trackInformation.text =
             $"<size=60>{G.Tracks[G.PlaySettings.TrackId].artist}</size>   {G.Tracks[G.PlaySettings.TrackId].title}";
-        trackInformationArea.difficulty.text = G.PlaySettings.Difficulty == 0 ? "easy" : "hard";
+        trackInformationArea.difficulty.text = G.PlaySettings.AutoPlay ? "auto  " : "";
+        trackInformationArea.difficulty.text += G.PlaySettings.Difficulty == 0 ? "easy" : "hard";
 
         backgroundArea.background.sprite =
             (Sprite) Resources.Load($"textures/tracks/normal/{G.Tracks[G.PlaySettings.TrackId].id}",

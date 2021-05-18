@@ -27,6 +27,8 @@ public class ResultPrinter : MonoBehaviour {
     public Button retry;
     public GameObject energyDes;
 
+    public GameObject autoPlayBarrier;
+
     public Sprite[] ranks;
 
     private AudioSource audioSource;
@@ -41,6 +43,12 @@ public class ResultPrinter : MonoBehaviour {
         if (G.Items.Energy <= 0) {
             retry.interactable = false;
             energyDes.SetActive(true);
+        }
+
+        autoPlayBarrier.SetActive(G.PlaySettings.AutoPlay);
+        if (G.PlaySettings.AutoPlay) {
+            var barrierGroup = autoPlayBarrier.GetComponent<CanvasGroup>();
+            StartCoroutine(Interpolators.Linear(0, 1, 0.3f, step => { barrierGroup.alpha = step; }, () => { }));
         }
 
         background.sprite =
@@ -81,10 +89,9 @@ public class ResultPrinter : MonoBehaviour {
 
         uiAnimator.Play("result_intro", -1, 0);
         StartCoroutine(PrintResult());
-        
+
         if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
             G.Items.CoolDown = DateTime.Now.AddMinutes(G.InternalSettings.CooldownInMinute).ToBinary();
-
     }
 
     // Update is called once per frame
@@ -102,7 +109,7 @@ public class ResultPrinter : MonoBehaviour {
             step => { scoreDiff.text = $"{scoreSign}{(int) step}"; }, () => { }));
 
         yield return new WaitForSeconds(0.25f);
-        
+
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 0, G.InGame.Accuracy, 0.75f,
             step => { accuracy.text = $"{step:F2}%"; }, () => { }));
 
@@ -113,7 +120,8 @@ public class ResultPrinter : MonoBehaviour {
 
         yield return new WaitForSeconds(0.25f);
 
-        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 0, G.InGame.CountOfPerfect + G.InGame.CountOfAccuracyPerfect, 0.75f,
+        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 0,
+            G.InGame.CountOfPerfect + G.InGame.CountOfAccuracyPerfect, 0.75f,
             step => { judgeP.text = $"{(int) step}"; }, () => { }));
 
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 0, G.InGame.CountOfGreat, 0.75f,
@@ -148,8 +156,13 @@ public class ResultPrinter : MonoBehaviour {
             StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, foreground.color.a, 0, 0.75f,
                 step => { foreground.color = new Color(0, 0, 0, step); }, () => { }));
         }
+        
+        if (G.PlaySettings.AutoPlay) {
+            var barrierGroup = autoPlayBarrier.GetComponent<CanvasGroup>();
+            StartCoroutine(Interpolators.Linear(1, 0, 0.3f, step => { barrierGroup.alpha = step; }, () => { autoPlayBarrier.SetActive(false); }));
+        }
 
-        yield return StartCoroutine(Interpolators.Linear(1, 0, 1.5f, 
+        yield return StartCoroutine(Interpolators.Linear(1, 0, 1.5f,
             step => { audioSource.volume = step; }, () => { }
         ));
 

@@ -60,6 +60,7 @@ public class UIElements {
         public Energy energy;
         public Difficulty difficulty;
         public Speed speed;
+        public AutoPlay autoPlay;
 
         [Serializable]
         public class Energy {
@@ -79,6 +80,12 @@ public class UIElements {
             public Text value;
             public Button increase;
             public Button decrease;
+        }
+        
+        [Serializable]
+        public class AutoPlay {
+            public Button toggle;
+            public Text value;
         }
     }
 
@@ -132,6 +139,8 @@ public class TrackSelect : MonoBehaviour {
             InitializePlayerPrefs();
 
         G.InitTracks();
+
+        G.PlaySettings.AutoPlay = false;
 
         G.PlaySettings.TrackId = PlayerPrefs.GetInt(G.Keys.SelectedTrack);
         G.PlaySettings.DisplaySpeed = PlayerPrefs.GetInt(G.Keys.Speed);
@@ -488,6 +497,12 @@ public class TrackSelect : MonoBehaviour {
         _backAnimating = true;
         
         StartCoroutine(AnimateBack());
+    }
+
+    public void ToggleAutoPlay() {
+        G.PlaySettings.AutoPlay = !G.PlaySettings.AutoPlay;
+        uiElements.playSettings.autoPlay.value.text = G.PlaySettings.AutoPlay ? "on" : "off";
+        uiElements.playSettings.autoPlay.value.color = new Color(1, 1, 1, G.PlaySettings.AutoPlay ? 1 : 0.35f);
     }
 
     private IEnumerator AnimateBack() {
