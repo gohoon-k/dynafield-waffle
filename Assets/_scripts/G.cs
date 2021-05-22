@@ -108,7 +108,8 @@ public static class G {
         private static int _key = 0;
     }
 
-    public static class PlaySettings {
+    public static class PlaySettings
+    {
         public static int TrackId {
             get => _trackId;
             set {
