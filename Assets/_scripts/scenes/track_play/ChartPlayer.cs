@@ -167,6 +167,10 @@ public class ChartPlayer : MonoBehaviour {
             CreateNote(_lastPlacedNoteId);
             _lastPlacedNoteId++;
         }
+        
+        _notes.ForEach(note => {
+            note.GetRenderers().ForEach(noteRenderer => noteRenderer.color = new Color(1, 1, 1, 0));
+        });
 
         _audio = GetComponent<AudioSource>();
         _audio.clip = (AudioClip) Resources.Load($"tracks/{G.Tracks[G.PlaySettings.TrackId].id}", typeof(AudioClip));
@@ -192,6 +196,11 @@ public class ChartPlayer : MonoBehaviour {
 
             if (!_trackStarted) {
                 StartCoroutine(StartTrack());
+                StartCoroutine(Interpolators.Linear(0, 1, 0.75f, step => {
+                    _notes.ForEach(note => {
+                        note.GetRenderers().ForEach(noteRenderer => noteRenderer.color = new Color(1, 1, 1, step));
+                    });
+                }, () => { }));
                 _trackStarted = true;
             }
 

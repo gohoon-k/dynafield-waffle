@@ -207,6 +207,10 @@ public class NoteCounter : Note {
         AlphaAnim(mainRenderer, false);
         AlphaAnim(timeoutEffect);
     }
+    
+    public override List<SpriteRenderer> GetRenderers() {
+        return new List<SpriteRenderer> { mainRenderer };
+    }
 
     protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 2; i++)

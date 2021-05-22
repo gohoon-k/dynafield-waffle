@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class NoteSwipe : Note {
@@ -33,6 +34,10 @@ public class NoteSwipe : Note {
     public override void SetRenderer(SpriteRenderer noteRenderer) {
         base.SetRenderer(noteRenderer);
         _renderer = noteRenderer;
+    }
+    
+    public override List<SpriteRenderer> GetRenderers() {
+        return new List<SpriteRenderer> { _renderer };
     }
 
     protected override void PlayErrorAnim() {

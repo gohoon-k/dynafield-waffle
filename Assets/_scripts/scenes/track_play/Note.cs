@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Note : MonoBehaviour {
@@ -201,6 +202,8 @@ public abstract class Note : MonoBehaviour {
     }
 
     public virtual void SetRenderer(SpriteRenderer noteRenderer) { }
+
+    public abstract List<SpriteRenderer> GetRenderers();
 
     protected abstract void PlayErrorAnim();
 

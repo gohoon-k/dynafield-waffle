@@ -232,6 +232,10 @@ public class NoteHold : Note {
     protected override bool IsPending() {
         return !destroying && !_handling && _startTime + 1 <= 0.001;
     }
+    
+    public override List<SpriteRenderer> GetRenderers() {
+        return new List<SpriteRenderer> { startRenderer, holdRenderer, endRenderer, progressRenderer };
+    }
 
     protected override int TimeDifferenceToJudge(float diff) {
         for (var i = 0; i < 3; i++)
