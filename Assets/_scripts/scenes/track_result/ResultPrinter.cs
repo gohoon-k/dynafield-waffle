@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using GoogleMobileAds.Api;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -32,6 +32,8 @@ public class ResultPrinter : MonoBehaviour {
     public Sprite[] ranks;
 
     private AudioSource audioSource;
+
+    private InterstitialAd _trackFinishedAd;
 
     // Start is called before the first frame update
     void Start() {
@@ -92,10 +94,18 @@ public class ResultPrinter : MonoBehaviour {
 
         if (G.Items.Energy == 0 && G.Items.CoolDown == -1)
             G.Items.CoolDown = DateTime.Now.AddMinutes(G.InternalSettings.CooldownInMinute).ToBinary();
+        
+        LoadAd();
     }
 
-    // Update is called once per frame
-    void Update() { }
+    private void LoadAd() {
+        _trackFinishedAd?.Destroy();
+
+        _trackFinishedAd = new InterstitialAd(G.AD.TestMode ? G.AD.TestId : G.AD.TrackFinishedId);
+        _trackFinishedAd.OnAdClosed += HandleAdClosed;
+        
+        _trackFinishedAd.LoadAd(new AdRequest.Builder().Build());
+    }
 
     private IEnumerator PrintResult() {
         yield return new WaitForSeconds(0.75f);
@@ -146,7 +156,7 @@ public class ResultPrinter : MonoBehaviour {
         G.InGame.Reset();
     }
 
-    private IEnumerator Outro(bool animateForeground, Action callback) {
+    private IEnumerator Outro(bool animateForeground, bool showAd) {
         uiAnimator.SetFloat("Speed", -2);
         uiAnimator.Play("result_intro", -1, 1);
 
@@ -162,20 +172,29 @@ public class ResultPrinter : MonoBehaviour {
             StartCoroutine(Interpolators.Linear(1, 0, 0.3f, step => { barrierGroup.alpha = step; }, () => { autoPlayBarrier.SetActive(false); }));
         }
 
-        yield return StartCoroutine(Interpolators.Linear(1, 0, 1.5f,
+        yield return StartCoroutine(Interpolators.Linear(1, 0, 1f,
             step => { audioSource.volume = step; }, () => { }
         ));
 
-        yield return new WaitForSeconds(0.25f);
-
-        callback.Invoke();
+        if (showAd && _trackFinishedAd.IsLoaded()) {
+            _trackFinishedAd.Show();
+        }
     }
 
+    private void HandleAdClosed(object sender, EventArgs args) {
+        StartCoroutine(LeaveScene());
+    }
+
+    private IEnumerator LeaveScene() {
+        yield return new WaitForSeconds(0.75f);
+        SceneManager.LoadScene("_scenes/TrackSelect");
+    }
+    
     public void Retry() {
-        StartCoroutine(Outro(false, () => { SceneManager.LoadScene("_scenes/TrackPlay"); }));
+        StartCoroutine(Outro(false, false));
     }
 
     public void Next() {
-        StartCoroutine(Outro(true, () => { SceneManager.LoadScene("_scenes/TrackSelect"); }));
+        StartCoroutine(Outro(true, true));
     }
 }
