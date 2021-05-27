@@ -234,7 +234,7 @@ public class NoteHold : Note {
     }
     
     public override List<SpriteRenderer> GetRenderers() {
-        return new List<SpriteRenderer> { startRenderer, holdRenderer, endRenderer, progressRenderer };
+        return new List<SpriteRenderer> { startRenderer, holdRenderer, endRenderer };
     }
 
     protected override int TimeDifferenceToJudge(float diff) {
