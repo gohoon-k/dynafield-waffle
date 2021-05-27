@@ -30,7 +30,12 @@ public static class G {
     }
 
     public static class AD {
-        public const string RewardAdId = "ca-app-pub-3940256099942544/5224354917";
+        public const bool TestMode = true;
+        
+        public const string TestId = "ca-app-pub-3940256099942544/5224354917";
+        
+        public const string RefillEnergyId = "ca-app-pub-7103199490015871/9958279056";
+        public const string TrackFinishedId = "ca-app-pub-7103199490015871/4844132290";
     }
 
     public static class Keys {
