@@ -195,7 +195,7 @@ public class TrackSelect : MonoBehaviour {
         G.PlaySettings.FromTrackPlay = false;
         G.PlaySettings.FromTrackResult = false;
 
-        LoadAd();
+        LoadEnergyRefillAd();
     }
 
     void Update() {
@@ -215,8 +215,8 @@ public class TrackSelect : MonoBehaviour {
         }
     }
 
-    private void LoadAd() {
-        _energyRefillAd = new RewardedAd(G.AD.RewardAdId);
+    private void LoadEnergyRefillAd() {
+        _energyRefillAd = new RewardedAd(G.AD.TestMode ? G.AD.TestId : G.AD.RefillEnergyId);
 
         _energyRefillAd.OnUserEarnedReward += HandleUserEarnedReward;
         _energyRefillAd.OnAdClosed += HandleRewardAdClosed;
@@ -507,7 +507,7 @@ public class TrackSelect : MonoBehaviour {
     private void HandleRewardAdClosed(object sender, EventArgs args) {
         StartCoroutine(CloseDialog());
         
-        LoadAd();
+        LoadEnergyRefillAd();
     }
 
     private void HandleUserEarnedReward(object sender, Reward args) {
