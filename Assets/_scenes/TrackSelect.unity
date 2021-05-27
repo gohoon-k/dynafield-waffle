@@ -1532,7 +1532,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -175, y: -100}
-  m_SizeDelta: {x: 131.3, y: 100}
+  m_SizeDelta: {x: 135.03, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &207996409
 MonoBehaviour:
@@ -6191,7 +6191,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -175, y: -99.99997}
-  m_SizeDelta: {x: 131.3, y: 100}
+  m_SizeDelta: {x: 135, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &678726197
 MonoBehaviour:
@@ -16884,7 +16884,6 @@ GameObject:
   - component: {fileID: 1940476420}
   - component: {fileID: 1940476419}
   - component: {fileID: 1940476418}
-  - component: {fileID: 1940476421}
   - component: {fileID: 1940476422}
   m_Layer: 5
   m_Name: fake_ad
@@ -16966,19 +16965,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1940476416}
   m_CullTransparentMesh: 1
---- !u!114 &1940476421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1940476416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51b119e239c6ec147becc1918701e926, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  length: 30
 --- !u!225 &1940476422
 CanvasGroup:
   m_ObjectHideFlags: 0

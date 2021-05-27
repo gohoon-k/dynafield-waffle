@@ -140,10 +140,10 @@ public class DialogManager : MonoBehaviour {
 
     public void OpenAdDialog() {
         if (energyRefillDialog.isOpen) energyRefillDialog.Close(false);
+        adDialog.message.text = "광고가 진행 중입니다...";
         adDialog.Open();
-        StartCoroutine(adDialog.gameObject.GetComponent<FakeAdController>().StartCountdown(
-            () => { selector.RefillEnergy(); }
-        ));
+        selector.MuteAudio(true);
+        StartCoroutine(selector.StartEnergyRefillAd());
     }
 
     public void OpenStoreDialog() {

@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using GoogleMobileAds.Api;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -81,7 +81,7 @@ public class UIElements {
             public Button increase;
             public Button decrease;
         }
-        
+
         [Serializable]
         public class AutoPlay {
             public Button toggle;
@@ -104,7 +104,7 @@ public class UIElements {
 [Serializable]
 public class Others {
     public DialogManager dialogManager;
-    
+
     public Animator bgBrightAnimator;
     public Animator prepareBack;
     public Animator preparePlay;
@@ -130,10 +130,16 @@ public class TrackSelect : MonoBehaviour {
     private bool _canStartGame;
     private bool _prepareAnimating;
     private bool _starting;
-    private bool _backAnimating = false;
+    private bool _backAnimating;
+
+    private RewardedAd _energyRefillAd;
 
     void Start() {
         #region Initialization
+
+        if (!G.AdInitializeStatus) {
+            MobileAds.Initialize(initStatus => { G.AdInitializeStatus = true; });
+        }
 
         if (!PlayerPrefs.HasKey("initialized"))
             InitializePlayerPrefs();
@@ -163,7 +169,8 @@ public class TrackSelect : MonoBehaviour {
 
         uiElements.playSettings.speed.value.text = $"{G.PlaySettings.DisplaySpeed}";
 
-        _startGameEffectImage = others.preparePlay.gameObject.transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();
+        _startGameEffectImage = others.preparePlay.gameObject.transform.GetChild(0).GetChild(0).gameObject
+            .GetComponent<Image>();
 
         #endregion
 
@@ -187,6 +194,8 @@ public class TrackSelect : MonoBehaviour {
 
         G.PlaySettings.FromTrackPlay = false;
         G.PlaySettings.FromTrackResult = false;
+
+        LoadAd();
     }
 
     void Update() {
@@ -204,6 +213,15 @@ public class TrackSelect : MonoBehaviour {
                 Back();
             }
         }
+    }
+
+    private void LoadAd() {
+        _energyRefillAd = new RewardedAd(G.AD.RewardAdId);
+
+        _energyRefillAd.OnUserEarnedReward += HandleUserEarnedReward;
+        _energyRefillAd.OnAdClosed += HandleRewardAdClosed;
+
+        _energyRefillAd.LoadAd(new AdRequest.Builder().Build());
     }
 
     public void UpdateEnergyUI(int delta, bool energyChanged = true) {
@@ -254,7 +272,7 @@ public class TrackSelect : MonoBehaviour {
         others.preparePlay.transform.GetChild(0).gameObject.SetActive(G.Items.Energy != 0);
         others.preparePlay.transform.GetChild(1).gameObject.SetActive(G.Items.Energy != 0);
         others.preparePlay.transform.GetChild(2).gameObject.SetActive(G.Items.Energy != 0);
-        
+
         others.preparePlay.transform.GetChild(3).gameObject.SetActive(G.Items.Energy == 0);
 
         others.prepareBack.SetFloat(others.prepareBack.GetParameter(0).name, 3f);
@@ -265,11 +283,11 @@ public class TrackSelect : MonoBehaviour {
         StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 1.5f, 1f, 0.35f, step => {
                     uiElements.preparePlay.start.localScale = new Vector3(step, step, 1);
                     uiElements.preparePlay.startGroup.alpha = 1 - (step - 1) * 2;
-                }, 
-            () => {}
+                },
+                () => { }
             )
         );
-        
+
         StartCoroutine(SetGameCanStart(0.2f));
     }
 
@@ -284,14 +302,13 @@ public class TrackSelect : MonoBehaviour {
         others.preparePlay.Play("track_select_prepare_play", -1, 1);
         others.prepareBack.SetFloat(others.prepareBack.GetParameter(0).name, slow ? -0.75f : -2f);
         others.preparePlay.SetFloat(others.preparePlay.GetParameter(0).name, slow ? -0.75f : -2f);
-        
-        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 1f, 0f, 0.5f, step => {
-                    uiElements.preparePlay.startGroup.alpha = step;
-                }, 
-                () => {}
+
+        StartCoroutine(Interpolators.Curve(Interpolators.EaseOutCurve, 1f, 0f, 0.5f,
+                step => { uiElements.preparePlay.startGroup.alpha = step; },
+                () => { }
             )
         );
-        
+
         StartCoroutine(DeactivatePrepare(slow ? 0.6f : 0.2f));
     }
 
@@ -364,7 +381,7 @@ public class TrackSelect : MonoBehaviour {
         var bestAcFloat = Math.Round((bestAc - bestAcInt) * 100);
         uiElements.records.accuracyInt.text = $"{bestAcInt:00}";
         uiElements.records.accuracyFloat.text = $"{bestAcFloat:00}";
-        
+
         var playType = PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0);
         uiElements.records.playType.text = G.InternalSettings.PlayTypeNames[playType];
     }
@@ -467,7 +484,7 @@ public class TrackSelect : MonoBehaviour {
 
         uiElements.playSettings.difficulty.value.text =
             $"{G.Tracks[G.PlaySettings.TrackId].difficulty[G.PlaySettings.Difficulty]}";
-        
+
         UpdateScoreUI();
     }
 
@@ -480,7 +497,43 @@ public class TrackSelect : MonoBehaviour {
         uiElements.playSettings.speed.decrease.interactable = G.PlaySettings.DisplaySpeed > 1;
     }
 
-    public void RefillEnergy() {
+    public IEnumerator StartEnergyRefillAd() {
+        yield return new WaitForSeconds(0.75f);
+        if (_energyRefillAd.IsLoaded()) {
+            _energyRefillAd.Show();
+        }
+    }
+    
+    private void HandleRewardAdClosed(object sender, EventArgs args) {
+        StartCoroutine(CloseDialog());
+        
+        LoadAd();
+    }
+
+    private void HandleUserEarnedReward(object sender, Reward args) {
+        StartCoroutine(RewardAndCloseDialog(args));
+    }
+
+    private IEnumerator RewardAndCloseDialog(Reward args) {
+        others.dialogManager.adDialog.message.text = "성공!";
+        yield return new WaitForSeconds(0.35f);
+        if (args.Type.Equals("ENERGY")) {
+            
+        }
+        RefillEnergy();
+    }
+
+    private IEnumerator CloseDialog() {
+        yield return new WaitForSeconds(0.35f);
+        others.dialogManager.adDialog.Close(true);
+        MuteAudio(false);
+    }
+
+    public void MuteAudio(bool mute) {
+        StartCoroutine(Interpolators.Linear(mute ? 1 : 0, mute ? 0 : 1, 0.35f, step => { _previewPlayer.volume = step; }, () => { }));
+    }
+
+    private void RefillEnergy() {
         G.Items.Energy = G.Items.MaxEnergy[G.Items.MaxEnergyStep];
         G.Items.CoolDown = -1;
         UpdateEnergyUI(G.Items.MaxEnergy[G.Items.MaxEnergyStep]);
@@ -495,7 +548,7 @@ public class TrackSelect : MonoBehaviour {
     {
         if (_backAnimating) return;
         _backAnimating = true;
-        
+
         StartCoroutine(AnimateBack());
     }
 

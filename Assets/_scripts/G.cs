@@ -5,6 +5,8 @@ public static class G {
     public static Track[] Tracks;
     public static bool[] TrackUnlockData;
 
+    public static bool AdInitializeStatus;
+
     public static void InitTracks() {
         if (Tracks != null) return;
         Tracks = JsonUtility.FromJson<TrackList>(Resources.Load("data/tracks", typeof(TextAsset)).ToString()).tracks;
@@ -25,6 +27,10 @@ public static class G {
         var dat = new TrackUnlockDataRaw {data = TrackUnlockData};
         PlayerPrefs.SetString(Keys.UnlockedTracks, JsonUtility.ToJson(dat));
         PlayerPrefs.Save();
+    }
+
+    public static class AD {
+        public const string RewardAdId = "ca-app-pub-3940256099942544/5224354917";
     }
 
     public static class Keys {
