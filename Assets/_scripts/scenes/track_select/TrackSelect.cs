@@ -231,7 +231,7 @@ public class TrackSelect : MonoBehaviour {
     }
 
     private void LoadEnergyRefillAd() {
-        _energyRefillAd = new RewardedAd(G.AD.TestMode ? G.AD.TestId : G.AD.RefillEnergyId);
+        _energyRefillAd = new RewardedAd(G.AD.TestMode ? G.AD.TestRewardedId : G.AD.RefillEnergyId);
 
         _energyRefillAd.OnUserEarnedReward += HandleUserEarnedReward;
         _energyRefillAd.OnAdClosed += HandleRewardAdClosed;

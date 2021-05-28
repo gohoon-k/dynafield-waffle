@@ -109,7 +109,7 @@ public class ResultPrinter : MonoBehaviour {
     private void LoadAd() {
         _trackFinishedAd?.Destroy();
 
-        _trackFinishedAd = new InterstitialAd(G.AD.TestMode ? G.AD.TestId : G.AD.TrackFinishedId);
+        _trackFinishedAd = new InterstitialAd(G.AD.TestMode ? G.AD.TestInterstitialId : G.AD.TrackFinishedId);
         _trackFinishedAd.OnAdClosed += HandleAdClosed;
         
         _trackFinishedAd.LoadAd(new AdRequest.Builder().Build());
