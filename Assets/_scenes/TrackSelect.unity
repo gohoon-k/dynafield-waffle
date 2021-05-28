@@ -4912,7 +4912,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 937434921}
         m_TargetAssemblyTypeName: DialogManager, Assembly-CSharp
-        m_MethodName: OpenDailyRewardsDialog
+        m_MethodName: OpenDailyRewardsDialogB
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5077,7 +5077,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 133.07007, y: 126.17999}
+  m_AnchoredPosition: {x: 133.07031, y: 126.17993}
   m_SizeDelta: {x: 134.18, y: 185.26}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &571033626
@@ -7005,7 +7005,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -60.000004}
+  m_AnchoredPosition: {x: 0, y: -97}
   m_SizeDelta: {x: 2000, y: 318.59}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &793773568
@@ -7310,7 +7310,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -173}
+  m_AnchoredPosition: {x: 0, y: -210}
   m_SizeDelta: {x: 2000, y: 318.59}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &835634590
@@ -9101,7 +9101,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -361}
+  m_AnchoredPosition: {x: 0, y: -398}
   m_SizeDelta: {x: 204.13, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1109047977
@@ -10894,7 +10894,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -178.03003, y: -951.49}
+  m_AnchoredPosition: {x: -178.03027, y: -951.49}
   m_SizeDelta: {x: 172.76, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1289534194
@@ -13535,7 +13535,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 309.04}
+  m_AnchoredPosition: {x: 0, y: 272.04}
   m_SizeDelta: {x: 2000, y: 318.59}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1518902276

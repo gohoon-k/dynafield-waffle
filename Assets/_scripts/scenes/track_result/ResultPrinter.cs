@@ -34,6 +34,7 @@ public class ResultPrinter : MonoBehaviour {
     private AudioSource audioSource;
 
     private InterstitialAd _trackFinishedAd;
+    private bool _adClosed;
 
     // Start is called before the first frame update
     void Start() {
@@ -96,6 +97,13 @@ public class ResultPrinter : MonoBehaviour {
             G.Items.CoolDown = DateTime.Now.AddMinutes(G.InternalSettings.CooldownInMinute).ToBinary();
         
         LoadAd();
+    }
+
+    void Update() {
+        if (_adClosed) {
+            _adClosed = false;
+            StartCoroutine(LeaveScene());
+        }
     }
 
     private void LoadAd() {
@@ -182,7 +190,7 @@ public class ResultPrinter : MonoBehaviour {
     }
 
     private void HandleAdClosed(object sender, EventArgs args) {
-        StartCoroutine(LeaveScene());
+        _adClosed = true;
     }
 
     private IEnumerator LeaveScene() {

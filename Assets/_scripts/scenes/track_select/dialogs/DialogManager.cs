@@ -174,6 +174,10 @@ public class DialogManager : MonoBehaviour {
         dailyRewardsDialog.Open(closeAction);
     }
 
+    public void OpenDailyRewardsDialogB() {
+        OpenDailyRewardsDialog();
+    }
+
     public void OpenUnlockTrackDialog() {
         dialogs.SetActive(true);
         trackUnlockDialog.Open();

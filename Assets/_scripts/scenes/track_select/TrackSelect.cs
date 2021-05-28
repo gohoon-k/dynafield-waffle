@@ -133,6 +133,8 @@ public class TrackSelect : MonoBehaviour {
     private bool _backAnimating;
 
     private RewardedAd _energyRefillAd;
+    private bool _energyRefillPending;
+    private bool _energyRefillAdClosed;
 
     void Start() {
         #region Initialization
@@ -212,6 +214,19 @@ public class TrackSelect : MonoBehaviour {
             } else {
                 Back();
             }
+        }
+
+        if (_energyRefillAdClosed && _energyRefillPending) {
+            others.dialogManager.adDialog.message.text = "성공!";
+            
+            _energyRefillPending = false;
+            _energyRefillAdClosed = false;
+            
+            RefillEnergy();
+            
+            StartCoroutine(CloseDialog());
+        } else if (_energyRefillAdClosed) {
+            _energyRefillAdClosed = false;
         }
     }
 
@@ -505,22 +520,16 @@ public class TrackSelect : MonoBehaviour {
     }
     
     private void HandleRewardAdClosed(object sender, EventArgs args) {
-        StartCoroutine(CloseDialog());
-        
         LoadEnergyRefillAd();
+
+        _energyRefillAdClosed = true;
     }
 
     private void HandleUserEarnedReward(object sender, Reward args) {
-        StartCoroutine(RewardAndCloseDialog(args));
-    }
-
-    private IEnumerator RewardAndCloseDialog(Reward args) {
-        others.dialogManager.adDialog.message.text = "성공!";
-        yield return new WaitForSeconds(0.35f);
         if (args.Type.Equals("ENERGY")) {
             
         }
-        RefillEnergy();
+        _energyRefillPending = true;
     }
 
     private IEnumerator CloseDialog() {

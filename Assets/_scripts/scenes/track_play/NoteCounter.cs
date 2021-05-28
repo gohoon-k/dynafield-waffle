@@ -144,8 +144,13 @@ public class NoteCounter : Note {
         clickEffectBeamInstantiated.transform.position = pos;
 
         var currentHandledCount = _handledCount;
+        _handledCount++;
+        
+        _countText.text = $"{count - currentHandledCount}";
 
-        _countEffects[_handledCount].text = $"{count - _handledCount - 1}";
+        if (currentHandledCount >= _countEffects.Length) return;
+        
+        _countEffects[currentHandledCount].text = $"{count - currentHandledCount - 1}";
         StartCoroutine(Interpolators.Linear(1, 1.75f, 0.15f,
                 step => {
                     _countEffects[currentHandledCount].gameObject.transform.localScale = new Vector3(step, step, 1);
@@ -158,9 +163,6 @@ public class NoteCounter : Note {
                 () => { }
             )
         );
-
-        _countText.text = $"{count - _handledCount - 1}";
-        _handledCount++;
     }
 
     private void EndHandle() {
