@@ -72,7 +72,9 @@ public class DialogManager : MonoBehaviour {
                 }
             } else {
                 var rewards = CheckPlayTypeReward(PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0));
-                StartCoroutine(OpenPlayTypeRewardWithDelay(rewards));
+                if (rewards.valid) {
+                    StartCoroutine(OpenPlayTypeRewardWithDelay(rewards));
+                }
             }
         }
     }
