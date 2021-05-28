@@ -32,7 +32,8 @@ public static class G {
     public static class AD {
         public const bool TestMode = true;
         
-        public const string TestId = "ca-app-pub-3940256099942544/5224354917";
+        public const string TestRewardedId = "ca-app-pub-3940256099942544/5224354917";
+        public const string TestInterstitialId = "ca-app-pub-3940256099942544/1033173712";
         
         public const string RefillEnergyId = "ca-app-pub-7103199490015871/9958279056";
         public const string TrackFinishedId = "ca-app-pub-7103199490015871/4844132290";
