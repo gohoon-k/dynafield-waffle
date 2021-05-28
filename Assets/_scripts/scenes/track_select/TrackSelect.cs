@@ -526,10 +526,13 @@ public class TrackSelect : MonoBehaviour {
     }
 
     private void HandleUserEarnedReward(object sender, Reward args) {
-        if (args.Type.Equals("ENERGY")) {
-            
+        if (G.AD.TestMode) {
+            _energyRefillPending = true;
+        } else {
+            if (args.Type.Equals("ENERGY")) {
+                _energyRefillPending = true;
+            }
         }
-        _energyRefillPending = true;
     }
 
     private IEnumerator CloseDialog() {
