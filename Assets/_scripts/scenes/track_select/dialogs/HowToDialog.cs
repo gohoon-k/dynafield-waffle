@@ -64,7 +64,14 @@ public class HowToDialog : MonoBehaviour
 
         gameObject.SetActive(true);
         pages[0].gameObject.SetActive(true);
+        _pageGroups[0].alpha = 1;
         _pageTransforms[0].anchoredPosition = new Vector2(0, _pageTransforms[0].anchoredPosition.y);
+
+        for (var i = 1; i < _pageSize; i++) {
+            pages[i].gameObject.SetActive(false);
+            _pageGroups[i].alpha = 0;
+            _pageTransforms[i].anchoredPosition = new Vector2(300, _pageTransforms[0].anchoredPosition.y);
+        }
         
         StartCoroutine(Interpolators.Linear(0, 1, 0.4f, step => {
             _group.alpha = step;
