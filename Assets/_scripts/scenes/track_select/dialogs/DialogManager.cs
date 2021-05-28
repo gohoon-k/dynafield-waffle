@@ -34,18 +34,12 @@ public class DialogManager : MonoBehaviour {
 
     private bool _beforeDialogState = false;
 
+    private bool _initialAction = true;
+
     void Start() {
         if (PlayerPrefs.GetInt(G.Keys.FirstExecution, 0) == 0) {
             StartCoroutine(ShowHowToWithDelay());
-        } else if (PlayerPrefs.GetString(G.Keys.CheckedDate, "1990-01-01") != DateTime.Now.ToString("yyyy-MM-dd")) {
-            var rewards = CheckPlayTypeReward(PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0));
-            if (rewards.valid) {
-                StartCoroutine(ShowDailyRewardWithDelay(() => {
-                    StartCoroutine(OpenPlayTypeRewardWithDelay(rewards)); 
-                }));
-            } else {
-                StartCoroutine(ShowDailyRewardWithDelay());
-            }
+            _initialAction = false;
         }
     }
 
@@ -63,6 +57,23 @@ public class DialogManager : MonoBehaviour {
                     );
                     selector.uiElements.scalable.mainGroup.alpha = 1 - step;
                 }, () => { }));
+        }
+
+        if (_initialAction) {
+            _initialAction = false;
+            if (PlayerPrefs.GetString(G.Keys.CheckedDate, "1990-01-01") != DateTime.Now.ToString("yyyy-MM-dd")) {
+                var rewards = CheckPlayTypeReward(PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0));
+                if (rewards.valid) {
+                    StartCoroutine(ShowDailyRewardWithDelay(() => {
+                        StartCoroutine(OpenPlayTypeRewardWithDelay(rewards)); 
+                    }));
+                } else {
+                    StartCoroutine(ShowDailyRewardWithDelay());
+                }
+            } else {
+                var rewards = CheckPlayTypeReward(PlayerPrefs.GetInt(G.Keys.FormatKey(G.Keys.PlayType), 0));
+                StartCoroutine(OpenPlayTypeRewardWithDelay(rewards));
+            }
         }
     }
 
