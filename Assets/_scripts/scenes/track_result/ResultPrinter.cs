@@ -186,6 +186,9 @@ public class ResultPrinter : MonoBehaviour {
 
         if (showAd && _trackFinishedAd.IsLoaded()) {
             _trackFinishedAd.Show();
+        } else {
+            yield return new WaitForSeconds(0.35f);
+            SceneManager.LoadScene("_scenes/TrackSelect");
         }
     }
 
