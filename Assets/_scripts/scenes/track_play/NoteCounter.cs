@@ -76,6 +76,8 @@ public class NoteCounter : Note {
     }
 
     protected override void HandleInput(Touch touch) {
+        if (judged) return;
+        
         if (touch.phase != TouchPhase.Began) return;
 
         var inputPosition = GetInputPosition(touch);
@@ -146,7 +148,7 @@ public class NoteCounter : Note {
         var currentHandledCount = _handledCount;
         _handledCount++;
         
-        _countText.text = $"{count - currentHandledCount}";
+        _countText.text = $"{count - _handledCount}";
 
         if (currentHandledCount >= _countEffects.Length) return;
         
