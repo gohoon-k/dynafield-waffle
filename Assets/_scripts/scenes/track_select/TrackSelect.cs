@@ -125,6 +125,8 @@ public class TrackSelect : MonoBehaviour {
     private Sprite[] _brightBackgrounds;
     private Sprite[] _blurBackgrounds;
 
+    public bool preparing;
+    
     private bool _canPrepare;
     private bool _trackSelectable = true;
     private bool _canStartGame;
@@ -289,6 +291,8 @@ public class TrackSelect : MonoBehaviour {
     public void PreparePlay() {
         if (_prepareAnimating || _starting || !_canPrepare) return;
 
+        preparing = true;
+
         _prepareAnimating = true;
 
         others.prepareBack.gameObject.SetActive(true);
@@ -320,8 +324,9 @@ public class TrackSelect : MonoBehaviour {
         if (_prepareAnimating) return;
         _prepareAnimating = true;
 
+        preparing = false;
 
-        _canStartGame = false;
+            _canStartGame = false;
 
         others.prepareBack.Play("track_select_prepare_back", -1, 1);
         others.preparePlay.Play("track_select_prepare_play", -1, 1);

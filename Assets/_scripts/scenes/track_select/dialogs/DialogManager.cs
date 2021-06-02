@@ -133,6 +133,8 @@ public class DialogManager : MonoBehaviour {
     }
 
     public void EnergyButtonAction() {
+        if (selector.preparing) return;
+        
         if (G.Items.Energy == 0) {
             OpenEnergyRefillDialog();
         } else {
