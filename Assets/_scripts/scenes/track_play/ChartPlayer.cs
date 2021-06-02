@@ -79,7 +79,7 @@ public class ChartPlayer : MonoBehaviour {
     private readonly List<Note> _notes = new List<Note>();
     private Chart _chart;
 
-    private readonly int[] _loadableNoteCountsPerSpeed = {200, 185, 170, 155, 140, 125, 110, 100};
+    private readonly int[] _loadableNoteCountsPerSpeed = {200, 185, 170, 155, 140, 125, 110, 100, 90, 80, 80};
     private int _loadableNoteCount;
 
     private float[] _notePositions;
