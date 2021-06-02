@@ -148,7 +148,8 @@ public class NoteCounter : Note {
         var currentHandledCount = _handledCount;
         _handledCount++;
         
-        _countText.text = $"{count - _handledCount}";
+        if (count - _handledCount >= 0)
+            _countText.text = $"{count - _handledCount}";
 
         if (currentHandledCount >= _countEffects.Length) return;
         
