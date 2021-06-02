@@ -184,8 +184,11 @@ public class ResultPrinter : MonoBehaviour {
             step => { audioSource.volume = step; }, () => { }
         ));
 
-        if (showAd && _trackFinishedAd.IsLoaded()) {
-            _trackFinishedAd.Show();
+        if (showAd) {
+            if (_trackFinishedAd.IsLoaded())
+                _trackFinishedAd.Show();
+            else
+                StartCoroutine(LeaveScene());
         } else {
             yield return new WaitForSeconds(0.35f);
             SceneManager.LoadScene("_scenes/TrackPlay");
