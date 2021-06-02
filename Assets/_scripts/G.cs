@@ -30,8 +30,8 @@ public static class G {
     }
 
     public static class AD {
-        public const bool TestMode = true;
-        
+        public const bool TestMode = false;
+
         public const string TestRewardedId = "ca-app-pub-3940256099942544/5224354917";
         public const string TestInterstitialId = "ca-app-pub-3940256099942544/1033173712";
         
@@ -73,7 +73,6 @@ public static class G {
         public static string FormatPlayTypeRewards(int playType) {
             return string.Format(PlayTypeRewards, PlaySettings.TrackId, PlaySettings.Difficulty, playType);
         }
-        
     }
 
     public static class Items {
@@ -120,8 +119,7 @@ public static class G {
         private static int _key = 0;
     }
 
-    public static class PlaySettings
-    {
+    public static class PlaySettings {
         public static int TrackId {
             get => _trackId;
             set {
@@ -186,9 +184,10 @@ public static class G {
         public static readonly int[] DailyRewardAmount = {2, 1, 3, 1, 4, 1};
         public static readonly int[] DailyRewardType = {0, 1, 0, 1, 0, 1};
 
-        public static readonly string[] PlayTypeNames = { "", "FC", "P", "K" };
+        public static readonly string[] PlayTypeNames = {"", "FC", "P", "K"};
+
         public static readonly int[][] PlayTypeRewards = {
-            new [] { 0, 1, 2, 3 }, new [] { 0, 2, 5, 10 }
+            new[] {0, 1, 2, 3}, new[] {0, 2, 5, 10}
         };
 
         public const int CooldownInMinute = 10;
