@@ -188,7 +188,7 @@ public class ResultPrinter : MonoBehaviour {
             _trackFinishedAd.Show();
         } else {
             yield return new WaitForSeconds(0.35f);
-            SceneManager.LoadScene("_scenes/TrackSelect");
+            SceneManager.LoadScene("_scenes/TrackPlay");
         }
     }
 
