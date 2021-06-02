@@ -226,15 +226,25 @@ public class TrackSelect : MonoBehaviour {
             
             StartCoroutine(CloseDialog());
         } else if (_energyRefillAdClosed) {
+            others.dialogManager.adDialog.message.text = "실패했습니다. 광고가 로드되지 않은 것 같네요.\n나중에 다시 시도해주세요.";
             _energyRefillAdClosed = false;
+
+            StartCoroutine(CloseDialogDelay());
         }
     }
 
+    private IEnumerator CloseDialogDelay() {
+        yield return new WaitForSeconds(3);
+        
+        StartCoroutine(CloseDialog());
+    }
+    
     private void LoadEnergyRefillAd() {
         _energyRefillAd = new RewardedAd(G.AD.TestMode ? G.AD.TestRewardedId : G.AD.RefillEnergyId);
 
         _energyRefillAd.OnUserEarnedReward += HandleUserEarnedReward;
         _energyRefillAd.OnAdClosed += HandleRewardAdClosed;
+        _energyRefillAd.OnAdFailedToLoad += HandleOnAdFailedToLoad;
 
         _energyRefillAd.LoadAd(new AdRequest.Builder().Build());
     }
@@ -516,6 +526,8 @@ public class TrackSelect : MonoBehaviour {
         yield return new WaitForSeconds(0.75f);
         if (_energyRefillAd.IsLoaded()) {
             _energyRefillAd.Show();
+        } else {
+            _energyRefillAdClosed = true;
         }
     }
     
@@ -533,6 +545,12 @@ public class TrackSelect : MonoBehaviour {
                 _energyRefillPending = true;
             }
         }
+    }
+    
+    void HandleOnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+    {
+        Debug.Log("HandleFailedToReceiveAd event received with message: "
+                            + args.LoadAdError.GetMessage());
     }
 
     private IEnumerator CloseDialog() {
