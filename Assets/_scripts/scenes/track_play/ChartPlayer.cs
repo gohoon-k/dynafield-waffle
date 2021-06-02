@@ -576,6 +576,8 @@ public class ChartPlayer : MonoBehaviour {
                 StartCoroutine(DelayResume());
             } else {
                 if (!G.InGame.CanBeResumed) return;
+
+                G.InGame.CanBePaused = false;
                 
                 StartCoroutine(Ready());
                 scripts.userInterfaceUpdater.ShowPauseMenu(false);
