@@ -30,6 +30,9 @@ public class TextLoader : MonoBehaviour {
         yield return new WaitForSeconds(5f);
         text.color = new Color(text.color.r, text.color.g, text.color.b, 0f);
         yield return new WaitForSeconds(2f);
+        while (!G.AdInitializeStatus) {
+            yield return new WaitForSeconds(0.25f);
+        }
         SceneManager.LoadScene("Intro");
     }
 
